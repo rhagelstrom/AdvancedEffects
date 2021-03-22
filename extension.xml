@@ -17,13 +17,18 @@
 
 	<announcement text="Advanced Effects - PFRPG/3.5E v1.2\rby Celestian, 2017-2021\r ported by rmilmine and bmos" font="emotefont" icon="celestian" />
 	
-    <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
 	<base>
 		<icon name="celestian" file="graphics/icons/celestian.png" />
 
-    
-    <includefile source="utility/template_utility_advanced.xml" />
-    <includefile source="utility/utility_effects_advanced.xml" />
-    <includefile source="advanced_effects.xml" /> 
+		<script name="EffectManagerAE" file="scripts/manager_effect_AE.lua" />
+		<script name="CharManagerAE" file="scripts/manager_char_AE.lua" />
+
+		<includefile source="strings/strings.xml" />
+		<includefile source="utility/template_utility_advanced.xml" />
+		<includefile source="utility/utility_effects_advanced.xml" />
+		<includefile source="campaign/record_char_actions_AE.xml" />
+		<includefile source="campaign/record_item.xml" />
+		<includefile source="campaign/record_npc_AE.xml" />
+		<includefile source="campaign/record_char_combat_AE.xml" />
     </base>
 </root>

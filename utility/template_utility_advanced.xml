@@ -16,7 +16,8 @@
 			<allowdelete />
 			<child></child>
 			<child><backcolor>1A40301E</backcolor></child>
-			<noscroll />
+			<datasource>.effectlist</datasource>
+			<class>advanced_effects_entry</class>
 			<script>
 				function onInit()
 					registerMenuItem(Interface.getString("list_menu_createitem"), "insert", 5);
@@ -40,7 +41,13 @@
 				end
 				
 				function addEntry(bFocus)
-					return createWindow();
+					local w = createWindow();
+					if w then
+						if bFocus then
+							w.name.setFocus();
+						end
+					end
+					return w;
 				end
 			</script>
 		</windowlist>
@@ -50,11 +57,12 @@
 		<button_stringcycler>
 			<parameters>
                 <defaultlabelres mergerule="replace">modifier</defaultlabelres>
-				<labelsres>modifier</labelsres>
-                <values>modifier</values>
+				<labelsres>check</labelsres>
+                <values>check</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
+
 	<template name="cycler_ability_short">
 		<button_stringcycler>
 			<parameters>
@@ -65,15 +73,40 @@
 		</button_stringcycler>
 	</template>
 
+	<template name="cycler_ability_long">
+		<button_stringcycler>
+			<parameters>
+				<defaultlabelres mergerule="replace">strength</defaultlabelres>
+				<labelsres>dexterity|constitution|intelligence|wisdom|charisma</labelsres>
+				<values>dexterity|constitution|intelligence|wisdom|charisma</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+
+	<template name="combobox_bonus_types">
+			<combobox>
+				<listdirection>down</listdirection>
+				<script>
+					function onInit()
+						super.onInit();
+						addItems(DataCommon.bonustypes);
+						add("none");
+					end
+				</script>
+			<listmaxsize>3</listmaxsize>
+			</combobox>
+	</template>
+	
 	<template name="cycler_effecttypes">
 		<button_stringcycler>
 			<parameters>
 				<defaultlabelres mergerule="replace">dash</defaultlabelres>
-				<labelsres>save|ability|susceptiblity|misc</labelsres>
-                <values>save|ability|susceptiblity|misc</values>
+				<labelsres>save|ability|susceptiblity|misc|label</labelsres>
+                <values>save|ability|susceptiblity|misc|label</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
+
 	<template name="cycler_savetypes">
 		<button_stringcycler>
 			<parameters>
@@ -83,18 +116,17 @@
 			</parameters>
 		</button_stringcycler>
 	</template>
-	<template name="combobox_saveselect">
-			<combobox>
-				<listdirection>down</listdirection>
-				<script>
-					function onInit()
-						super.onInit();
-						addItems({"STR","DEX","CON","INT","WIS","CHA"});
-					end
-				</script>
-				<!-- <script file="campaign/scripts/prof_select.lua"/> bonuscomps -->
-			</combobox>
+
+	<template name="cycler_saves">
+		<button_stringcycler>
+			<parameters>
+				<defaultlabelres mergerule="replace">fortitude</defaultlabelres>
+				<labelsres>reflex|will</labelsres>
+				<values>reflex|will</values>
+			</parameters>
+		</button_stringcycler>
 	</template>
+
 	<template name="cycler_susceptiblitytypes">
 		<button_stringcycler>
 			<parameters>
@@ -104,28 +136,30 @@
 			</parameters>
 		</button_stringcycler>
 	</template>
-	<template name="combobox_susceptiblity_items">
+
+	<template name="combobox_damage_types">
 			<combobox>
 				<listdirection>down</listdirection>
 				<script>
 					function onInit()
 						super.onInit();
 						addItems(DataCommon.dmgtypes);
-						addItems(DataCommon.conditions);
 					end
 				</script>
-				<!-- <script file="campaign/scripts/prof_select.lua"/> -->
+				<listmaxsize>3</listmaxsize>
 			</combobox>
 	</template>
+
 	<template name="cycler_misctypes">
 		<button_stringcycler>
 			<parameters>
 				<defaultlabelres mergerule="replace">ac</defaultlabelres>
-				<labelsres>atk|check|dmg|heal|init_ae|save</labelsres>
-                <values>atk|check|dmg|heal|init_ae|save</values>
+				<labelsres>atk|dmg|heal|init_ae</labelsres>
+                <values>atk|dmg|heal|init</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
+	
     <template name="advanced_effect_number">
         <basicnumber>
             <default>0</default>

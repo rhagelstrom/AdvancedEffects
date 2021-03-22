@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<windowclass name="charsheet_combat" merge="join">
+		<sheetdata>
+			<frame_char name="advanced_effects_frame">
+				<bounds>15,480,480,150</bounds>
+			</frame_char>
+	
+			<label_frametop name="advanced_effects_label">
+				<anchored to="advanced_effects_frame" />
+				<static textres="char_abilities_label_advancedeffects" />
+			</label_frametop>
+
+			<list_editor_advanced_effects name="effects_list">
+				<anchored height="110" width="460">
+					<top parent="advanced_effects_frame" anchor="top" relation="relative" offset="30" />
+					<left offset="20" />
+					<right parent="advanced_effects_frame" anchor="right" relation="relative" offset="-10" />
+				</anchored>
+			</list_editor_advanced_effects>
+
+			<scrollbar_list>
+				<anchored to="effects_list" />
+				<target>effects_list</target>
+			</scrollbar_list>
+
+			<button_iedit name="effects_iedit">
+				<anchored to="advanced_effects_frame" position="insidetopright" offset="15,10" />
+				<target>effects_list</target>
+			</button_iedit>
+			<button_iadd name="effects_list_iadd">
+				<anchored to="effects_iedit" position="left" offset="5,0" />
+				<target>effects_list</target>
+			</button_iadd>
+		</sheetdata>
+	</windowclass>    
+</root>

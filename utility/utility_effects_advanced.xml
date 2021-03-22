@@ -11,17 +11,21 @@
 		<margins control="0,0,2,2" />
         <script>
             function onInit()
-                if Session.IsHost then
-                    header_effects.setVisible(true);
-                    effects_iedit.setVisible(true);
-                    effects_list_iadd.setVisible(true);
-                    effects_list.setVisible(true);
-                else
-                    header_effects.setVisible(false);
-                    effects_iedit.setVisible(false);
-                    effects_list_iadd.setVisible(false);
-                    effects_list.setVisible(false);
+                local node = getDatabaseNode();
+                local bIDentified = DB.getValue(node, "isidentified", 0) > 0;
+                local bPCEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
+                local bIsPcItem = string.match(node.getPath(),"^charsheet") ~= null;
+                local bCanEdit = false;
+                
+                if (bIsPcItem and bIDentified and bPCEdit) then
+                    bCanEdit = true;
                 end
+                
+				local bVisible = (Session.IsHost or bCanEdit)
+				header_effects.setVisible(bVisible);
+				effects_iedit.setVisible(bVisible);
+				effects_list_iadd.setVisible(bVisible);
+				effects_list.setVisible(bVisible);
             end
         </script>
 		<sheetdata>
@@ -33,14 +37,7 @@
 			</header_column>
 			<button_iedit name="effects_iedit">
 				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
- 				<script>
-					function onValueChanged()
-						local bEditMode = (getValue() == 1);
-						
-						window.effects_list_iadd.setVisible(bEditMode);
-						window.effects_list.update();
-					end
-				</script>
+ 				<target>effects_list</target>
 			</button_iedit>
 			<button_iadd name="effects_list_iadd">
 				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
@@ -48,16 +45,6 @@
 			</button_iadd>
             
 			<list_editor_advanced_effects name="effects_list">
-				<datasource>.effectlist</datasource>
-				<class>advanced_effects_entry</class>
-				<script>
-					function addEntry(bFocus)
-						local n = getWindowCount();
-						
-						local w = createWindow();
-						return w;
-					end
-				</script>
 			</list_editor_advanced_effects>
             <!-- end advanced effects entry -->
 		</sheetdata>
@@ -84,19 +71,25 @@
 			</genericcontrol>
 
             <!-- editor button -->
-            <button_poweractioneditor name="effectdetail">
-				<editor>advanced_effect_editor</editor>
-				<anchored to="rightanchor">
+            <buttoncontrol name="effectdetail">
+				<anchored to="rightanchor" width="20" height="20">
 					<top />
-					<right anchor="left" relation="relative" offset="-25" />
+					<right anchor="left" relation="relative" />
 				</anchored>
-			</button_poweractioneditor>
+				<state icon="button_details" pressed="button_details_down" />
+				<script>
+					function onButtonPress()
+                        local w = Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
+                        w.main.subwindow.name.setValue(DB.getValue(window.getDatabaseNode(), "...name", ""));
+					end
+				</script>
+			</buttoncontrol>
             
             <!-- delete button if in edit mode -->
 			<button_idelete name="idelete">
-				<anchored to="rightanchor">
-					<top offset="-2" />
-					<right anchor="left" relation="relative" offset="-25" />
+				<anchored width="20" height="20">
+					<top parent="effectdetail" anchor="top"/>
+					<right parent="effectdetail" anchor="left" relation="relative"/>
 				</anchored>
 			</button_idelete>
 
@@ -121,8 +114,8 @@
             
         </sheetdata>
 	</windowclass>
-    
-<!-- advanced effect edit window -->
+    	
+	<!-- advanced effect edit window -->
 	<windowclass name="advanced_effect_editor">
 		<frame>charsheethelper</frame>
 		<placement>
@@ -184,29 +177,33 @@
 				<font>sheettext</font>
 				<readonly />
 			</stringcontrol>
-
+			
             <!-- effect type cycler here -->
 			<label_column name="type_label">
 				<static textres="power_label_type" />
                 <tooltip textres="power_label_type_tooltip" />
 			</label_column>
+
             <cycler_effecttypes name="type">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
 					<left offset="97" />
 					<right offset="-110" />
 				</anchored>
-                <!-- <tooltip textres="power_label_type_tooltip" /> -->
             </cycler_effecttypes>
-            
-            <!-- effect / label -->
+
 			<header_column name="header_label">
 				<static textres="power_header_effect" />
 				<center />
 			</header_column>
-			<string_column_full name="effect" />
 			
             
+            <!-- effect / label -->
+			<string_column_full name="effect" />
+			
+            <!-- effect is a label only -->
+			<string_column_full name="label_only" />
+			
             <!-- SAVE types -->
 			<cycler_savetypes name="save_type">
 				<anchored>
@@ -217,16 +214,19 @@
                 <tooltip textres="item_save_type_tooltip" />
 			</cycler_savetypes>
 
-			<combobox_saveselect name="save">
+			<cycler_saves name="save">
                 <anchored to="save_type" position="righthigh" offset="10,0" width="70"  height="20"/>
                 <tooltip textres="item_label_save_type_tooltip" />
-			</combobox_saveselect>
+			</cycler_saves>
 
-            <!-- save modifier/score -->
  			<advanced_effect_number name="save_modifier">
 				<anchored to="save" position="righthigh" offset="10,0" width="20"  height="20"/>
                 <tooltip textres="item_label_save_value_tooltip" />
 			</advanced_effect_number>
+
+			<combobox_bonus_types name="save_bonus_type">
+				<anchored to="save_modifier" position="righthigh" offset="10,0" width="100"  height="20"/>
+			</combobox_bonus_types>
 
             <!-- ability version -->
 			<cycler_abilitytypes name="ability_type">
@@ -242,13 +242,18 @@
                 <anchored to="ability_type" position="righthigh" offset="10,0" width="80"  height="20"/>
 			</cycler_ability_short>
 
-            <!-- ability modifier/score -->
+			<cycler_ability_long name="ability_check">
+                <anchored to="ability_type" position="righthigh" offset="10,0" width="80"  height="20"/>
+			</cycler_ability_long>
+
 			<advanced_effect_number name="ability_modifier">
 				<anchored to="ability" position="righthigh" offset="10,0" width="20"  height="20"/>
 			</advanced_effect_number>
-            
-            <!-- end ability version -->
-            
+
+			<combobox_bonus_types name="ability_bonus_type">
+				<anchored to="ability_modifier" position="righthigh" offset="10,0" width="100"  height="20"/>
+			</combobox_bonus_types>
+
             <!-- Susceptiblity version -->
 			<cycler_susceptiblitytypes name="susceptiblity_type">
 				<anchored>
@@ -259,15 +264,13 @@
                 <tooltip textres="item_ability_type_tooltip" />
 			</cycler_susceptiblitytypes>
 
-            <combobox_susceptiblity_items name="susceptiblity">
+            <combobox_damage_types name="susceptiblity">
                 <anchored to="susceptiblity_type" position="righthigh" offset="10,0" width="80"  height="20"/>
-			</combobox_susceptiblity_items>
+			</combobox_damage_types>
 
-            <!-- Susceptiblity modifier/score -->
 			<advanced_effect_number name="susceptiblity_modifier">
 				<anchored to="susceptiblity" position="righthigh" offset="10,0" width="20"  height="20"/>
 			</advanced_effect_number>
-            <!-- end Susceptiblity version -->
 
             <!-- misc version -->
 			<cycler_misctypes name="misc_type">
@@ -279,19 +282,21 @@
                 <tooltip textres="effect_label_misc_type_tooltip" />
 			</cycler_misctypes>
 
-            <!-- misc modifier/score -->
 			<advanced_effect_number name="misc_modifier">
 				<anchored to="misc_type" position="righthigh" offset="10,0" width="20"  height="20"/>
                 <tooltip textres="effect_label_misc_value_tooltip" />
 			</advanced_effect_number>
-            <!-- end misc version -->
-
+			
+			<combobox_bonus_types name="misc_bonus_type">
+				<anchored to="misc_modifier" position="righthigh" offset="10,0" width="100"  height="20"/>
+			</combobox_bonus_types>
+			
             <!-- duration header-->
 			<header_column name="header_duration">
 				<static textres="power_header_effect_duration" />
 				<center />
 			</header_column>
-            
+           
             <!-- duration dice -->
 			<basicdice name="durdice">
 				<anchored width="50" height="20">
@@ -299,24 +304,24 @@
 					<left offset="5" />
 				</anchored>
 				<hideonvalue value="0" />
-        <tooltip textres="power_label_duration_dice_tooltip" />
-      </basicdice>
-      <label_fieldtop>
-        <anchored to="durdice" />
-        <static textres="item_label_effects_dice" />
-        <tooltip textres="item_effects_dice_tooltip" />
-      </label_fieldtop>
+				<tooltip textres="power_label_duration_dice_tooltip" />
+			</basicdice>
+			<label_fieldtop>
+				<anchored to="durdice" />
+				<static textres="item_label_effects_dice" />
+				<tooltip textres="item_effects_dice_tooltip" />
+			</label_fieldtop>
         
             <!-- duration modifier -->
 			<advanced_effect_number name="durmod">
 				<anchored to="durdice" position="righthigh" offset="10,0" width="20" height="20" />
                 <tooltip textres="power_label_duration_mod_tooltip" />
 			</advanced_effect_number>
-      <label_fieldtop>
-        <anchored to="durmod" />
-        <static textres="text_MOD" />
-        <tooltip textres="item_label_effects_mod_tooltip" />
-      </label_fieldtop>
+			<label_fieldtop>
+				<anchored to="durmod" />
+				<static textres="text_MOD" />
+				<tooltip textres="item_label_effects_mod_tooltip" />
+			</label_fieldtop>
       
             <!-- duration unit -->
 			<button_stringcycler name="durunit">
@@ -327,11 +332,11 @@
 					<values>minute|hour|day</values>
 				</parameters>
 			</button_stringcycler>
-      <label_fieldtop>
-        <anchored to="durunit" />
-        <static textres="item_label_effects_unit" />
-        <tooltip textres="item_label_effects_unit_tooltip" />
-      </label_fieldtop>
+			<label_fieldtop>
+				<anchored to="durunit" />
+				<static textres="item_label_effects_unit" />
+				<tooltip textres="item_label_effects_unit_tooltip" />
+			</label_fieldtop>
       
             <!-- show/hide effect -->
 			<button_stringcycler name="visibility">
@@ -343,28 +348,24 @@
 				</parameters>
                 <tooltip textres="item_label_effect_visible_tooltip" />
 			</button_stringcycler>
-      <label_fieldtop>
-        <anchored to="visibility" />
-        <static textres="item_label_effect_visible" />
-        <tooltip textres="item_label_effect_visible_tooltip" />
-      </label_fieldtop>
+			<label_fieldtop>
+				<anchored to="visibility" />
+				<static textres="item_label_effect_visible" />
+				<tooltip textres="item_label_effect_visible_tooltip" />
+			</label_fieldtop>
 
             <!-- weapon/attack effect only? -->
 			<button_checkbox name="actiononly">
 				<anchored to="visibility" position="righthigh" offset="10,0" width="10" height="20" />
 				<tooltip textres="item_label_effect_attackonly_tooltip" />
 			</button_checkbox>
-      <label>
-        <font>sheetlabelmini</font>
-        <anchored to="actiononly" position="righthigh" offset="2,0"/>
-				<static textres="item_label_effect_attackonly" />
-				<tooltip textres="item_label_effect_attackonly_tooltip" />
-      </label>
-            
-            
+			<label>
+				<font>sheetlabelmini</font>
+				<anchored to="actiononly" position="righthigh" offset="2,0"/>
+					<static textres="item_label_effect_attackonly" />
+					<tooltip textres="item_label_effect_attackonly_tooltip" />
+			</label>
 		</sheetdata>
 	</windowclass>
-
-<!-- new effect edit window work -->
-    
+	<!-- new effect edit window work -->
 </root>
