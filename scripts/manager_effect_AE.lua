@@ -970,25 +970,9 @@ function addNPC(sClass, nodeNPC, sName)
 	return nodeEntry;
 end
 
--- get the Connected Player's name that has this identity
-function getUserFromNode(node)
-	local sNodePath = node.getPath();
-	local _, sRecord = DB.getValue(node, "link", "", "");
-	local sUser = nil;
-	for _,vUser in ipairs(User.getActiveUsers()) do
-		for _,vIdentity in ipairs(User.getActiveIdentities(vUser)) do
-			if (sRecord == ("charsheet." .. vIdentity)) then
-				sUser = vUser;
-				break;
-			end
-		end
-	end
-	return sUser;
-end
-
 -- build message to send that effect removed
 function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
-	local sUser = getUserFromNode(nodeChar);
+	local sUser = nodeChar.getOwner();
 --Debug.console("manager_effect_adnd.lua","sendEffectRemovedMessage","sUser",sUser);	
 	local sCharacterName = DB.getValue(nodeChar, "name", "");
 	-- Build output message
@@ -1004,7 +988,7 @@ function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
 end
 -- build message to send that effect added
 function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
-	local sUser = getUserFromNode(nodeCT);
+	local sUser = nodeChar.getOwner();
 --Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);	
 	-- Build output message
 	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
