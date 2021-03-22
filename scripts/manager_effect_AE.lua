@@ -264,163 +264,160 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 	
 	-- Iterate through effects
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
-		-- Check active
 		local nActive = DB.getValue(v, "isactive", 0);
-		if (nActive ~= 0) then
-			-- Check effect is from used weapon.
-			if (EffectManagerAE.isValidCheckEffect(rActor,v)) then
-				-- Check targeting
-				local bTargeted = EffectManager.isTargetedEffect(v);
-				if not bTargeted or EffectManager.isEffectTarget(v, rFilterActor) then
-					local sLabel = DB.getValue(v, "label", "");
-					local aEffectComps = EffectManager.parseEffect(sLabel);
+		-- Check effect is from used weapon.
+		if isValidCheckEffect(rActor,v) then
+			-- Check targeting
+			local bTargeted = EffectManager.isTargetedEffect(v);
+			if not bTargeted or EffectManager.isEffectTarget(v, rFilterActor) then
+				local sLabel = DB.getValue(v, "label", "");
+				local aEffectComps = EffectManager.parseEffect(sLabel);
+				
+				-- Look for type/subtype match
+				local nMatch = 0;
+				for kEffectComp, sEffectComp in ipairs(aEffectComps) do
+					local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
+					-- Handle conditionals
+					if rEffectComp.type == "IF" then
+						if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+							break;
+						end
+					elseif rEffectComp.type == "IFT" then
+						if not rFilterActor then
+							break;
+						end
+						if not EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+							break;
+						end
+						bTargeted = true;
 					
-					-- Look for type/subtype match
-					local nMatch = 0;
-					for kEffectComp, sEffectComp in ipairs(aEffectComps) do
-						local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
-						-- Handle conditionals
-						if rEffectComp.type == "IF" then
-							if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
-								break;
-							end
-						elseif rEffectComp.type == "IFT" then
-							if not rFilterActor then
-								break;
-							end
-							if not EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
-								break;
-							end
-							bTargeted = true;
+					-- Compare other attributes
+					else
+						-- Strip energy/bonus types for subtype comparison
+						local aEffectRangeFilter = {};
+						local aEffectOtherFilter = {};
 						
-						-- Compare other attributes
-						else
-							-- Strip energy/bonus types for subtype comparison
-							local aEffectRangeFilter = {};
-							local aEffectOtherFilter = {};
+						local aComponents = {};
+						for _,vPhrase in ipairs(rEffectComp.remainder) do
+							local nTempIndexOR = 0;
+							local aPhraseOR = {};
+							repeat
+								local nStartOR, nEndOR = vPhrase:find("%s+or%s+", nTempIndexOR);
+								if nStartOR then
+									table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR, nStartOR - nTempIndexOR));
+									nTempIndexOR = nEndOR;
+								else
+									table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR));
+								end
+							until nStartOR == nil;
 							
-							local aComponents = {};
-							for _,vPhrase in ipairs(rEffectComp.remainder) do
-								local nTempIndexOR = 0;
-								local aPhraseOR = {};
+							for _,vPhraseOR in ipairs(aPhraseOR) do
+								local nTempIndexAND = 0;
 								repeat
-									local nStartOR, nEndOR = vPhrase:find("%s+or%s+", nTempIndexOR);
-									if nStartOR then
-										table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR, nStartOR - nTempIndexOR));
-										nTempIndexOR = nEndOR;
+									local nStartAND, nEndAND = vPhraseOR:find("%s+and%s+", nTempIndexAND);
+									if nStartAND then
+										local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND, nStartAND - nTempIndexAND));
+										table.insert(aComponents, sInsert);
+										nTempIndexAND = nEndAND;
 									else
-										table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR));
+										local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND));
+										table.insert(aComponents, sInsert);
 									end
-								until nStartOR == nil;
-								
-								for _,vPhraseOR in ipairs(aPhraseOR) do
-									local nTempIndexAND = 0;
-									repeat
-										local nStartAND, nEndAND = vPhraseOR:find("%s+and%s+", nTempIndexAND);
-										if nStartAND then
-											local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND, nStartAND - nTempIndexAND));
-											table.insert(aComponents, sInsert);
-											nTempIndexAND = nEndAND;
-										else
-											local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND));
-											table.insert(aComponents, sInsert);
-										end
-									until nStartAND == nil;
-								end
+								until nStartAND == nil;
 							end
-							local j = 1;
-							while aComponents[j] do
-								if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or 
-										StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
-										aComponents[j] == "all" then
-									-- Skip
-								elseif StringManager.contains(DataCommon.rangetypes, aComponents[j]) then
-									table.insert(aEffectRangeFilter, aComponents[j]);
-								else
-									table.insert(aEffectOtherFilter, aComponents[j]);
-								end
-								
-								j = j + 1;
+						end
+						local j = 1;
+						while aComponents[j] do
+							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or 
+									StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
+									aComponents[j] == "all" then
+								-- Skip
+							elseif StringManager.contains(DataCommon.rangetypes, aComponents[j]) then
+								table.insert(aEffectRangeFilter, aComponents[j]);
+							else
+								table.insert(aEffectOtherFilter, aComponents[j]);
+							end
+							
+							j = j + 1;
+						end
+					
+						-- Check for match
+						local comp_match = false;
+						if rEffectComp.type == sEffectType then
+
+							-- Check effect targeting
+							if bTargetedOnly and not bTargeted then
+								comp_match = false;
+							else
+								comp_match = true;
 							end
 						
-							-- Check for match
-							local comp_match = false;
-							if rEffectComp.type == sEffectType then
-
-								-- Check effect targeting
-								if bTargetedOnly and not bTargeted then
+							-- Check filters
+							if #aEffectRangeFilter > 0 then
+								local bRangeMatch = false;
+								for _,v2 in pairs(aRangeFilter) do
+									if StringManager.contains(aEffectRangeFilter, v2) then
+										bRangeMatch = true;
+										break;
+									end
+								end
+								if not bRangeMatch then
 									comp_match = false;
-								else
-									comp_match = true;
 								end
-							
-								-- Check filters
-								if #aEffectRangeFilter > 0 then
-									local bRangeMatch = false;
-									for _,v2 in pairs(aRangeFilter) do
-										if StringManager.contains(aEffectRangeFilter, v2) then
-											bRangeMatch = true;
-											break;
-										end
-									end
-									if not bRangeMatch then
-										comp_match = false;
-									end
-								end
-								if #aEffectOtherFilter > 0 then
-									local bOtherMatch = false;
-									for _,v2 in pairs(aOtherFilter) do
-										if type(v2) == "table" then
-											local bOtherTableMatch = true;
-											for k3, v3 in pairs(v2) do
-												if not StringManager.contains(aEffectOtherFilter, v3) then
-													bOtherTableMatch = false;
-													break;
-												end
-											end
-											if bOtherTableMatch then
-												bOtherMatch = true;
+							end
+							if #aEffectOtherFilter > 0 then
+								local bOtherMatch = false;
+								for _,v2 in pairs(aOtherFilter) do
+									if type(v2) == "table" then
+										local bOtherTableMatch = true;
+										for k3, v3 in pairs(v2) do
+											if not StringManager.contains(aEffectOtherFilter, v3) then
+												bOtherTableMatch = false;
 												break;
 											end
-										elseif StringManager.contains(aEffectOtherFilter, v2) then
+										end
+										if bOtherTableMatch then
 											bOtherMatch = true;
 											break;
 										end
-									end
-									if not bOtherMatch then
-										comp_match = false;
+									elseif StringManager.contains(aEffectOtherFilter, v2) then
+										bOtherMatch = true;
+										break;
 									end
 								end
-							end
-
-							-- Match!
-							if comp_match then
-								nMatch = kEffectComp;
-								if nActive == 1 then
-									table.insert(results, rEffectComp);
+								if not bOtherMatch then
+									comp_match = false;
 								end
 							end
 						end
-					end -- END EFFECT COMPONENT LOOP
 
-					-- Remove one shot effects
-					if nMatch > 0 then
-						if nActive == 2 then
-							DB.setValue(v, "isactive", "number", 1);
-						else
-							local sApply = DB.getValue(v, "apply", "");
-							if sApply == "action" then
-								EffectManager.notifyExpire(v, 0);
-							elseif sApply == "roll" then
-								EffectManager.notifyExpire(v, 0, true);
-							elseif sApply == "single" then
-								EffectManager.notifyExpire(v, nMatch, true);
+						-- Match!
+						if comp_match then
+							nMatch = kEffectComp;
+							if nActive == 1 then
+								table.insert(results, rEffectComp);
 							end
 						end
 					end
-				end -- END TARGET CHECK
-			end -- END VALID CHECK
-		end	-- END ACTIVE CHECK
+				end -- END EFFECT COMPONENT LOOP
+
+				-- Remove one shot effects
+				if nMatch > 0 then
+					if nActive == 2 then
+						DB.setValue(v, "isactive", "number", 1);
+					else
+						local sApply = DB.getValue(v, "apply", "");
+						if sApply == "action" then
+							EffectManager.notifyExpire(v, 0);
+						elseif sApply == "roll" then
+							EffectManager.notifyExpire(v, 0, true);
+						elseif sApply == "single" then
+							EffectManager.notifyExpire(v, nMatch, true);
+						end
+					end
+				end
+			end -- END TARGET CHECK
+		end -- END VALID CHECK
 	end	-- END EFFECT LOOP
 	
 	return results;
@@ -1134,7 +1131,7 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 		
 		-- CHANGE FOR ADVANCED EFFECTS
 		-- original line: if nActive ~= 0 then
-		if (EffectManagerADND.isValidCheckEffect(rActor,v)) then
+		if isValidCheckEffect(rActor,v) then
 		-- END CHANGE FOR ADVANCED EFFECTS
 		
 			-- Parse each effect label
@@ -1208,7 +1205,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 
 		-- CHANGE FOR ADVANCED EFFECTS
 		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
-		if EffectManagerAE.isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getPath()) then
+		if isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getPath()) then
 		-- END CHANGE FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
