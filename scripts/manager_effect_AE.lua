@@ -84,20 +84,21 @@ function checkEffectsAfterEdit(itemNode)
 		end
 	end
 end
--- this checks to see if an effect is missing a associated item that applied the effect 
--- when items are deleted and then clears that effect if it's missing.
+
+-- this checks to see if an effect is missing its associated item
+-- if the item isn't found, it removes the effect as the item has been removed
 function updateFromDeletedInventory(node)
 --Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
 		local nodeChar = DB.getChild(node, "..");
 		local nodeCT = getCTNodeByNodeChar(nodeChar);
 		-- if we're already in a combattracker situation (npcs)
 		if not ActorManager.isPC(nodeChar) and string.match(nodeChar.getPath(),"^combattracker") then
-				nodeCT = nodeChar;
+			nodeCT = nodeChar;
 		end
 		if nodeCT then
-				-- check that we still have the combat effect source item
-				-- otherwise remove it
-				checkEffectsAfterDelete(nodeCT);
+			-- check that we still have the combat effect source item
+			-- otherwise remove it
+			checkEffectsAfterDelete(nodeCT);
 		end
 	--onEncumbranceChanged();
 end
@@ -139,7 +140,7 @@ end
 function updateItemEffects(nodeItem)
 	local nodeChar = DB.getChild(nodeItem, "...");
 		if not nodeChar then
-				return;
+			return;
 		end
 		local sUser = User.getUsername();
 		local sName = DB.getValue(nodeItem, "name", "");
@@ -150,7 +151,7 @@ function updateItemEffects(nodeItem)
 		end
 		-- if not in the combat tracker bail
 		if not nodeChar then
-				return;
+			return;
 		end
 
 		local nCarried = DB.getValue(nodeItem, "carried", 0);
@@ -158,11 +159,11 @@ function updateItemEffects(nodeItem)
 		local nIdentified = DB.getValue(nodeItem, "isidentified", 1);
 		-- local bOptionID = OptionsManager.isOption("MIID", "on");
 		-- if not bOptionID then 
-				-- nIdentified = 1;
+			-- nIdentified = 1;
 		-- end
 
 		for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
-				updateItemEffect(nodeItemEffect, sName, nodeChar, nil, bEquipped, nIdentified);
+			updateItemEffect(nodeItemEffect, sName, nodeChar, nil, bEquipped, nIdentified);
 		end -- for item's effects list
 end
 
@@ -441,7 +442,7 @@ end
 -- nodeEntry: node in combat tracker for PC/NPC
 function updateCharEffects(nodeChar,nodeEntry)
 		for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
-				updateCharEffect(nodeCharEffect,nodeEntry);
+			updateCharEffect(nodeCharEffect,nodeEntry);
 		end -- for item's effects list 
 end
 -- this will be used to manage PC/NPC effectslist objects
@@ -455,16 +456,16 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 	local dDurationDice = DB.getValue(nodeCharEffect, "durdice");
 	local nModDice = DB.getValue(nodeCharEffect, "durmod", 0);
 	if (dDurationDice and dDurationDice ~= "") then
-			nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+		nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
 	else
-			nRollDuration = nModDice;
+		nRollDuration = nModDice;
 	end
 	local nDMOnly = 0;
 	local sVisibility = DB.getValue(nodeCharEffect, "visibility", "");
 	if sVisibility == "show" then
-			nDMOnly = 0;
+		nDMOnly = 0;
 	elseif sVisibility == "hide" then
-			nDMOnly = 1;
+		nDMOnly = 1;
 	end
 	if not ActorManager.isPC(nodeEntry) then
 		nDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
@@ -512,7 +513,7 @@ function addPC(nodePC)
 		-- now flip through inventory and pass each to updateEffects()
 		-- so that if they have a combat_effect it will be applied.
 		for _,nodeItem in pairs(DB.getChildren(nodePC, "inventorylist")) do
-				updateItemEffects(nodeItem,true);
+			updateItemEffects(nodeItem,true);
 		end
 		-- end
 		-- check to see if npc effects exists and if so apply --celestian
@@ -527,7 +528,7 @@ end
 -- added the bit that checks for PC effects to add -- celestian
 function addNPC(sClass, nodeNPC, sName)
 	local nodeEntry, nodeLastMatch = CombatManager.addNPCHelper(nodeNPC, sName);
-	
+
 	local bPFMode = DataCommon.isPFRPG();
 
 	-- HP
@@ -579,9 +580,9 @@ function addNPC(sClass, nodeNPC, sName)
 		for _,v in pairs(nodeAttacks.getChildren()) do
 			v.delete();
 		end
-		
+
 		local nAttacks = 0;
-		
+
 		local sAttack = DB.getValue(nodeNPC, "atk", "");
 		if sAttack ~= "" then
 			local nodeValue = nodeAttacks.createChild();
@@ -590,7 +591,7 @@ function addNPC(sClass, nodeNPC, sName)
 				nAttacks = nAttacks + 1;
 			end
 		end
-		
+
 		local sFullAttack = DB.getValue(nodeNPC, "fullatk", "");
 		if sFullAttack ~= "" then
 			nodeValue = nodeAttacks.createChild();
@@ -599,7 +600,7 @@ function addNPC(sClass, nodeNPC, sName)
 				nAttacks = nAttacks + 1;
 			end
 		end
-		
+
 		if nAttacks == 0 then
 			nodeAttacks.createChild();
 		end
@@ -608,7 +609,7 @@ function addNPC(sClass, nodeNPC, sName)
 	-- Track additional damage types and intrinsic effects
 	local aEffects = {};
 	local aAddDamageTypes = {};
-	
+
 	-- Decode monster type qualities
 	local sType = string.lower(DB.getValue(nodeNPC, "type", ""));
 	local sCreatureType, sSubTypes = string.match(sType, "([^(]+) %(([^)]+)%)");
@@ -709,7 +710,7 @@ function addNPC(sClass, nodeNPC, sName)
 
 	-- DECODE SPECIAL QUALITIES
 	local sSpecialQualities = string.lower(DB.getValue(nodeNPC, "specialqualities", ""));
-	
+
 	local aSQWords = StringManager.parseWords(sSpecialQualities);
 	local i = 1;
 	while aSQWords[i] do
