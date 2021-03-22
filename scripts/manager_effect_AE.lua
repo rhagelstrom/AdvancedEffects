@@ -1,7 +1,10 @@
 --
 -- Effects on Items, apply to character in CT
 --
---
+
+local addPC_old
+local addNPC_old
+
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
 	if Session.IsHost then
@@ -29,12 +32,16 @@ function onInit()
 		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
 		DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
 	end
-	CombatManager.setCustomAddPC(addPC);
-	CombatManager.setCustomAddNPC(addNPC);
+	
+	addPC_old = CombatManager.addPC;
+	addNPC_old = CombatManager2.addNPC;
 
 	-- CoreRPG replacements
 	ActionsManager.decodeActors = decodeActors;
+	CombatManager.addPC = addPC;
+	CombatManager.addNPC = addNPC;
 	
+	-- 3.5E replacements
 	EffectManager35E.checkConditionalHelper = checkConditionalHelper;
 	EffectManager35E.getEffectsByType = getEffectsByType;
 	EffectManager35E.hasEffect = hasEffect;
@@ -430,10 +437,11 @@ end
 -- nodeChar: node of PC/NPC in PC/NPCs record list
 -- nodeEntry: node in combat tracker for PC/NPC
 function updateCharEffects(nodeChar,nodeEntry)
-		for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
-			updateCharEffect(nodeCharEffect,nodeEntry);
-		end -- for item's effects list 
+	for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
+		updateCharEffect(nodeCharEffect,nodeEntry);
+	end -- for item's effects list 
 end
+
 -- this will be used to manage PC/NPC effectslist objects
 -- nodeCharEffect: node in effectlist on PC/NPC
 -- nodeEntry: node in combat tracker for PC/NPC
@@ -477,484 +485,40 @@ end
 
 -- custom version of the one in CoreRPG to deal with adding new 
 -- pcs to the combat tracker to deal with advanced effects. --celestian
-function addPC(nodePC)
+function addPC(nodeChar)
 	-- Parameter validation
-	if not nodePC then
-		return;
-	end
-
-	-- Create a new combat tracker window
-	local nodeEntry = DB.createChild("combattracker.list");
-	if not nodeEntry then
+	if not nodeChar then
 		return;
 	end
 	
-	-- Set up the CT specific information
-	DB.setValue(nodeEntry, "link", "windowreference", "charsheet", nodePC.getNodeName());
-	DB.setValue(nodeEntry, "friendfoe", "string", "friend");
+	-- Call original function for better compatibility
+	addPC_old(nodeChar)
 
-	local sToken = DB.getValue(nodePC, "token", nil);
-	if not sToken or sToken == "" then
-		sToken = "portrait_" .. nodePC.getName() .. "_token"
+	-- now flip through inventory and pass each to updateEffects()
+	-- so that if they have a combat_effect it will be applied.
+	for _,nodeItem in pairs(DB.getChildren(nodeChar, "inventorylist")) do
+		updateItemEffects(nodeItem,true);
 	end
-	DB.setValue(nodeEntry, "token", "token", sToken);
+	-- end
+	
+	local rActor = ActorManager.resolveActor(nodeChar)
+	local nodeCT = ActorManager.getCTNode(rActor)
+	
+	-- check to see if npc effects exists and if so apply --celestian
+	updateCharEffects(nodeChar,nodeCT);
 
-		-- now flip through inventory and pass each to updateEffects()
-		-- so that if they have a combat_effect it will be applied.
-		for _,nodeItem in pairs(DB.getChildren(nodePC, "inventorylist")) do
-			updateItemEffects(nodeItem,true);
-		end
-		-- end
-		-- check to see if npc effects exists and if so apply --celestian
-		updateCharEffects(nodePC,nodeEntry);
-
-		-- make sure active users get ownership of their CT nodes
-		-- otherwise effects applied by items/etc won't work.
-		--AccessManagerADND.manageCTOwners(nodeEntry);
+	-- make sure active users get ownership of their CT nodes
+	-- otherwise effects applied by items/etc won't work.
+	--AccessManagerADND.manageCTOwners(nodeEntry);
 end
 
--- copied the base addNPC from manager_combat2.lua from 5E ruleset for this and
--- added the bit that checks for PC effects to add -- celestian
-function addNPC(sClass, nodeNPC, sName)
-	local nodeEntry, nodeLastMatch = CombatManager.addNPCHelper(nodeNPC, sName);
+-- call the base addNPC from manager_combat2.lua from 5E ruleset for this and
+-- then check for PC effects to add -- celestian
+function addNPC(sClass, nodeCT, sName)
+	-- Call original function
+	local nodeEntry = addNPC_old(sClass, nodeCT, sName);
 
-	local bPFMode = DataCommon.isPFRPG();
-
-	-- HP
-	local sOptHRNH = OptionsManager.getOption("HRNH");
-	local nHP = DB.getValue(nodeNPC, "hp", 0);
-	local sHD = StringManager.trim(DB.getValue(nodeNPC, "hd", ""));
-	if sOptHRNH == "max" and sHD ~= "" then
-		nHP = StringManager.evalDiceString(sHD, true, true);
-	elseif sOptHRNH == "random" and sHD ~= "" then
-		nHP = math.max(StringManager.evalDiceString(sHD, true), 1);
-	end
-	DB.setValue(nodeEntry, "hp", "number", nHP);
-
-	-- Defensive properties
-	local sAC = DB.getValue(nodeNPC, "ac", "10");
-	DB.setValue(nodeEntry, "ac_final", "number", tonumber(string.match(sAC, "^(%d+)")) or 10);
-	DB.setValue(nodeEntry, "ac_touch", "number", tonumber(string.match(sAC, "touch (%d+)")) or 10);
-	local sFlatFooted = string.match(sAC, "flat[%-–]footed (%d+)");
-	if not sFlatFooted then
-		sFlatFooted = string.match(sAC, "flatfooted (%d+)");
-	end
-	DB.setValue(nodeEntry, "ac_flatfooted", "number", tonumber(sFlatFooted) or 10);
-	
-	-- Handle BAB / Grapple / CM Field
-	local sBABGrp = DB.getValue(nodeNPC, "babgrp", "");
-	local aSplitBABGrp = StringManager.split(sBABGrp, "/", true);
-	
-	local sMatch = string.match(sBABGrp, "CMB ([+-]%d+)");
-	if sMatch then
-		DB.setValue(nodeEntry, "grapple", "number", tonumber(sMatch) or 0);
-	else
-		if aSplitBABGrp[2] then
-			DB.setValue(nodeEntry, "grapple", "number", tonumber(aSplitBABGrp[2]) or 0);
-		end
-	end
-
-	sMatch = string.match(sBABGrp, "CMD ([+-]?%d+)");
-	if sMatch then
-		DB.setValue(nodeEntry, "cmd", "number", tonumber(sMatch) or 0);
-	else
-		if aSplitBABGrp[3] then
-			DB.setValue(nodeEntry, "cmd", "number", tonumber(aSplitBABGrp[3]) or 0);
-		end
-	end
-
-	-- Offensive properties
-	local nodeAttacks = nodeEntry.createChild("attacks");
-	if nodeAttacks then
-		for _,v in pairs(nodeAttacks.getChildren()) do
-			v.delete();
-		end
-
-		local nAttacks = 0;
-
-		local sAttack = DB.getValue(nodeNPC, "atk", "");
-		if sAttack ~= "" then
-			local nodeValue = nodeAttacks.createChild();
-			if nodeValue then
-				DB.setValue(nodeValue, "value", "string", sAttack);
-				nAttacks = nAttacks + 1;
-			end
-		end
-
-		local sFullAttack = DB.getValue(nodeNPC, "fullatk", "");
-		if sFullAttack ~= "" then
-			nodeValue = nodeAttacks.createChild();
-			if nodeValue then
-				DB.setValue(nodeValue, "value", "string", sFullAttack);
-				nAttacks = nAttacks + 1;
-			end
-		end
-
-		if nAttacks == 0 then
-			nodeAttacks.createChild();
-		end
-	end
-
-	-- Track additional damage types and intrinsic effects
-	local aEffects = {};
-	local aAddDamageTypes = {};
-
-	-- Decode monster type qualities
-	local sType = string.lower(DB.getValue(nodeNPC, "type", ""));
-	local sCreatureType, sSubTypes = string.match(sType, "([^(]+) %(([^)]+)%)");
-	if not sCreatureType then
-		sCreatureType = sType;
-	end
-	local aTypes = StringManager.split(sCreatureType, " ", true);
-	local aSubTypes = {};
-	if sSubTypes then
-		aSubTypes = StringManager.split(sSubTypes, ",", true);
-	end
-
-	if StringManager.contains(aSubTypes, "lawful") then
-		table.insert(aAddDamageTypes, "lawful");
-	end
-	if StringManager.contains(aSubTypes, "chaotic") then
-		table.insert(aAddDamageTypes, "chaotic");
-	end
-	if StringManager.contains(aSubTypes, "good") then
-		table.insert(aAddDamageTypes, "good");
-	end
-	if StringManager.contains(aSubTypes, "evil") then
-		table.insert(aAddDamageTypes, "evil");
-	end
-	
-	local bImmuneNonlethal = false;
-	local bImmuneCritical = false;
-	local bImmunePrecision = false;
-	if bPFMode then
-		local bElemental = false;
-		if StringManager.contains(aTypes, "construct") then
-			table.insert(aEffects, "Construct traits");
-			bImmuneNonlethal = true;
-		elseif StringManager.contains(aTypes, "elemental") then
-			bElemental = true;
-		elseif StringManager.contains(aTypes, "ooze") then
-			table.insert(aEffects, "Ooze traits");
-			bImmuneCritical = true;
-			bImmunePrecision = true;
-		elseif StringManager.contains(aTypes, "undead") then
-			table.insert(aEffects, "Undead traits");
-			bImmuneNonlethal = true;
-		end
-		
-		if StringManager.contains(aSubTypes, "aeon") then
-			table.insert(aEffects, "Aeon traits");
-			bImmuneCritical = true;
-		end
-		if StringManager.contains(aSubTypes, "elemental") then
-			bElemental = true;
-		end
-		if StringManager.contains(aSubTypes, "incorporeal") then
-			bImmunePrecision = true;
-		end
-		if StringManager.contains(aSubTypes, "swarm") then
-			table.insert(aEffects, "Swarm traits");
-			bImmuneCritical = true;
-		end
-		
-		if bElemental then
-			table.insert(aEffects, "Elemental traits");
-			bImmuneCritical = true;
-			bImmunePrecision = true;
-		end
-	else
-		if StringManager.contains(aTypes, "construct") then
-			table.insert(aEffects, "Construct traits");
-			bImmuneNonlethal = true;
-			bImmuneCritical = true;
-		elseif StringManager.contains(aTypes, "elemental") then
-			table.insert(aEffects, "Elemental traits");
-			bImmuneCritical = true;
-		elseif StringManager.contains(aTypes, "ooze") then
-			table.insert(aEffects, "Ooze traits");
-			bImmuneCritical = true;
-		elseif StringManager.contains(aTypes, "plant") then
-			table.insert(aEffects, "Plant traits");
-			bImmuneCritical = true;
-		elseif StringManager.contains(aTypes, "undead") then
-			table.insert(aEffects, "Undead traits");
-			bImmuneNonlethal = true;
-			bImmuneCritical = true;
-		end
-		if StringManager.contains(aSubTypes, "swarm") then
-			table.insert(aEffects, "Swarm traits");
-			bImmuneCritical = true;
-		end
-	end
-	if bImmuneNonlethal then
-		table.insert(aEffects, "IMMUNE: nonlethal");
-	end
-	if bImmuneCritical then
-		table.insert(aEffects, "IMMUNE: critical");
-	end
-	if bImmunePrecision then
-		table.insert(aEffects, "IMMUNE: precision");
-	end
-
-	-- DECODE SPECIAL QUALITIES
-	local sSpecialQualities = string.lower(DB.getValue(nodeNPC, "specialqualities", ""));
-
-	local aSQWords = StringManager.parseWords(sSpecialQualities);
-	local i = 1;
-	while aSQWords[i] do
-		-- HARDNESS
-		if StringManager.isWord(aSQWords[i], "hardness") and StringManager.isNumberString(aSQWords[i+1]) then
-			i = i + 1;
-			local sHardnessAmount = aSQWords[i];
-			if (tonumber(aSQWords[i+1]) or 0) <= 20 then
-				table.insert(aEffects, "DR: " .. sHardnessAmount .. " adamantine; RESIST: " .. sHardnessAmount .. " " .. table.concat(DataCommon.energytypes, "; RESIST: " .. sHardnessAmount .. " "));
-			else
-				table.insert(aEffects, "DR: " .. sHardnessAmount .. " all; RESIST: " .. sHardnessAmount .. " " .. table.concat(DataCommon.energytypes, "; RESIST: " .. sHardnessAmount .. " "));
-			end
-
-		-- DAMAGE REDUCTION
-		elseif StringManager.isWord(aSQWords[i], "dr") or (StringManager.isWord(aSQWords[i], "damage") and StringManager.isWord(aSQWords[i+1], "reduction")) then
-			if aSQWords[i] ~= "dr" then
-				i = i + 1;
-			end
-			
-			if StringManager.isNumberString(aSQWords[i+1]) then
-				i = i + 1;
-				local sDRAmount = aSQWords[i];
-				local aDRTypes = {};
-				
-				while aSQWords[i+1] do
-					if StringManager.isWord(aSQWords[i+1], { "and", "or" }) then
-						table.insert(aDRTypes, aSQWords[i+1]);
-					elseif StringManager.isWord(aSQWords[i+1], { "epic", "magic" }) then
-						table.insert(aDRTypes, aSQWords[i+1]);
-						table.insert(aAddDamageTypes, aSQWords[i+1]);
-					elseif StringManager.isWord(aSQWords[i+1], "cold") and StringManager.isWord(aSQWords[i+2], "iron") then
-						table.insert(aDRTypes, "cold iron");
-						i = i + 1;
-					elseif StringManager.isWord(aSQWords[i+1], DataCommon.dmgtypes) then
-						table.insert(aDRTypes, aSQWords[i+1]);
-					else
-						break;
-					end
-
-					i = i + 1;
-				end
-				
-				local sDREffect = "DR: " .. sDRAmount;
-				if #aDRTypes > 0 then
-					sDREffect = sDREffect .. " " .. table.concat(aDRTypes, " ");
-				end
-				table.insert(aEffects, sDREffect);
-			end
-
-		-- SPELL RESISTANCE
-		elseif StringManager.isWord(aSQWords[i], "sr") or (StringManager.isWord(aSQWords[i], "spell") and StringManager.isWord(aSQWords[i+1], "resistance")) then
-			if aSQWords[i] ~= "sr" then
-				i = i + 1;
-			end
-			
-			if StringManager.isNumberString(aSQWords[i+1]) then
-				i = i + 1;
-				DB.setValue(nodeEntry, "sr", "number", tonumber(aSQWords[i]) or 0);
-			end
-		
-		-- FAST HEALING
-		elseif StringManager.isWord(aSQWords[i], "fast") and StringManager.isWord(aSQWords[i+1], { "healing", "heal" }) then
-			i = i + 1;
-			
-			if StringManager.isNumberString(aSQWords[i+1]) then
-				i = i + 1;
-				table.insert(aEffects, "FHEAL: " .. aSQWords[i]);
-			end
-		
-		-- REGENERATION
-		elseif StringManager.isWord(aSQWords[i], "regeneration") then
-			if StringManager.isNumberString(aSQWords[i+1]) then
-				i = i + 1;
-				local sRegenAmount = aSQWords[i];
-				local aRegenTypes = {};
-				
-				while aSQWords[i+1] do
-					if StringManager.isWord(aSQWords[i+1], { "and", "or" }) then
-						table.insert(aRegenTypes, aSQWords[i+1]);
-					elseif StringManager.isWord(aSQWords[i+1], "cold") and StringManager.isWord(aSQWords[i+2], "iron") then
-						table.insert(aRegenTypes, "cold iron");
-						i = i + 1;
-					elseif StringManager.isWord(aSQWords[i+1], DataCommon.dmgtypes) then
-						table.insert(aRegenTypes, aSQWords[i+1]);
-					else
-						break;
-					end
-
-					i = i + 1;
-				end
-				i = i - 1;
-				
-				local sRegenEffect = "REGEN: " .. sRegenAmount;
-				if #aRegenTypes > 0 then
-					sRegenEffect = sRegenEffect .. " " .. table.concat(aRegenTypes, " ");
-					EffectManager.addEffect("", "", nodeEntry, { sName = sRegenEffect, nDuration = 0, nGMOnly = 1 }, false);
-				else
-					table.insert(aEffects, sRegenEffect);
-				end
-			end
-			
-		-- RESISTANCE
-		elseif StringManager.isWord(aSQWords[i], "resistance") and StringManager.isWord(aSQWords[i+1], "to") then
-			i = i + 1;
-		
-			while aSQWords[i+1] do
-				if StringManager.isWord(aSQWords[i+1], "and") then
-					-- SKIP
-				elseif StringManager.isWord(aSQWords[i+1], DataCommon.energytypes) and StringManager.isNumberString(aSQWords[i+2]) then
-					i = i + 1;
-					table.insert(aEffects, "RESIST: " .. aSQWords[i+1] .. " " .. aSQWords[i]);
-				else
-					break;
-				end
-
-				i = i + 1;
-			end
-
-		elseif StringManager.isWord(aSQWords[i], "resist") then
-			while aSQWords[i+1] do
-				if StringManager.isWord(aSQWords[i+1], DataCommon.energytypes) and StringManager.isNumberString(aSQWords[i+2]) then
-					i = i + 1;
-					table.insert(aEffects, "RESIST: " .. aSQWords[i+1] .. " " .. aSQWords[i]);
-				elseif not StringManager.isWord(aSQWords[i+1], "and") then
-					break;
-				end
-				
-				i = i + 1;
-			end
-			
-		-- VULNERABILITY
-		elseif StringManager.isWord(aSQWords[i], {"vulnerability", "vulnerable"}) and StringManager.isWord(aSQWords[i+1], "to") then
-			i = i + 1;
-		
-			while aSQWords[i+1] do
-				if StringManager.isWord(aSQWords[i+1], "and") then
-					-- SKIP
-				elseif StringManager.isWord(aSQWords[i+1], DataCommon.energytypes) then
-					table.insert(aEffects, "VULN: " .. aSQWords[i+1]);
-				else
-					break;
-				end
-
-				i = i + 1;
-			end
-			
-		-- IMMUNITY
-		elseif StringManager.isWord(aSQWords[i], "immunity") and StringManager.isWord(aSQWords[i+1], "to") then
-			i = i + 1;
-		
-			while aSQWords[i+1] do
-				if StringManager.isWord(aSQWords[i+1], "and") then
-					-- SKIP
-				elseif StringManager.isWord(aSQWords[i+2], "traits") then
-					-- SKIP+
-					i = i + 1;
-				-- Add exception for "magic immunity", which is also a damage type
-				elseif StringManager.isWord(aSQWords[i+1], "magic") then
-					table.insert(aEffects, "IMMUNE: spell");
-				elseif StringManager.isWord(aSQWords[i+1], "critical") and StringManager.isWord(aSQWords[i+2], "hits") then
-					table.insert(aEffects, "IMMUNE: critical");
-					i = i + 1;
-				elseif StringManager.isWord(aSQWords[i+1], "precision") and StringManager.isWord(aSQWords[i+2], "damage") then
-					table.insert(aEffects, "IMMUNE: precision");
-					i = i + 1;
-				elseif StringManager.isWord(aSQWords[i+1], DataCommon.immunetypes) then
-					table.insert(aEffects, "IMMUNE: " .. aSQWords[i+1]);
-					if StringManager.isWord(aSQWords[i+2], "effects") then
-						i = i + 1;
-					end
-				elseif StringManager.isWord(aSQWords[i+1], DataCommon.dmgtypes) and not StringManager.isWord(aSQWords[i+1], DataCommon.specialdmgtypes) then
-					table.insert(aEffects, "IMMUNE: " .. aSQWords[i+1]);
-				else
-					break;
-				end
-
-				i = i + 1;
-			end
-		elseif StringManager.isWord(aSQWords[i], "immune") then
-			while aSQWords[i+1] do
-				if StringManager.isWord(aSQWords[i+1], "and") then
-					--SKIP
-				elseif StringManager.isWord(aSQWords[i+2], "traits") then
-					-- SKIP+
-					i = i + 1;
-				-- Add exception for "magic immunity", which is also a damage type
-				elseif StringManager.isWord(aSQWords[i+1], "magic") then
-					table.insert(aEffects, "IMMUNE: spell");
-				elseif StringManager.isWord(aSQWords[i+1], DataCommon.immunetypes) then
-					table.insert(aEffects, "IMMUNE: " .. aSQWords[i+1]);
-					if StringManager.isWord(aSQWords[i+2], "effects") then
-						i = i + 1;
-					end
-				elseif StringManager.isWord(aSQWords[i+1], DataCommon.dmgtypes) then
-					table.insert(aEffects, "IMMUNE: " .. aSQWords[i+1]);
-				else
-					break;
-				end
-
-				i = i + 1;
-			end
-			
-		-- SPECIAL DEFENSES
-		elseif StringManager.isWord(aSQWords[i], "uncanny") and StringManager.isWord(aSQWords[i+1], "dodge") then
-			if StringManager.isWord(aSQWords[i-1], "improved") then
-				table.insert(aEffects, "Improved Uncanny Dodge");
-			else
-				table.insert(aEffects, "Uncanny Dodge");
-			end
-			i = i + 1;
-		
-		elseif StringManager.isWord(aSQWords[i], "evasion") then
-			if StringManager.isWord(aSQWords[i-1], "improved") then
-				table.insert(aEffects, "Improved Evasion");
-			else
-				table.insert(aEffects, "Evasion");
-			end
-		
-		-- TRAITS
-		elseif StringManager.isWord(aSQWords[i], "incorporeal") then
-			table.insert(aEffects, "Incorporeal");
-		elseif StringManager.isWord(aSQWords[i], "blur") then
-			table.insert(aEffects, "CONC");
-		elseif StringManager.isWord(aSQWords[i], "natural") and StringManager.isWord(aSQWords[i+1], "invisibility") then
-			table.insert(aEffects, "Invisible");
-		end
-	
-		-- ITERATE SPECIAL QUALITIES DECODE
-		i = i + 1;
-	end
-
-	-- FINISH ADDING EXTRA DAMAGE TYPES
-	if #aAddDamageTypes > 0 then
-		table.insert(aEffects, "DMGTYPE: " .. table.concat(aAddDamageTypes, ","));
-	end
-	
-	-- ADD DECODED EFFECTS
-	if #aEffects > 0 then
-		EffectManager.addEffect("", "", nodeEntry, { sName = table.concat(aEffects, "; "), nDuration = 0, nGMOnly = 1 }, false);
-	end
-
-		updateCharEffects(nodeNPC,nodeEntry);
-
-	-- Roll initiative and sort
-	local sOptINIT = OptionsManager.getOption("INIT");
-	if sOptINIT == "group" then
-		if nodeLastMatch then
-			local nLastInit = DB.getValue(nodeLastMatch, "initresult", 0);
-			DB.setValue(nodeEntry, "initresult", "number", nLastInit);
-		else
-			DB.setValue(nodeEntry, "initresult", "number", math.random(20) + DB.getValue(nodeEntry, "init", 0));
-		end
-	elseif sOptINIT == "on" then
-		DB.setValue(nodeEntry, "initresult", "number", math.random(20) + DB.getValue(nodeEntry, "init", 0));
-	end
+	updateCharEffects(nodeCT,nodeEntry);
 
 	return nodeEntry;
 end
@@ -975,6 +539,7 @@ function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
 	end
 	sendRawMessage(sUser,nDMOnly,msg);
 end
+
 -- build message to send that effect added
 function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
 	local sUser = nodeCT.getOwner();
@@ -1081,12 +646,13 @@ function decodeActors(draginfo)
 		end
 	end
 
+	-- ADDITION FOR ADVANCED EFFECTS
 	-- itemPath data filled if itemPath if exists
 	local sItemPath = draginfo.getMetaData("itemPath");
 	if (sItemPath and sItemPath ~= "") then
 		rSource.itemPath = sItemPath;
 	end
-	--
+	-- END ADDITION FOR ADVANCED EFFECTS
 
 	return rSource, aTargets;
 end
