@@ -64,7 +64,7 @@ function checkEffectsAfterEdit(itemNode)
 		nodeChar = DB.getChild(itemNode, "...");
 		bIDUpdated = true;
 	end
-	local nodeCT = getCTNodeByNodeChar(nodeChar);
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
 	if nodeCT then
 		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
 			local sLabel = DB.getValue(nodeEffect, "label", "");
@@ -90,7 +90,7 @@ end
 function updateFromDeletedInventory(node)
 --Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
 		local nodeChar = DB.getChild(node, "..");
-		local nodeCT = getCTNodeByNodeChar(nodeChar);
+		local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
 		-- if we're already in a combattracker situation (npcs)
 		if not ActorManager.isPC(nodeChar) and string.match(nodeChar.getPath(),"^combattracker") then
 			nodeCT = nodeChar;
@@ -147,7 +147,7 @@ function updateItemEffects(nodeItem)
 		-- we swap the node to the combat tracker node
 		-- so the "effect" is written to the right node
 		if not string.match(nodeChar.getPath(),"^combattracker") then
-				nodeChar = getCTNodeByNodeChar(nodeChar);
+			nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
 		end
 		-- if not in the combat tracker bail
 		if not nodeChar then
@@ -422,19 +422,6 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 	end	-- END EFFECT LOOP
 	
 	return results;
-end
-
--- return the CTnode by using character sheet node 
-function getCTNodeByNodeChar(nodeChar)
-		local nodeCT = nil;
-	for _,node in pairs(DB.getChildren("combattracker.list")) do
-				local _, sRecord = DB.getValue(node, "link", "", "");
-				if sRecord ~= "" and sRecord == nodeChar.getPath() then
-						nodeCT = node;
-						break;
-				end
-		end
-		return nodeCT;
 end
 
 -- flip through all npc effects (generally do this in addNPC()/addPC()
