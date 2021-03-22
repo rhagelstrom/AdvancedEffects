@@ -975,7 +975,7 @@ function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
 end
 -- build message to send that effect added
 function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
-	local sUser = nodeChar.getOwner();
+	local sUser = nodeCT.getOwner();
 --Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);	
 	-- Build output message
 	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
