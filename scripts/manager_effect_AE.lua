@@ -215,9 +215,11 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 				nDMOnly = 0;
 			end
 
-			local bTokenVis = (DB.getValue(nodeChar,"tokenvis") == 1 or DB.getValue(nodeChar,"friendfoe") == "friend");
-			if not bTokenVis then
-				nDMOnly = 1; -- hide if token not visible
+			if not ActorManager.isPC(nodeChar) then
+				local bTokenVis = (DB.getValue(nodeChar,"tokenvis") == 1);
+				if not bTokenVis then
+					nDMOnly = 1; -- hide if token not visible
+				end
 			end
 
 			rEffect.nDuration = nRollDuration;
