@@ -204,10 +204,10 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 				nRollDuration = nModDice;
 			end
 			local nDMOnly = 0;
-			local sVisibility = DB.getValue(nodeItemEffect, "visibility", "");
+			local sVisibility = DB.getValue(nodeItemEffect, "visibility", "hide");
 			if sVisibility == "hide" then
 				nDMOnly = 1;
-			elseif sVisibility == "show"	then
+			elseif sVisibility == "show" then
 				nDMOnly = 0;
 			elseif nIdentified == 0 then
 				nDMOnly = 1;
@@ -215,7 +215,7 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 				nDMOnly = 0;
 			end
 
-			local bTokenVis = (DB.getValue(nodeChar,"tokenvis",1) == 1);
+			local bTokenVis = (DB.getValue(nodeChar,"tokenvis") == 1 or DB.getValue(nodeChar,"friendfoe") == "friend");
 			if not bTokenVis then
 				nDMOnly = 1; -- hide if token not visible
 			end
