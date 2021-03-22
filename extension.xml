@@ -2,29 +2,28 @@
 <root version="3.0" >
 
 	<properties>
-		<name>5E - Advanced Effects</name>
-		<version>4.9</version>
-		<loadorder>99</loadorder>
+		<name>Advanced Effects for 3.5E and Pathfinder</name>
+		<version>1.2</version>
+		<loadorder>40</loadorder>
 		<description>
-			<text>Advanced Effects, add effects to pc, npcs and items.</text>
+			<text>Add effects to pcs, npcs and items.</text>
 			<website></website>
 			<author>Celestian</author>
+			<ported_by>rmilmine and bmos</ported_by>
 		</description>
-		<ruleset>
-          <name>5E</name>
-		</ruleset>
+		<ruleset name="3.5E" />
+		<ruleset name="PFRPG" />
 	</properties>
 
-	<announcement text="Advanced Effects - 5E v4.9\rby Celestian, 2017-2020" font="emotefont" icon="celestian" />
-	<base>		
-	<icon name="celestian" file="graphics/icons/celestian.png" />
+	<announcement text="Advanced Effects - PFRPG/3.5E v1.2\rby Celestian, 2017-2021\r ported by rmilmine and bmos" font="emotefont" icon="celestian" />
 	
     <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
+	<base>
+		<icon name="celestian" file="graphics/icons/celestian.png" />
 
     
     <includefile source="utility/template_utility_advanced.xml" />
     <includefile source="utility/utility_effects_advanced.xml" />
     <includefile source="advanced_effects.xml" /> 
     </base>
-    
 </root>
