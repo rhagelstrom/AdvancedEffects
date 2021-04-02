@@ -11,8 +11,12 @@
 			<author>Celestian</author>
 			<ported_by>rmilmine and bmos</ported_by>
 		</description>
-		<ruleset name="3.5E" />
-		<ruleset name="PFRPG" />
+		<ruleset>
+			<name>3.5E</name>
+		</ruleset>
+		<ruleset>
+			<name>PFRPG</name>
+		</ruleset>
 	</properties>
 
 	<announcement text="Advanced Effects - PFRPG/3.5E v1.3\rby Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine and bmos" font="emotefont" icon="celestian" />
