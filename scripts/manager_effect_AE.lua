@@ -2,55 +2,6 @@
 -- Effects on Items, apply to character in CT
 --
 
-local addPC_old
-local addNPC_old
-
--- add the effect if the item is equipped and doesn't exist already
-function onInit()
-	if Session.IsHost then
-		-- watch the combatracker/npc inventory list
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.durdice", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.durmod", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.name", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
-		-- DB.addHandler("combattracker.list.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
-
-		-- watch the character/pc inventory list
-		DB.addHandler("charsheet.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durdice", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durmod", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.name", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
-	end
-	
-	addPC_old = CombatManager.addPC;
-	addNPC_old = CombatManager2.addNPC;
-
-	-- CoreRPG replacements
-	ActionsManager.decodeActors = decodeActors;
-	CombatManager.addPC = addPC;
-	CombatManager.addNPC = addNPC;
-	
-	-- 3.5E replacements
-	EffectManager35E.checkConditionalHelper = checkConditionalHelper;
-	EffectManager35E.getEffectsByType = getEffectsByType;
-	EffectManager35E.hasEffect = hasEffect;
-
-	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
-	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler", 
-			{ labels = "option_val_on" , values = "enabled", baselabel = "option_val_off", baseval = "disabled", default = "disabled" });		
-end
-
 -- run from addHandler for updated item effect options
 function inventoryUpdateItemEffects(nodeField)
 	nodeItem = DB.getChild(nodeField, "..");
@@ -485,6 +436,7 @@ end
 
 -- custom version of the one in CoreRPG to deal with adding new 
 -- pcs to the combat tracker to deal with advanced effects. --celestian
+local addPC_old
 function addPC(nodeChar)
 	-- Parameter validation
 	if not nodeChar then
@@ -514,6 +466,7 @@ end
 
 -- call the base addNPC from manager_combat2.lua from 5E ruleset for this and
 -- then check for PC effects to add -- celestian
+local addNPC_old
 function addNPC(sClass, nodeCT, sName)
 	-- Call original function
 	local nodeEntry = addNPC_old(sClass, nodeCT, sName);
@@ -790,4 +743,38 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	end
 	
 	return false;
+end
+
+-- add the effect if the item is equipped and doesn't exist already
+function onInit()
+	if Session.IsHost then
+		-- watch the character/pc inventory list
+		DB.addHandler("charsheet.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durdice", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durmod", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.name", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
+	end
+	
+	addPC_old = CombatManager.addPC;
+	addNPC_old = CombatManager.addNPC;
+
+	-- CoreRPG replacements
+	ActionsManager.decodeActors = decodeActors;
+	CombatManager.addPC = addPC;
+	CombatManager.addNPC = addNPC;
+	
+	-- 3.5E replacements
+	EffectManager35E.checkConditionalHelper = checkConditionalHelper;
+	EffectManager35E.getEffectsByType = getEffectsByType;
+	EffectManager35E.hasEffect = hasEffect;
+
+	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
+	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler", 
+			{ labels = "option_val_on" , values = "enabled", baselabel = "option_val_off", baseval = "disabled", default = "disabled" });		
 end
