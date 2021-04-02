@@ -15,7 +15,7 @@
 		<ruleset name="PFRPG" />
 	</properties>
 
-	<announcement text="Advanced Effects - PFRPG/3.5E v1.3\rby Celestian, 2017-2021\r ported by rmilmine and bmos" font="emotefont" icon="celestian" />
+	<announcement text="Advanced Effects - PFRPG/3.5E v1.3\rby Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine and bmos" font="emotefont" icon="celestian" />
 	
 	<base>
 		<icon name="celestian" file="graphics/icons/celestian.png" />
