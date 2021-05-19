@@ -6,6 +6,6 @@
 
 <root>
 	<windowclass name="char_weapon" merge="join">
-		<script file="campaign/scripts/char_weapon_AE.lua" merge="replace" />
+		<script file="campaign/scripts/char_weapon_AE.lua" />
 	</windowclass>
 </root>

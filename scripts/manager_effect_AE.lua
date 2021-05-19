@@ -426,7 +426,7 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 	rEffect.sLabel = sLabel; 
 	rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
 	rEffect.nInit = 0;
-	--rEffect.sSource = nodeEntry.getPath();
+	rEffect.sSource = nodeEntry.getPath();
 	rEffect.nGMOnly = nDMOnly;
 	rEffect.sApply = "";
 
@@ -530,8 +530,7 @@ end
 
 --	pass effect to here to see if the effect is being triggered
 --	by an item and if so if it's valid
-function isValidCheckEffect(rActor,nodeEffect)
-	local bResult = false;
+function isValidCheckEffect(rActor, nodeEffect)
 	local nActive = DB.getValue(nodeEffect, "isactive", 0);
 	local bItem = false;
 	local bActionItemUsed = false;
@@ -553,30 +552,28 @@ function isValidCheckEffect(rActor,nodeEffect)
 	if (rActor.itemPath and rActor.itemPath ~= "") then 
 		-- here is where we get the node path of the item, not the
 		-- effectslist entry
-		if ((DB.findNode(rActor.itemPath) ~= nil)) then
-			if (node and node ~= nil and nodeItem and nodeItem ) then
-				local sNodePath = nodeItem.getPath();
-				if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
-					bActionItemUsed = true;
-					bItem = true;
-				else
-					bActionItemUsed = false;
-					bItem = true; -- is item but doesn't match source path for this effect
-				end
+		if DB.findNode(rActor.itemPath) and nodeItem then
+			local sNodePath = nodeItem.getPath();
+			if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
+				bActionItemUsed = true;
+				bItem = true;
+			else
+				bActionItemUsed = false;
+				bItem = true; -- is item but doesn't match source path for this effect
 			end
 		end
 	end
 
-	if nActive ~= 0 and bActionOnly and bActionItemUsed then
-		bResult = true;
-	elseif nActive ~= 0 and not bActionOnly and bActionItemUsed then
-		bResult = true;
-	elseif nActive ~= 0 and bActionOnly and not bActionItemUsed then
-		bResult = false;
-	elseif nActive ~= 0 then
-		bResult = true;
+	if nActive ~= 0 then
+		Debug.chat(bActionOnly, bActionItemUsed)
+		if bActionOnly and bActionItemUsed then
+			return true;
+		elseif bActionOnly and not bActionItemUsed then
+			return false;
+		else
+			return true;
+		end
 	end
-	return bResult;
 end
 
 --
