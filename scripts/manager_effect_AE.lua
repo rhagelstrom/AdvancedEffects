@@ -199,7 +199,7 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 	end
 end
 
-function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
+local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
 	if not rActor then
 		return {};
 	end
@@ -383,6 +383,226 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 	
 	return results;
 end
+
+local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly, rEffectSpell)
+	if not rActor then
+		return {};
+	end
+	local results = {};
+	
+	-- Set up filters
+	local aRangeFilter = {};
+	local aOtherFilter = {};
+	if aFilter then
+		for _,v in pairs(aFilter) do
+			if type(v) ~= "string" then
+				table.insert(aOtherFilter, v);
+			elseif StringManager.contains(DataCommon.rangetypes, v) then
+				table.insert(aRangeFilter, v);
+			else
+				table.insert(aOtherFilter, v);
+			end
+		end
+	end
+	
+	-- Determine effect type targeting
+	local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
+	
+	-- Iterate through effects
+	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+		-- Check active
+		local nActive = DB.getValue(v, "isactive", 0);
+
+		-- COMPATIBILITY FOR ADVANCED EFFECTS
+		-- to add support for AE in other extensions, make this change
+		-- Check effect is from used weapon.
+		-- original line: if nActive ~= 0 then
+		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
+		-- END COMPATIBILITY FOR ADVANCED EFFECTS
+		
+			-- Check targeting
+			local bTargeted = EffectManager.isTargetedEffect(v);
+			if not bTargeted or EffectManager.isEffectTarget(v, rFilterActor) then
+				local sLabel = DB.getValue(v, "label", "");
+				local aEffectComps = EffectManager.parseEffect(sLabel);
+				
+				-- Look for type/subtype match
+				local nMatch = 0;
+				for kEffectComp, sEffectComp in ipairs(aEffectComps) do
+					local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
+					-- Handle conditionals
+					-- KEL adding TAG for SAVE
+					if rEffectComp.type == "IF" then
+						if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+							break;
+						end
+					elseif rEffectComp.type == "NIF" then
+						if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+							break;
+						end
+					elseif rEffectComp.type == "IFTAG" then
+						if not rEffectSpell then
+							break;
+						elseif not EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+							break;
+						end
+					elseif rEffectComp.type == "NIFTAG" then
+						if EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+							break;
+						end
+					elseif rEffectComp.type == "IFT" then
+						if not rFilterActor then
+							break;
+						end
+						if not EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+							break;
+						end
+						bTargeted = true;
+					elseif rEffectComp.type == "NIFT" then
+						if rActor.aTargets and not rFilterActor then
+							-- if ( #rActor.aTargets[1] > 0 ) and not rFilterActor then
+							break;
+							-- end
+						end
+						if EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+							break;
+						end
+						if rFilterActor then
+							bTargeted = true;
+						end
+					
+					-- Compare other attributes
+					else
+						-- Strip energy/bonus types for subtype comparison
+						local aEffectRangeFilter = {};
+						local aEffectOtherFilter = {};
+						
+						local aComponents = {};
+						for _,vPhrase in ipairs(rEffectComp.remainder) do
+							local nTempIndexOR = 0;
+							local aPhraseOR = {};
+							repeat
+								local nStartOR, nEndOR = vPhrase:find("%s+or%s+", nTempIndexOR);
+								if nStartOR then
+									table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR, nStartOR - nTempIndexOR));
+									nTempIndexOR = nEndOR;
+								else
+									table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR));
+								end
+							until nStartOR == nil;
+							
+							for _,vPhraseOR in ipairs(aPhraseOR) do
+								local nTempIndexAND = 0;
+								repeat
+									local nStartAND, nEndAND = vPhraseOR:find("%s+and%s+", nTempIndexAND);
+									if nStartAND then
+										local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND, nStartAND - nTempIndexAND));
+										table.insert(aComponents, sInsert);
+										nTempIndexAND = nEndAND;
+									else
+										local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND));
+										table.insert(aComponents, sInsert);
+									end
+								until nStartAND == nil;
+							end
+						end
+						local j = 1;
+						while aComponents[j] do
+							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or 
+									StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
+									aComponents[j] == "all" then
+								-- Skip
+							elseif StringManager.contains(DataCommon.rangetypes, aComponents[j]) then
+								table.insert(aEffectRangeFilter, aComponents[j]);
+							else
+								table.insert(aEffectOtherFilter, aComponents[j]);
+							end
+							
+							j = j + 1;
+						end
+					
+						-- Check for match
+						local comp_match = false;
+						if rEffectComp.type == sEffectType then
+
+							-- Check effect targeting
+							if bTargetedOnly and not bTargeted then
+								comp_match = false;
+							else
+								comp_match = true;
+							end
+						
+							-- Check filters
+							if #aEffectRangeFilter > 0 then
+								local bRangeMatch = false;
+								for _,v2 in pairs(aRangeFilter) do
+									if StringManager.contains(aEffectRangeFilter, v2) then
+										bRangeMatch = true;
+										break;
+									end
+								end
+								if not bRangeMatch then
+									comp_match = false;
+								end
+							end
+							if #aEffectOtherFilter > 0 then
+								local bOtherMatch = false;
+								for _,v2 in pairs(aOtherFilter) do
+									if type(v2) == "table" then
+										local bOtherTableMatch = true;
+										for k3, v3 in pairs(v2) do
+											if not StringManager.contains(aEffectOtherFilter, v3) then
+												bOtherTableMatch = false;
+												break;
+											end
+										end
+										if bOtherTableMatch then
+											bOtherMatch = true;
+											break;
+										end
+									elseif StringManager.contains(aEffectOtherFilter, v2) then
+										bOtherMatch = true;
+										break;
+									end
+								end
+								if not bOtherMatch then
+									comp_match = false;
+								end
+							end
+						end
+
+						-- Match!
+						if comp_match then
+							nMatch = kEffectComp;
+							if nActive == 1 then
+								table.insert(results, rEffectComp);
+							end
+						end
+					end
+				end -- END EFFECT COMPONENT LOOP
+
+				-- Remove one shot effects
+				if nMatch > 0 then
+					if nActive == 2 then
+						DB.setValue(v, "isactive", "number", 1);
+					else
+						local sApply = DB.getValue(v, "apply", "");
+						if sApply == "action" then
+							EffectManager.notifyExpire(v, 0);
+						elseif sApply == "roll" then
+							EffectManager.notifyExpire(v, 0, true);
+						elseif sApply == "single" then
+							EffectManager.notifyExpire(v, nMatch, true);
+						end
+					end
+				end
+			end -- END TARGET CHECK
+		end  -- END ACTIVE CHECK
+	end  -- END EFFECT LOOP
+	
+	return results;
+end
+
 
 -- flip through all npc effects (generally do this in addNPC()/addPC()
 -- nodeChar: node of PC/NPC in PC/NPCs record list
@@ -596,10 +816,14 @@ function decodeActors(draginfo)
 	end
 
 	-- ADDITION FOR ADVANCED EFFECTS
+	-- to add support for AE in other extensions, make this change
 	-- itemPath data filled if itemPath if exists
-	local sItemPath = draginfo.getMetaData("itemPath");
-	if (sItemPath and sItemPath ~= "") then
-		rSource.itemPath = sItemPath;
+	local sItemPath
+	if EffectManagerAE then
+		sItemPath = draginfo.getMetaData("itemPath");
+		if (sItemPath and sItemPath ~= "") then
+			rSource.itemPath = sItemPath;
+		end
 	end
 	-- END ADDITION FOR ADVANCED EFFECTS
 
@@ -607,7 +831,7 @@ function decodeActors(draginfo)
 end
 
 --	replace 3.5E EffectManager35E manager_effect_35E.lua hasEffect() with this
-function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
+local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
 	if not sEffect or not rActor then
 		return false;
 	end
@@ -618,10 +842,11 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
 		
-		-- CHANGE FOR ADVANCED EFFECTS
+		-- COMPATIBILITY FOR ADVANCED EFFECTS
+		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 then
-		if isValidCheckEffect(rActor,v) then
-		-- END CHANGE FOR ADVANCED EFFECTS
+		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
+		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 		
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
@@ -683,8 +908,221 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 	return false;
 end
 
+local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets, rEffectSpell)
+	if not sEffect or not rActor then
+		return false;
+	end
+	local sLowerEffect = sEffect:lower();
+	
+	-- Iterate through each effect
+	local aMatch = {};
+	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+		local nActive = DB.getValue(v, "isactive", 0);
+
+		-- COMPATIBILITY FOR ADVANCED EFFECTS
+		-- to add support for AE in other extensions, make this change
+		-- original line: if nActive ~= 0 then
+		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
+		-- END COMPATIBILITY FOR ADVANCED EFFECTS
+
+			-- Parse each effect label
+			local sLabel = DB.getValue(v, "label", "");
+			local bTargeted = EffectManager.isTargetedEffect(v);
+			-- KEL making conditions work with IFT etc.
+			local bIFT = false;
+			local aEffectComps = EffectManager.parseEffect(sLabel);
+
+			-- Iterate through each effect component looking for a type match
+			local nMatch = 0;
+			for kEffectComp, sEffectComp in ipairs(aEffectComps) do
+				local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
+				-- Check conditionals
+				-- KEL Adding TAG for SIMMUNE
+				if rEffectComp.type == "IF" then
+					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+						break;
+					end
+				elseif rEffectComp.type == "NIF" then
+					if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+						break;
+					end
+				elseif rEffectComp.type == "IFT" then
+					if not rTarget then
+						break;
+					end
+					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+						break;
+					end
+					bIFT = true;
+				elseif rEffectComp.type == "NIFT" then
+					if rActor.aTargets and not rTarget then
+						-- if ( #rActor.aTargets[1] > 0 ) and not rTarget then
+						break;
+						-- end
+					end
+					if EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+						break;
+					end
+					if rTarget then
+						bIFT = true;
+					end
+				elseif rEffectComp.type == "IFTAG" then
+					if not rEffectSpell then
+						break;
+					elseif not EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+						break;
+					end
+				elseif rEffectComp.type == "NIFTAG" then
+					if EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+						break;
+					end
+				
+				-- Check for match
+				elseif rEffectComp.original:lower() == sLowerEffect then
+					if bTargeted and not bIgnoreEffectTargets then
+						if EffectManager.isEffectTarget(v, rTarget) then
+							nMatch = kEffectComp;
+						end
+					elseif bTargetedOnly and bIFT then
+						nMatch = kEffectComp;
+					elseif not bTargetedOnly then
+						nMatch = kEffectComp;
+					end
+				end
+				
+			end
+			
+			-- If matched, then remove one-off effects
+			if nMatch > 0 then
+				if nActive == 2 then
+					DB.setValue(v, "isactive", "number", 1);
+				else
+					table.insert(aMatch, v);
+					local sApply = DB.getValue(v, "apply", "");
+					if sApply == "action" then
+						EffectManager.notifyExpire(v, 0);
+					elseif sApply == "roll" then
+						EffectManager.notifyExpire(v, 0, true);
+					elseif sApply == "single" then
+						EffectManager.notifyExpire(v, nMatch, true);
+					end
+				end
+			end
+		end
+	end
+	
+	if #aMatch > 0 then
+		return true;
+	end
+	return false;
+end
+
 --	replace 3.5E EffectManager35E manager_effect_35E.lua checkConditionalHelper() with this
-function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
+local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
+	if not rActor then
+		return false;
+	end
+	
+	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+		local nActive = DB.getValue(v, "isactive", 0);
+		
+		-- COMPATIBILITY FOR ADVANCED EFFECTS
+		-- to add support for AE in other extensions, make this change
+		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
+		if ((EffectManagerAE and isValidCheckEffect(rActor,v)) or (not EffectManagerAE and nActive ~= 0)) and not StringManager.contains(aIgnore, v.getPath()) then
+		-- END COMPATIBILITY FOR ADVANCED EFFECTS
+		
+			-- Parse each effect label
+			local sLabel = DB.getValue(v, "label", "");
+			local aEffectComps = EffectManager.parseEffect(sLabel);
+
+			-- Iterate through each effect component looking for a type match
+			for _,sEffectComp in ipairs(aEffectComps) do
+				local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
+
+				-- ADDITION FOR ADVANCED EFFECTS
+				-- to add support for AE in other extensions, make this change
+				-- CHECK FOR FOLLOWON EFFECT TAGS, AND IGNORE THE REST
+				-- originally this was not here and the first line in "check conditionals" was if rather than elseif.
+				if EffectManagerAE and (rEffectComp.type == "AFTER" or rEffectComp.type == "FAIL") then
+					break;
+				-- END ADDITION FOR ADVANCED EFFECTS
+
+				--Check conditionals
+				elseif rEffectComp.type == "IF" then
+					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
+						break;
+					end
+				elseif rEffectComp.type == "NIF" then
+					if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
+						break;
+					end
+				elseif rEffectComp.type == "IFTAG" then
+					break;
+				elseif rEffectComp.type == "NIFTAG" then
+					break;
+				elseif rEffectComp.type == "IFT" then
+					if not rTarget then
+						break;
+					end
+					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
+						break;
+					end
+				elseif rEffectComp.type == "NIFT" then
+					if rActor.aTargets and not rTarget then
+						-- if ( #rActor.aTargets[1] > 0 ) and not rTarget then
+						break;
+						-- end
+					end
+					if EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
+						break;
+					end
+				
+				-- Check for match
+				-- KEL ignore effects which are on skip
+				elseif rEffectComp.original:lower() == sEffect and nActive == 1 then
+					if EffectManager.isTargetedEffect(v) then
+						if EffectManager.isEffectTarget(v, rTarget) then
+							-- if nActive == 1 then
+							return true;
+							-- end
+						end
+					else
+						-- if nActive == 1 then
+						return true;
+						-- end
+					end
+				-- KEL Flatfooted improved
+				elseif sEffect == "nodex" and nActive == 1 then
+					local sLowerKel = rEffectComp.original:lower();
+					if StringManager.contains(DataCommon2.tnodex, sLowerKel) then
+						if EffectManager.isTargetedEffect(v) then
+							if EffectManager.isEffectTarget(v, rTarget) then
+								return true;
+							end
+						else
+							return true;
+						end
+					end
+				-- END
+				end
+			end
+		end
+	end
+	-- KEL CA for nodex thing; FG really dislikes having another effect list check in an existing effect list
+	-- Problem here: That creates a loop which will again check CA on the target etc., as in IF: bloodied stuff
+	-- if sEffect == "nodex" then
+		-- if hasEffect(rTarget, "CA", rActor, true) then
+			-- return true;
+		-- end
+	-- end
+	--END
+	
+	return false;
+end
+
+--	replace 3.5E EffectManager35E manager_effect_35E.lua checkConditionalHelper() with this
+local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 	if not rActor then
 		return false;
 	end
@@ -692,10 +1130,11 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
 
-		-- CHANGE FOR ADVANCED EFFECTS
+		-- COMPATIBILITY FOR ADVANCED EFFECTS
+		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
-		if isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getPath()) then
-		-- END CHANGE FOR ADVANCED EFFECTS
+		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
+		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
@@ -706,8 +1145,10 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 				local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
 
 				-- ADDITION FOR ADVANCED EFFECTS
+				-- to add support for AE in other extensions, make this change
 				-- CHECK FOR FOLLOWON EFFECT TAGS, AND IGNORE THE REST
-				if rEffectComp.type == "AFTER" or rEffectComp.type == "FAIL" then
+				-- originally this was not here and the first line in "check conditionals" was if rather than elseif.
+				if EffectManagerAE and (rEffectComp.type == "AFTER" or rEffectComp.type == "FAIL") then
 					break;
 				-- END ADDITION FOR ADVANCED EFFECTS
 				
@@ -741,6 +1182,12 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	return false;
 end
 
+local function usingKelrugemFOP()
+	return (StringManager.contains(Extension.getExtensions(), "Full OverlayPackage") or
+			StringManager.contains(Extension.getExtensions(), "Full OverlayPackage with alternative icons") or
+			StringManager.contains(Extension.getExtensions(), "Full OverlayPackage with other icons"));
+end
+
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
 	if Session.IsHost then
@@ -765,9 +1212,15 @@ function onInit()
 	CombatManager.addNPC = addNPC;
 	
 	-- 3.5E replacements
-	EffectManager35E.checkConditionalHelper = checkConditionalHelper;
-	EffectManager35E.getEffectsByType = getEffectsByType;
-	EffectManager35E.hasEffect = hasEffect;
+	if usingKelrugemFOP() then
+		EffectManager35E.checkConditionalHelper = EffectManager35E.checkConditionalHelper_kel;
+		EffectManager35E.getEffectsByType = getEffectsByType_kel;
+		EffectManager35E.hasEffect = hasEffect_kel;
+	else
+		EffectManager35E.checkConditionalHelper = EffectManager35E.checkConditionalHelper_new;
+		EffectManager35E.getEffectsByType = getEffectsByType_new;
+		EffectManager35E.hasEffect = hasEffect_new;
+	end
 
 	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
 	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler", 
