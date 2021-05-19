@@ -757,13 +757,12 @@ function onInit()
 		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
 		DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
 	end
-	
-	addPC_old = CombatManager.addPC;
-	addNPC_old = CombatManager.addNPC;
 
 	-- CoreRPG replacements
 	ActionsManager.decodeActors = decodeActors;
+	addPC_old = CombatManager.addPC;
 	CombatManager.addPC = addPC;
+	addNPC_old = CombatManager.addNPC;
 	CombatManager.addNPC = addNPC;
 	
 	-- 3.5E replacements
