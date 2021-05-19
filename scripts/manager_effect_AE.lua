@@ -1029,7 +1029,7 @@ local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
-		if ((EffectManagerAE and isValidCheckEffect(rActor,v)) or (not EffectManagerAE and nActive ~= 0)) and not StringManager.contains(aIgnore, v.getPath()) then
+		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 		
 			-- Parse each effect label
