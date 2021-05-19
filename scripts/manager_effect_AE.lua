@@ -1039,17 +1039,8 @@ local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
 			-- Iterate through each effect component looking for a type match
 			for _,sEffectComp in ipairs(aEffectComps) do
 				local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
-
-				-- ADDITION FOR ADVANCED EFFECTS
-				-- to add support for AE in other extensions, make this change
-				-- CHECK FOR FOLLOWON EFFECT TAGS, AND IGNORE THE REST
-				-- originally this was not here and the first line in "check conditionals" was if rather than elseif.
-				if EffectManagerAE and (rEffectComp.type == "AFTER" or rEffectComp.type == "FAIL") then
-					break;
-				-- END ADDITION FOR ADVANCED EFFECTS
-
 				--Check conditionals
-				elseif rEffectComp.type == "IF" then
+				if rEffectComp.type == "IF" then
 					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
 						break;
 					end
@@ -1143,17 +1134,8 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 			-- Iterate through each effect component looking for a type match
 			for _,sEffectComp in ipairs(aEffectComps) do
 				local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
-
-				-- ADDITION FOR ADVANCED EFFECTS
-				-- to add support for AE in other extensions, make this change
-				-- CHECK FOR FOLLOWON EFFECT TAGS, AND IGNORE THE REST
-				-- originally this was not here and the first line in "check conditionals" was if rather than elseif.
-				if EffectManagerAE and (rEffectComp.type == "AFTER" or rEffectComp.type == "FAIL") then
-					break;
-				-- END ADDITION FOR ADVANCED EFFECTS
-				
 				--Check conditionals
-				elseif rEffectComp.type == "IF" then
+				if rEffectComp.type == "IF" then
 					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
 						break;
 					end
