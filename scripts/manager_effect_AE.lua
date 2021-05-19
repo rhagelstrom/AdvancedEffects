@@ -565,7 +565,6 @@ function isValidCheckEffect(rActor, nodeEffect)
 	end
 
 	if nActive ~= 0 then
-		Debug.chat(bActionOnly, bActionItemUsed)
 		if bActionOnly and bActionItemUsed then
 			return true;
 		elseif bActionOnly and not bActionItemUsed then
