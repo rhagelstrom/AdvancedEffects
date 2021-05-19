@@ -13,13 +13,13 @@ function updateItemEffectsForEdit(nodeField)
 	checkEffectsAfterEdit(nodeField.getChild(".."));
 end
 -- find the effect for this source and delete and re-build
-function checkEffectsAfterEdit(itemNode)
+function checkEffectsAfterEdit(nodeItem)
 	local nodeChar = nil
 	local bIDUpdated = false;
-	if itemNode.getPath():match("%.effectlist%.") then
-		nodeChar = DB.getChild(itemNode, ".....");
+	if nodeItem.getPath():match("%.effectlist%.") then
+		nodeChar = DB.getChild(nodeItem, ".....");
 	else
-		nodeChar = DB.getChild(itemNode, "...");
+		nodeChar = DB.getChild(nodeItem, "...");
 		bIDUpdated = true;
 	end
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
@@ -31,10 +31,10 @@ function checkEffectsAfterEdit(itemNode)
 			local nodeEffectFound = DB.findNode(sEffSource);
 			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
 				local nodeEffectItem = nodeEffectFound.getChild("...");
-				if nodeEffectFound == itemNode then -- effect hide/show edit
+				if nodeEffectFound == nodeItem then -- effect hide/show edit
 					nodeEffect.delete();
-					updateItemEffects(DB.getChild(itemNode, "..."));
-				elseif nodeEffectItem == itemNode then -- id state was changed
+					updateItemEffects(DB.getChild(nodeItem, "..."));
+				elseif nodeEffectItem == nodeItem then -- id state was changed
 					nodeEffect.delete();
 					updateItemEffects(nodeEffectItem);
 				end
