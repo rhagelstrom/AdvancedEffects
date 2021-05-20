@@ -5,7 +5,7 @@
     <string name="item_label_effect_visible_tooltip">Always SHOW or HIDE the effect. Default mode shows if item is identified or hides if not.</string>
     <string name="item_label_effects_hide">Hide</string>
     <string name="item_label_effects_show">Show</string>
-    
+
     <string name="item_label_effects_dice">Dice</string>
     <string name="item_effects_dice_tooltip">Dice rolled for duration of effect.</string>
     <string name="item_label_effects_mod_tooltip">Modifier applied to duration or do not use dice and set for static duration.</string>
@@ -13,7 +13,7 @@
     <string name="item_label_effects_unit_tooltip">Time unit, round, minute, hour or day.</string>
     <string name="item_label_effects_string_tooltip">Effect string. i.e. "STR: +1;SAVE -1;"</string>
     <string name="item_label_effect_tooltip">Effects that are applied with the item is equipped and the character is in the combat tracker.</string>
-    
+
     <string name="item_label_effectfeature">Effect</string>
     <string name="item_label_ability_type">Type</string>
     <string name="item_ability_type_tooltip">MODIFIER, PERCENT MODIFIER, BASE VALUE or BASE PERCENT value of an ability score.</string>
@@ -41,7 +41,7 @@
     <string name="item_label_effect_attackonly_tooltip">Check this so effect ONLY applied during an attack or damage.</string>
 	<string name="item_label_effect_labelonly">Label Only</string>
 	<string name="item_label_effect_labelonly_tooltip">Check this so effect does not include item name.</string>
-	
+
     <string name="text_MOD">MOD</string>
     <string name="custom">Custom</string>
     <string name="save">Save</string>
@@ -53,7 +53,7 @@
     <string name="susceptiblity">Susceptiblity</string>
     <string name="misc">Miscellaneous</string>
 	<string name="label">Label Only</string>
-		
+
     <string name="modifier">Modifier</string>
     <string name="percent_modifier">% Modifier</string>
     <string name="base">Base</string>
@@ -68,6 +68,6 @@
     <string name="init_ae">Initiative</string>
     <string name="save">Save</string>
 	<string bane="check">Check</string>
-	
+
     <string name="option_label_ADND_AE_EDIT">PC: Adv. Effect Edit</string>
 </root>

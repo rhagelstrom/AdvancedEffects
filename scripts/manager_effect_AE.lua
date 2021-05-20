@@ -204,7 +204,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 		return {};
 	end
 	local results = {};
-	
+
 	-- Set up filters
 	local aRangeFilter = {};
 	local aOtherFilter = {};
@@ -219,10 +219,10 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			end
 		end
 	end
-	
+
 	-- Determine effect type targeting
 	local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
-	
+
 	-- Iterate through effects
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
@@ -233,7 +233,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			if not bTargeted or EffectManager.isEffectTarget(v, rFilterActor) then
 				local sLabel = DB.getValue(v, "label", "");
 				local aEffectComps = EffectManager.parseEffect(sLabel);
-				
+
 				-- Look for type/subtype match
 				local nMatch = 0;
 				for kEffectComp, sEffectComp in ipairs(aEffectComps) do
@@ -251,13 +251,13 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 							break;
 						end
 						bTargeted = true;
-					
+
 					-- Compare other attributes
 					else
 						-- Strip energy/bonus types for subtype comparison
 						local aEffectRangeFilter = {};
 						local aEffectOtherFilter = {};
-						
+
 						local aComponents = {};
 						for _,vPhrase in ipairs(rEffectComp.remainder) do
 							local nTempIndexOR = 0;
@@ -271,7 +271,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 									table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR));
 								end
 							until nStartOR == nil;
-							
+
 							for _,vPhraseOR in ipairs(aPhraseOR) do
 								local nTempIndexAND = 0;
 								repeat
@@ -301,7 +301,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 							
 							j = j + 1;
 						end
-					
+
 						-- Check for match
 						local comp_match = false;
 						if rEffectComp.type == sEffectType then
@@ -312,7 +312,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 							else
 								comp_match = true;
 							end
-						
+
 							-- Check filters
 							if #aEffectRangeFilter > 0 then
 								local bRangeMatch = false;
@@ -380,7 +380,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			end -- END TARGET CHECK
 		end -- END VALID CHECK
 	end	-- END EFFECT LOOP
-	
+
 	return results;
 end
 
@@ -389,7 +389,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 		return {};
 	end
 	local results = {};
-	
+
 	-- Set up filters
 	local aRangeFilter = {};
 	local aOtherFilter = {};
@@ -404,10 +404,10 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 			end
 		end
 	end
-	
+
 	-- Determine effect type targeting
 	local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
-	
+
 	-- Iterate through effects
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		-- Check active
@@ -419,13 +419,13 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 		-- original line: if nActive ~= 0 then
 		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
-		
+
 			-- Check targeting
 			local bTargeted = EffectManager.isTargetedEffect(v);
 			if not bTargeted or EffectManager.isEffectTarget(v, rFilterActor) then
 				local sLabel = DB.getValue(v, "label", "");
 				local aEffectComps = EffectManager.parseEffect(sLabel);
-				
+
 				-- Look for type/subtype match
 				local nMatch = 0;
 				for kEffectComp, sEffectComp in ipairs(aEffectComps) do
@@ -476,7 +476,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 						-- Strip energy/bonus types for subtype comparison
 						local aEffectRangeFilter = {};
 						local aEffectOtherFilter = {};
-						
+
 						local aComponents = {};
 						for _,vPhrase in ipairs(rEffectComp.remainder) do
 							local nTempIndexOR = 0;
@@ -490,7 +490,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 									table.insert(aPhraseOR, vPhrase:sub(nTempIndexOR));
 								end
 							until nStartOR == nil;
-							
+
 							for _,vPhraseOR in ipairs(aPhraseOR) do
 								local nTempIndexAND = 0;
 								repeat
@@ -520,7 +520,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 							
 							j = j + 1;
 						end
-					
+
 						-- Check for match
 						local comp_match = false;
 						if rEffectComp.type == sEffectType then
@@ -531,7 +531,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 							else
 								comp_match = true;
 							end
-						
+
 							-- Check filters
 							if #aEffectRangeFilter > 0 then
 								local bRangeMatch = false;
@@ -599,7 +599,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 			end -- END TARGET CHECK
 		end  -- END ACTIVE CHECK
 	end  -- END EFFECT LOOP
-	
+
 	return results;
 end
 
@@ -638,7 +638,7 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 	if not ActorManager.isPC(nodeEntry) then
 		nDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
 	end
-	
+
 	local rEffect = {};
 	rEffect.nDuration = nRollDuration;
 	--rEffect.sName = sName .. ";" .. sLabel;
@@ -662,7 +662,7 @@ function addPC(nodeChar)
 	if not nodeChar then
 		return;
 	end
-	
+
 	-- Call original function for better compatibility
 	addPC_old(nodeChar)
 
@@ -672,10 +672,10 @@ function addPC(nodeChar)
 		updateItemEffects(nodeItem,true);
 	end
 	-- end
-	
+
 	local rActor = ActorManager.resolveActor(nodeChar)
 	local nodeCT = ActorManager.getCTNode(rActor)
-	
+
 	-- check to see if npc effects exists and if so apply --celestian
 	updateCharEffects(nodeChar,nodeCT);
 
@@ -803,7 +803,7 @@ end
 function decodeActors(draginfo)
 	local rSource = nil;
 	local aTargets = {};
-	
+
 	for k,v in ipairs(draginfo.getShortcutList()) do
 		if k == 1 then
 			rSource = ActorManager.resolveActor(v.recordname);
@@ -836,18 +836,18 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 		return false;
 	end
 	local sLowerEffect = sEffect:lower();
-	
+
 	-- Iterate through each effect
 	local aMatch = {};
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
-		
+
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 then
 		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
-		
+
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
 			local bTargeted = EffectManager.isTargetedEffect(v);
@@ -869,7 +869,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
 						break;
 					end
-				
+
 				-- Check for match
 				elseif rEffectComp.original:lower() == sLowerEffect then
 					if bTargeted and not bIgnoreEffectTargets then
@@ -882,7 +882,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 				end
 				
 			end
-			
+
 			-- If matched, then remove one-off effects
 			if nMatch > 0 then
 				if nActive == 2 then
@@ -901,7 +901,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 			end
 		end
 	end
-	
+
 	if #aMatch > 0 then
 		return true;
 	end
@@ -913,7 +913,7 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 		return false;
 	end
 	local sLowerEffect = sEffect:lower();
-	
+
 	-- Iterate through each effect
 	local aMatch = {};
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
@@ -976,7 +976,7 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 					if EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
 						break;
 					end
-				
+
 				-- Check for match
 				elseif rEffectComp.original:lower() == sLowerEffect then
 					if bTargeted and not bIgnoreEffectTargets then
@@ -991,7 +991,7 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 				end
 				
 			end
-			
+
 			-- If matched, then remove one-off effects
 			if nMatch > 0 then
 				if nActive == 2 then
@@ -1010,7 +1010,7 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 			end
 		end
 	end
-	
+
 	if #aMatch > 0 then
 		return true;
 	end
@@ -1022,16 +1022,16 @@ local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
 	if not rActor then
 		return false;
 	end
-	
+
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
-		
+
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
 		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
-		
+
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
 			local aEffectComps = EffectManager.parseEffect(sLabel);
@@ -1068,7 +1068,7 @@ local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
 					if EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
-				
+
 				-- Check for match
 				-- KEL ignore effects which are on skip
 				elseif rEffectComp.original:lower() == sEffect and nActive == 1 then
@@ -1108,7 +1108,7 @@ local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
 		-- end
 	-- end
 	--END
-	
+
 	return false;
 end
 
@@ -1117,7 +1117,7 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 	if not rActor then
 		return false;
 	end
-	
+
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
 
@@ -1146,7 +1146,7 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
-				
+
 				-- Check for match
 				elseif rEffectComp.original:lower() == sEffect then
 					if EffectManager.isTargetedEffect(v) then
@@ -1160,7 +1160,7 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 			end
 		end
 	end
-	
+
 	return false;
 end
 
@@ -1188,8 +1188,10 @@ function onInit()
 
 	-- CoreRPG replacements
 	ActionsManager.decodeActors = decodeActors;
+
 	addPC_old = CombatManager.addPC;
 	CombatManager.addPC = addPC;
+
 	addNPC_old = CombatManager.addNPC;
 	CombatManager.addNPC = addNPC;
 	
