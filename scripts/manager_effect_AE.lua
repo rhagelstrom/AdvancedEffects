@@ -1197,11 +1197,11 @@ function onInit()
 	
 	-- 3.5E replacements
 	if usingKelrugemFOP() then
-		EffectManager35E.checkConditionalHelper = EffectManager35E.checkConditionalHelper_kel;
+		EffectManager35E.checkConditionalHelper = checkConditionalHelper_kel;
 		EffectManager35E.getEffectsByType = getEffectsByType_kel;
 		EffectManager35E.hasEffect = hasEffect_kel;
 	else
-		EffectManager35E.checkConditionalHelper = EffectManager35E.checkConditionalHelper_new;
+		EffectManager35E.checkConditionalHelper = checkConditionalHelper_new;
 		EffectManager35E.getEffectsByType = getEffectsByType_new;
 		EffectManager35E.hasEffect = hasEffect_new;
 	end
