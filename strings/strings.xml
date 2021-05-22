@@ -39,8 +39,8 @@
     <string name="item_label_savefeature">Feature</string>
     <string name="item_label_effect_attackonly">Action Only</string>
     <string name="item_label_effect_attackonly_tooltip">Check this so effect ONLY applied during an attack or damage.</string>
-	<string name="item_label_effect_labelonly">Label Only</string>
-	<string name="item_label_effect_labelonly_tooltip">Check this so effect does not include item name.</string>
+    <string name="item_label_effect_labelonly">Label Only</string>
+    <string name="item_label_effect_labelonly_tooltip">Check this so effect does not include item name.</string>
 
     <string name="text_MOD">MOD</string>
     <string name="custom">Custom</string>
@@ -52,7 +52,7 @@
     <string name="vuln">Vulnerability</string>
     <string name="susceptiblity">Susceptiblity</string>
     <string name="misc">Miscellaneous</string>
-	<string name="label">Label Only</string>
+    <string name="label">Label Only</string>
 
     <string name="modifier">Modifier</string>
     <string name="percent_modifier">% Modifier</string>
@@ -67,7 +67,7 @@
     <string name="heal">Heal</string>
     <string name="init_ae">Initiative</string>
     <string name="save">Save</string>
-	<string bane="check">Check</string>
+    <string name="check">Check</string>
 
     <string name="option_label_ADND_AE_EDIT">PC: Adv. Effect Edit</string>
 </root>
