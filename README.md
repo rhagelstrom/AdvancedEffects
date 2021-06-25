@@ -1,5 +1,5 @@
 # FG-PFRPG-Advanced-Effects
-Add effects to PCs, NPCs and items.
+Attach effects to PCs, NPCs and items.
 
 # How does it work?
 When you apply the extension to a 5E campaign you'll notice a new field on items, npcs and character sheets (under Abilities tab) called "Effect Features".
