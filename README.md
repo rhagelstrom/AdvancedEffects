@@ -1,4 +1,6 @@
 # FG-PFRPG-Advanced-Effects
+Original extension by [Celestian](https://www.fantasygrounds.com/forums/member.php?54726-celestian). Ported to PFRPG/3.5E by [rmilmine](https://www.fantasygrounds.com/forums/member.php?215591-rmilmine) and [bmos](https://www.fantasygrounds.com/forums/member.php?194283-bmos).
+
 Attach effects to PCs, NPCs and items.
 
 # How does it work?
