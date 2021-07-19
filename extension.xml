@@ -2,7 +2,7 @@
 <root version="3.0" >
 
 	<properties>
-		<name>Advanced Effects for 3.5E and Pathfinder</name>
+		<name>Feature: Advanced Effects</name>
 		<version>1.4</version>
 		<loadorder>40</loadorder>
 		<description>
@@ -19,7 +19,7 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="Advanced Effects - PFRPG/3.5E v1.4\rby Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine and bmos" font="emotefont" icon="celestian" />
+	<announcement text="Advanced Effects - PFRPG and 3.5E v1.4\rby Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine and bmos" font="emotefont" icon="celestian" />
 	
 	<base>
 		<icon name="celestian" file="graphics/icons/celestian.png" />
