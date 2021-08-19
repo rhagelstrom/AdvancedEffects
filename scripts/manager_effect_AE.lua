@@ -657,14 +657,14 @@ end
 -- custom version of the one in CoreRPG to deal with adding new 
 -- pcs to the combat tracker to deal with advanced effects. --celestian
 local addPC_old
-function addPC(nodeChar)
+function addPC(nodeChar, ...)
 	-- Parameter validation
 	if not nodeChar then
 		return;
 	end
 
 	-- Call original function for better compatibility
-	addPC_old(nodeChar)
+	addPC_old(nodeChar, ...)
 
 	-- now flip through inventory and pass each to updateEffects()
 	-- so that if they have a combat_effect it will be applied.
@@ -687,9 +687,9 @@ end
 -- call the base addNPC from manager_combat2.lua from 5E ruleset for this and
 -- then check for PC effects to add -- celestian
 local addNPC_old
-function addNPC(sClass, nodeCT, sName)
+function addNPC(sClass, nodeCT, sName, ...)
 	-- Call original function
-	local nodeEntry = addNPC_old(sClass, nodeCT, sName);
+	local nodeEntry = addNPC_old(sClass, nodeCT, sName, ...);
 
 	updateCharEffects(nodeCT,nodeEntry);
 

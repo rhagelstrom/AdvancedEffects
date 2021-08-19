@@ -4,8 +4,8 @@
 --
 
 local getWeaponDamageRollStructures_old
-function getWeaponDamageRollStructures(nodeWeapon)
-	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon);
+function getWeaponDamageRollStructures(nodeWeapon, ...)
+	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...);
 
     -- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
@@ -16,8 +16,8 @@ function getWeaponDamageRollStructures(nodeWeapon)
 end
 
 local getWeaponAttackRollStructures_old
-function getWeaponAttackRollStructures(nodeWeapon, nAttack)
-	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack);
+function getWeaponAttackRollStructures(nodeWeapon, nAttack, ...)
+	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack, ...);
 
     -- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
