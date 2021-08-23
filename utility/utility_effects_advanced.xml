@@ -12,7 +12,7 @@
         <script>
             function onInit()
                 local node = getDatabaseNode();
-                local bIDentified = DB.getValue(node, "isidentified", 0) > 0;
+                local bIDentified = DB.getValue(node, "isidentified", 1) > 0;
                 local bPCEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
                 local bIsPcItem = string.match(node.getPath(),"^charsheet") ~= null;
                 local bCanEdit = false;
