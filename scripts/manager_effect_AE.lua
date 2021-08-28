@@ -801,8 +801,8 @@ end
 local itemPathKey = "ItemPath"
 
 local encodeActionForDrag_old
-function encodeActionForDrag(draginfo, rSource, sType, rRolls)
-	encodeActionForDrag_old(draginfo, rSource, sType, rRolls)
+function encodeActionForDrag(draginfo, rSource, sType, rRolls, ...)
+	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
 	local itemPath = rSource.itemPath
 	if itemPath and itemPath ~= "" then
@@ -812,8 +812,8 @@ end
 
 --	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
 local decodeActors_old
-function decodeActors(draginfo)
-	local rSource, aTargets = decodeActors_old(draginfo)
+function decodeActors(draginfo, ...)
+	local rSource, aTargets = decodeActors_old(draginfo, ...)
 
 	local sItemPath = draginfo.getMetaData(itemPathKey)
 	if (sItemPath and sItemPath ~= "") then
