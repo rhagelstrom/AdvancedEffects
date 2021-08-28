@@ -657,7 +657,7 @@ end
 -- custom version of the one in CoreRPG to deal with adding new 
 -- pcs to the combat tracker to deal with advanced effects. --celestian
 local addPC_old
-function addPC(nodeChar, ...)
+function addPC_new(nodeChar, ...)
 	-- Parameter validation
 	if not nodeChar then
 		return;
@@ -687,7 +687,7 @@ end
 -- call the base addNPC from manager_combat2.lua from 5E ruleset for this and
 -- then check for PC effects to add -- celestian
 local addNPC_old
-function addNPC(sClass, nodeCT, sName, ...)
+function addNPC_new(sClass, nodeCT, sName, ...)
 	-- Call original function
 	local nodeEntry = addNPC_old(sClass, nodeCT, sName, ...);
 
@@ -814,7 +814,7 @@ end
 
 --	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
 local decodeActors_old
-function decodeActors(draginfo, ...)
+function decodeActors_new(draginfo, ...)
 	local rSource, aTargets = decodeActors_old(draginfo, ...)
 
 	local sItemPath = draginfo.getMetaData(itemPathKey)
@@ -1185,13 +1185,13 @@ function onInit()
 	ActionsManager.encodeActionForDrag = encodeActionForDrag_new
 
 	decodeActors_old = ActionsManager.decodeActors
-	ActionsManager.decodeActors = decodeActors
+	ActionsManager.decodeActors = decodeActors_new
 
 	addPC_old = CombatManager.addPC;
-	CombatManager.addPC = addPC;
+	CombatManager.addPC = addPC_new;
 
 	addNPC_old = CombatManager.addNPC;
-	CombatManager.addNPC = addNPC;
+	CombatManager.addNPC = addNPC_new;
 	
 	-- 3.5E replacements
 	if usingKelrugemFOP() then
