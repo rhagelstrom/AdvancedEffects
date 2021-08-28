@@ -801,12 +801,14 @@ end
 local itemPathKey = "ItemPath"
 
 local encodeActionForDrag_old
-function encodeActionForDrag(draginfo, rSource, sType, rRolls, ...)
+function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
 	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
-	local itemPath = rSource.itemPath
-	if itemPath and itemPath ~= "" then
-		draginfo.setMetaData(itemPathKey, itemPath)
+	if rSource and rSource.itemPath then
+		local itemPath = rSource.itemPath
+		if itemPath ~= "" then
+			draginfo.setMetaData(itemPathKey, itemPath)
+		end
 	end
 end
 
@@ -1180,7 +1182,7 @@ function onInit()
 
 	-- CoreRPG replacements
 	encodeActionForDrag_old = ActionsManager.encodeActionForDrag
-	ActionsManager.encodeActionForDrag = encodeActionForDrag
+	ActionsManager.encodeActionForDrag = encodeActionForDrag_new
 
 	decodeActors_old = ActionsManager.decodeActors
 	ActionsManager.decodeActors = decodeActors
