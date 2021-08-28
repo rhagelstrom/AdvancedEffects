@@ -751,40 +751,39 @@ end
 --	pass effect to here to see if the effect is being triggered
 --	by an item and if so if it's valid
 function isValidCheckEffect(rActor, nodeEffect)
-	local nActive = DB.getValue(nodeEffect, "isactive", 0);
-	local bItem = false;
-	local bActionItemUsed = false;
-	local bActionOnly = false;
-	local nodeItem = nil;
+	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
+		local bItem = false;
+		local bActionItemUsed = false;
+		local bActionOnly = false;
+		local nodeItem = nil;
 
-	local sSource = DB.getValue(nodeEffect,"source_name","");
-	-- if source is a valid node and we can find "actiononly"
-	-- setting then we set it.
-	local node = DB.findNode(sSource);
-	if (node and node ~= nil) then
-		nodeItem = node.getChild("...");
-		if nodeItem and nodeItem ~= nil then
-			bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
-		end
-	end
-
-	-- if there is a itemPath do some sanity checking
-	if (rActor.itemPath and rActor.itemPath ~= "") then 
-		-- here is where we get the node path of the item, not the
-		-- effectslist entry
-		if DB.findNode(rActor.itemPath) and nodeItem then
-			local sNodePath = nodeItem.getPath();
-			if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
-				bActionItemUsed = true;
-				bItem = true;
-			else
-				bActionItemUsed = false;
-				bItem = true; -- is item but doesn't match source path for this effect
+		local sSource = DB.getValue(nodeEffect,"source_name","");
+		-- if source is a valid node and we can find "actiononly"
+		-- setting then we set it.
+		local node = DB.findNode(sSource);
+		if (node and node ~= nil) then
+			nodeItem = node.getChild("...");
+			if nodeItem and nodeItem ~= nil then
+				bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
 			end
 		end
-	end
 
-	if nActive ~= 0 then
+		-- if there is a itemPath do some sanity checking
+		if (rActor.itemPath and rActor.itemPath ~= "") then
+			-- here is where we get the node path of the item, not the
+			-- effectslist entry
+			if DB.findNode(rActor.itemPath) and nodeItem then
+				local sNodePath = nodeItem.getPath();
+				if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
+					bActionItemUsed = true;
+					bItem = true;
+				else
+					bActionItemUsed = false;
+					bItem = true; -- is item but doesn't match source path for this effect
+				end
+			end
+		end
+
 		if bActionOnly and bActionItemUsed then
 			return true;
 		elseif bActionOnly and not bActionItemUsed then
@@ -799,33 +798,27 @@ end
 --	REPLACEMENT FUNCTIONS
 --
 
+local itemPathKey = "ItemPath"
+
+local encodeActionForDrag_old
+function encodeActionForDrag(draginfo, rSource, sType, rRolls, ...)
+	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
+
+	local itemPath = rSource.itemPath
+	if itemPath and itemPath ~= "" then
+		draginfo.setMetaData(itemPathKey, itemPath)
+	end
+end
+
 --	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
-function decodeActors(draginfo)
-	local rSource = nil;
-	local aTargets = {};
+local decodeActors_old
+function decodeActors(draginfo, ...)
+	local rSource, aTargets = decodeActors_old(draginfo, ...)
 
-	for k,v in ipairs(draginfo.getShortcutList()) do
-		if k == 1 then
-			rSource = ActorManager.resolveActor(v.recordname);
-		else
-			local rTarget = ActorManager.resolveActor(v.recordname);
-			if rTarget then
-				table.insert(aTargets, rTarget);
-			end
-		end
+	local sItemPath = draginfo.getMetaData(itemPathKey)
+	if (sItemPath and sItemPath ~= "") then
+		rSource.itemPath = sItemPath
 	end
-
-	-- ADDITION FOR ADVANCED EFFECTS
-	-- to add support for AE in other extensions, make this change
-	-- itemPath data filled if itemPath if exists
-	local sItemPath
-	if EffectManagerAE then
-		sItemPath = draginfo.getMetaData("itemPath");
-		if (sItemPath and sItemPath ~= "") then
-			rSource.itemPath = sItemPath;
-		end
-	end
-	-- END ADDITION FOR ADVANCED EFFECTS
 
 	return rSource, aTargets;
 end
@@ -976,7 +969,6 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 					if EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
 						break;
 					end
-
 				-- Check for match
 				elseif rEffectComp.original:lower() == sLowerEffect then
 					if bTargeted and not bIgnoreEffectTargets then
@@ -1187,7 +1179,11 @@ function onInit()
 	end
 
 	-- CoreRPG replacements
-	ActionsManager.decodeActors = decodeActors;
+	encodeActionForDrag_old = ActionsManager.encodeActionForDrag
+	ActionsManager.encodeActionForDrag = encodeActionForDrag
+
+	decodeActors_old = ActionsManager.decodeActors
+	ActionsManager.decodeActors = decodeActors
 
 	addPC_old = CombatManager.addPC;
 	CombatManager.addPC = addPC;
