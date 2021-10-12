@@ -648,7 +648,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 	end
 end
 
-local function updateItemEffects(nodeItem)
+function updateItemEffects(nodeItem)
 	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild("...")));
 	if not nodeChar then
 		return;
