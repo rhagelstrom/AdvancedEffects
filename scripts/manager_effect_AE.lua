@@ -2,20 +2,19 @@
 -- Effects on Items, apply to character in CT
 --
 
--- run from addHandler for updated item effect options
+--	run from addHandler for updated item effect options
 function inventoryUpdateItemEffects(nodeField)
 	nodeItem = DB.getChild(nodeField, "..");
 
 	updateItemEffects(DB.getChild(nodeField, ".."));
 end
--- update single item from edit for *.effect handler
+--	update single item from edit for *.effect handler
 function updateItemEffectsForEdit(nodeField)
 	checkEffectsAfterEdit(nodeField.getChild(".."));
 end
--- find the effect for this source and delete and re-build
+--	find the effect for this source and delete and re-build
 function checkEffectsAfterEdit(nodeItem)
-	local nodeChar = nil
-	local bIDUpdated = false;
+	local nodeChar, bIDUpdated
 	if nodeItem.getPath():match("%.effectlist%.") then
 		nodeChar = DB.getChild(nodeItem, ".....");
 	else
@@ -43,8 +42,8 @@ function checkEffectsAfterEdit(nodeItem)
 	end
 end
 
--- this checks to see if an effect is missing its associated item
--- if the item isn't found, it removes the effect as the item has been removed
+--	this checks to see if an effect is missing its associated item
+--	if the item isn't found, it removes the effect as the item has been removed
 function updateFromDeletedInventory(node)
 --Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
 		local nodeChar = DB.getChild(node, "..");
@@ -227,7 +226,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
 		-- Check effect is from used weapon.
-		if isValidCheckEffect(rActor,v) then
+		if isValidCheckEffect(rActor, v) then
 			-- Check targeting
 			local bTargeted = EffectManager.isTargetedEffect(v);
 			if not bTargeted or EffectManager.isEffectTarget(v, rFilterActor) then
@@ -378,8 +377,8 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 					end
 				end
 			end -- END TARGET CHECK
-		end -- END VALID CHECK
-	end	-- END EFFECT LOOP
+		end  -- END ACTIVE CHECK
+	end  -- END EFFECT LOOP
 
 	return results;
 end
@@ -748,14 +747,10 @@ function sendRawMessage(sUser, nDMOnly, msg)
 	end
 end
 
---	pass effect to here to see if the effect is being triggered
---	by an item and if so if it's valid
+---	This function returns false if the effect is tied to an item but the item isn't being used.
 function isValidCheckEffect(rActor, nodeEffect)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
-		local bItem = false;
-		local bActionItemUsed = false;
-		local bActionOnly = false;
-		local nodeItem = nil;
+		local bItem, bActionItemUsed, bActionOnly, nodeItem
 
 		local sSource = DB.getValue(nodeEffect,"source_name","");
 		-- if source is a valid node and we can find "actiononly"
@@ -784,11 +779,7 @@ function isValidCheckEffect(rActor, nodeEffect)
 			end
 		end
 
-		if bActionOnly and bActionItemUsed then
-			return true;
-		elseif bActionOnly and not bActionItemUsed then
-			return false;
-		else
+		if not (bActionOnly and not bActionItemUsed) then
 			return true;
 		end
 	end
