@@ -197,10 +197,10 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 end
 
 local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
-	if not rActor then
-		return {};
-	end
 	local results = {};
+	if not rActor then
+		return results;
+	end
 
 	-- Set up filters
 	local aRangeFilter = {};
