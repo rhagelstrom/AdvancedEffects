@@ -51,94 +51,40 @@ local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
 	sendRawMessage(sUser,nGMOnly,msg);
 end
 
-function updateItemEffects(nodeItem)
-	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild("...")));
-	if not nodeChar then
-		return;
-	end
+---	This function returns false if the effect is tied to an item but the item isn't being used.
+local function isValidCheckEffect(rActor, nodeEffect)
+	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
+		local bItem, bActionItemUsed, bActionOnly, nodeItem
 
-	local bEquipped = (DB.getValue(nodeItem, "carried") == 2);
-	local nIdentified = DB.getValue(nodeItem, "isidentified", 1);
-	-- local bOptionID = OptionsManager.isOption("MIID", "on");
-	-- if not bOptionID then 
-		-- nIdentified = 1;
-	-- end
-
-	for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
-		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, "name", ""), nodeChar, nil, bEquipped, nIdentified);
-	end
-end
-
--- update single effect for item
-function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nIdentified)
-	local sCharacterName = DB.getValue(nodeChar, "name", "");
-	local sItemSource = nodeItemEffect.getPath();
-	local sLabel = DB.getValue(nodeItemEffect, "effect", "");
--- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);		
--- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);	
-	if sLabel and sLabel ~= "" then -- if we have effect string
-		local bFound = false;
-		for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
-			local nActive = DB.getValue(nodeEffect, "isactive", 0);
-			local nGMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
-			if (nActive ~= 0) then
-				local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-				if (sEffSource == sItemSource) then
-					bFound = true;
-					if (not bEquipped) then
-						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly, sUser)
-						nodeEffect.delete();
-						break;
-					end -- not equipped
-				end -- effect source == item source
-			end -- was active
-		end -- nodeEffect for
-		if (not bFound and bEquipped) then
-			local rEffect = {};
-			local nRollDuration = 0;
-			local dDurationDice = DB.getValue(nodeItemEffect, "durdice");
-			local nModDice = DB.getValue(nodeItemEffect, "durmod", 0);
-			local bLabelOnly = (DB.getValue(nodeItemEffect, "type", "") == "label");
-
-			if (dDurationDice and dDurationDice ~= "") then
-				nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
-			else
-				nRollDuration = nModDice;
+		local sSource = DB.getValue(nodeEffect,"source_name","");
+		-- if source is a valid node and we can find "actiononly"
+		-- setting then we set it.
+		local node = DB.findNode(sSource);
+		if (node and node ~= nil) then
+			nodeItem = node.getChild("...");
+			if nodeItem and nodeItem ~= nil then
+				bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
 			end
-			local nGMOnly = 0;
-			local sVisibility = DB.getValue(nodeItemEffect, "visibility", "hide");
-			if sVisibility == "hide" then
-				nGMOnly = 1;
-			elseif sVisibility == "show" then
-				nGMOnly = 0;
-			elseif nIdentified == 0 then
-				nGMOnly = 1;
-			elseif nIdentified > 0	then
-				nGMOnly = 0;
-			end
+		end
 
-			if not ActorManager.isPC(nodeChar) then
-				local bTokenVis = (DB.getValue(nodeChar,"tokenvis") == 1);
-				if not bTokenVis then
-					nGMOnly = 1; -- hide if token not visible
+		-- if there is a itemPath do some sanity checking
+		if (rActor.itemPath and rActor.itemPath ~= "") then
+			-- here is where we get the node path of the item, not the
+			-- effectslist entry
+			if DB.findNode(rActor.itemPath) and nodeItem then
+				local sNodePath = nodeItem.getPath();
+				if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
+					bActionItemUsed = true;
+					bItem = true;
+				else
+					bActionItemUsed = false;
+					bItem = true; -- is item but doesn't match source path for this effect
 				end
 			end
+		end
 
-			rEffect.nDuration = nRollDuration;
-			if not bLabelOnly then
-				rEffect.sName = sName .. ";" .. sLabel;
-			else
-				rEffect.sName = sLabel;
-			end
-			rEffect.sLabel = sLabel; 
-			rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
-			rEffect.nInit = 0;
-			rEffect.sSource = sItemSource;
-			rEffect.nGMOnly = nGMOnly;
-			rEffect.sApply = "";
-		
-			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly, sUser)
-			EffectManager.addEffect("", "", nodeChar, rEffect, false);
+		if not (bActionOnly and not bActionItemUsed) then
+			return true;
 		end
 	end
 end
@@ -596,44 +542,6 @@ local function updateCharEffects(nodeChar, nodeEntry)
 	end -- for item's effects list 
 end
 
----	This function returns false if the effect is tied to an item but the item isn't being used.
-local function isValidCheckEffect(rActor, nodeEffect)
-	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
-		local bItem, bActionItemUsed, bActionOnly, nodeItem
-
-		local sSource = DB.getValue(nodeEffect,"source_name","");
-		-- if source is a valid node and we can find "actiononly"
-		-- setting then we set it.
-		local node = DB.findNode(sSource);
-		if (node and node ~= nil) then
-			nodeItem = node.getChild("...");
-			if nodeItem and nodeItem ~= nil then
-				bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
-			end
-		end
-
-		-- if there is a itemPath do some sanity checking
-		if (rActor.itemPath and rActor.itemPath ~= "") then
-			-- here is where we get the node path of the item, not the
-			-- effectslist entry
-			if DB.findNode(rActor.itemPath) and nodeItem then
-				local sNodePath = nodeItem.getPath();
-				if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
-					bActionItemUsed = true;
-					bItem = true;
-				else
-					bActionItemUsed = false;
-					bItem = true; -- is item but doesn't match source path for this effect
-				end
-			end
-		end
-
-		if not (bActionOnly and not bActionItemUsed) then
-			return true;
-		end
-	end
-end
-
 --
 --	REPLACEMENT FUNCTIONS
 --
@@ -664,6 +572,98 @@ local function decodeActors_new(draginfo, ...)
 	end
 
 	return rSource, aTargets;
+end
+
+-- update single effect for item
+local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, bIdentified)
+	local sCharacterName = DB.getValue(nodeChar, "name", "");
+	local sItemSource = nodeItemEffect.getPath();
+	local sLabel = DB.getValue(nodeItemEffect, "effect", "");
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);		
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);	
+	if sLabel and sLabel ~= "" then -- if we have effect string
+		local bFound = false;
+		for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
+			local nActive = DB.getValue(nodeEffect, "isactive", 0);
+			local nGMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
+			if (nActive ~= 0) then
+				local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+				if (sEffSource == sItemSource) then
+					bFound = true;
+					if (not bEquipped) then
+						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly, sUser)
+						nodeEffect.delete();
+						break;
+					end -- not equipped
+				end -- effect source == item source
+			end -- was active
+		end -- nodeEffect for
+		if (not bFound and bEquipped) then
+			local rEffect = {};
+			local nRollDuration = 0;
+			local dDurationDice = DB.getValue(nodeItemEffect, "durdice");
+			local nModDice = DB.getValue(nodeItemEffect, "durmod", 0);
+			local bLabelOnly = (DB.getValue(nodeItemEffect, "type", "") == "label");
+
+			if (dDurationDice and dDurationDice ~= "") then
+				nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+			else
+				nRollDuration = nModDice;
+			end
+			local nGMOnly = 0;
+			local sVisibility = DB.getValue(nodeItemEffect, "visibility");
+			if sVisibility == "hide" then
+				nGMOnly = 1;
+			elseif sVisibility == "show" then
+				nGMOnly = 0;
+			elseif not bIdentified then
+				nGMOnly = 1;
+			elseif bIdentified	then
+				nGMOnly = 0;
+			end
+
+			if not ActorManager.isPC(nodeChar) then
+				local bTokenVis = DB.getValue(nodeChar,"tokenvis") == 1;
+				if not bTokenVis then
+					nGMOnly = 1; -- hide if token not visible
+				end
+			end
+
+			rEffect.nDuration = nRollDuration;
+			if not bLabelOnly then
+				rEffect.sName = sName .. ";" .. sLabel;
+			else
+				rEffect.sName = sLabel;
+			end
+			rEffect.sLabel = sLabel; 
+			rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
+			rEffect.nInit = 0;
+			rEffect.sSource = sItemSource;
+			rEffect.nGMOnly = nGMOnly;
+			rEffect.sApply = "";
+		
+			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly, sUser)
+			EffectManager.addEffect("", "", nodeChar, rEffect, false);
+		end
+	end
+end
+
+local function updateItemEffects(nodeItem)
+	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild("...")));
+	if not nodeChar then
+		return;
+	end
+
+	local bEquipped = DB.getValue(nodeItem, "carried") == 2;
+	local bIdentified = DB.getValue(nodeItem, "isidentified") == 1;
+	-- local bOptionID = OptionsManager.isOption("MIID", "on");
+	-- if not bOptionID then 
+		-- bIdentified = true;
+	-- end
+
+	for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
+		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, "name", ""), nodeChar, nil, bEquipped, bIdentified);
+	end
 end
 
 local addPC_old
