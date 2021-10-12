@@ -2,70 +2,6 @@
 -- Effects on Items, apply to character in CT
 --
 
---	run from addHandler for updated item effect options
-function inventoryUpdateItemEffects(nodeField)
-	updateItemEffects(nodeField.getParent());
-end
---	update single item from edit for *.effect handler
-function updateItemEffectsForID(nodeField)
-	local nodeItem = nodeField.getParent();
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
-	if nodeCT then
-		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-			local sLabel = DB.getValue(nodeEffect, "label", "");
-			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-			-- see if the node exists and if it's in an inventory node
-			local nodeEffectFound = DB.findNode(sEffSource);
-			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
-				local nodeEffectItem = nodeEffectFound.getChild("...");
-				if nodeEffectItem == nodeItem then -- id state was changed
-					nodeEffect.delete();
-					updateItemEffects(nodeEffectItem);
-				end
-			end
-		end
-	end
-end
-
---	update single item from edit for *.effect handler
-function updateItemEffectsForEdit(nodeField)
-	local nodeItem = nodeField.getParent();
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, ".....")));
-	if nodeCT then
-		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-			local sLabel = DB.getValue(nodeEffect, "label", "");
-			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-			-- see if the node exists and if it's in an inventory node
-			local nodeEffectFound = DB.findNode(sEffSource);
-			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
-				local nodeEffectItem = nodeEffectFound.getChild("...");
-				if nodeEffectFound == nodeItem then -- effect hide/show edit
-					nodeEffect.delete();
-					updateItemEffects(DB.getChild(nodeItem, "..."));
-				end
-			end
-		end
-	end
-end
-
---	this checks to see if an effect is missing its associated item
---	if the item isn't found, it removes the effect as the item has been removed
-function updateFromDeletedInventory(node)
---Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
-		local nodeChar = node.getParent();
-		local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
-		-- if we're already in a combattracker situation (npcs)
-		if not ActorManager.isPC(nodeChar) and string.match(nodeChar.getPath(),"^combattracker") then
-			nodeCT = nodeChar;
-		end
-		if nodeCT then
-			-- check that we still have the combat effect source item
-			-- otherwise remove it
-			checkEffectsAfterDelete(nodeCT);
-		end
-	--onEncumbranceChanged();
-end
-
 -- this checks to see if an effect is missing a associated item that applied the effect 
 -- when items are deleted and then clears that effect if it's missing.
 function checkEffectsAfterDelete(nodeChar)
@@ -1153,6 +1089,71 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 	end
 
 	return false;
+end
+
+--	run from addHandler for updated item effect options
+local function inventoryUpdateItemEffects(nodeField)
+	updateItemEffects(nodeField.getParent());
+end
+
+--	This function changes the visibility of effects when items are identified.
+local function updateItemEffectsForID(nodeField)
+	local nodeItem = nodeField.getParent();
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
+	local nCarried = DB.getValue(nodeItem, "carried", 0);
+	if nodeCT and nCarried == 2 then
+		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
+			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+			-- see if the node exists and if it's in an inventory node
+			local nodeEffectFound = DB.findNode(sEffSource);
+			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
+				local nodeEffectItem = nodeEffectFound.getChild("...");
+				if nodeEffectItem == nodeItem then
+					nodeEffect.delete();
+					updateItemEffects(nodeEffectItem);
+				end
+			end
+		end
+	end
+end
+
+--	This function changes the associated effects when item effect lists are changed while item is equipped.
+local function updateItemEffectsForEdit(nodeField)
+	local nodeEffectItem = nodeField.getParent();
+	local nodeItem = nodeEffectItem.getChild('...');
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
+	local nCarried = DB.getValue(nodeItem, "carried", 0);
+	if nodeCT and nCarried == 2 then
+		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
+			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+			-- see if the node exists and if it's in an inventory node
+			local nodeEffectFound = DB.findNode(sEffSource);
+			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
+				if nodeEffectFound == nodeEffectItem then
+					nodeEffect.delete();
+					updateItemEffects(DB.getChild(nodeEffectItem, "..."));
+				end
+			end
+		end
+	end
+end
+
+--	this checks to see if an effect is missing its associated item
+--	if the item isn't found, it removes the effect as the item has been removed
+local function updateFromDeletedInventory(node)
+	--Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
+	local nodeChar = node.getParent();
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
+	-- if we're already in a combattracker situation (npcs)
+	if not ActorManager.isPC(nodeChar) and string.match(nodeChar.getPath(),"^combattracker") then
+		nodeCT = nodeChar;
+	end
+	if nodeCT then
+		-- check that we still have the combat effect source item
+		-- otherwise remove it
+		checkEffectsAfterDelete(nodeCT);
+	end
+	--onEncumbranceChanged();
 end
 
 local function usingKelrugemFOP()
