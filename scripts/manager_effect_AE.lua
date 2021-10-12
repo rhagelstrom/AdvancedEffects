@@ -7,19 +7,30 @@ function inventoryUpdateItemEffects(nodeField)
 	updateItemEffects(nodeField.getParent());
 end
 --	update single item from edit for *.effect handler
-function updateItemEffectsForEdit(nodeField)
-	checkEffectsAfterEdit(nodeField.getParent());
-end
---	find the effect for this source and delete and re-build
-function checkEffectsAfterEdit(nodeItem)
-	local nodeChar, bIDUpdated
-	if nodeItem.getPath():match("%.effectlist%.") then
-		nodeChar = DB.getChild(nodeItem, ".....");
-	else
-		nodeChar = DB.getChild(nodeItem, "...");
-		bIDUpdated = true;
+function updateItemEffectsForID(nodeField)
+	local nodeItem = nodeField.getParent();
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
+	if nodeCT then
+		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
+			local sLabel = DB.getValue(nodeEffect, "label", "");
+			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+			-- see if the node exists and if it's in an inventory node
+			local nodeEffectFound = DB.findNode(sEffSource);
+			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
+				local nodeEffectItem = nodeEffectFound.getChild("...");
+				if nodeEffectItem == nodeItem then -- id state was changed
+					nodeEffect.delete();
+					updateItemEffects(nodeEffectItem);
+				end
+			end
+		end
 	end
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
+end
+
+--	update single item from edit for *.effect handler
+function updateItemEffectsForEdit(nodeField)
+	local nodeItem = nodeField.getParent();
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, ".....")));
 	if nodeCT then
 		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
 			local sLabel = DB.getValue(nodeEffect, "label", "");
@@ -31,9 +42,6 @@ function checkEffectsAfterEdit(nodeItem)
 				if nodeEffectFound == nodeItem then -- effect hide/show edit
 					nodeEffect.delete();
 					updateItemEffects(DB.getChild(nodeItem, "..."));
-				elseif nodeEffectItem == nodeItem then -- id state was changed
-					nodeEffect.delete();
-					updateItemEffects(nodeEffectItem);
 				end
 			end
 		end
@@ -1158,7 +1166,7 @@ function onInit()
 	if Session.IsHost then
 		-- watch the character/pc inventory list
 		DB.addHandler("charsheet.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
-		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForID);
 		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
 		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durdice", "onUpdate", updateItemEffectsForEdit);
 		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durmod", "onUpdate", updateItemEffectsForEdit);
