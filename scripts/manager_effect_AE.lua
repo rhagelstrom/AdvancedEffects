@@ -2,40 +2,6 @@
 -- Effects on Items, apply to character in CT
 --
 
--- this checks to see if an effect is missing a associated item that applied the effect 
--- when items are deleted and then clears that effect if it's missing.
-function checkEffectsAfterDelete(nodeChar)
-	local sUser = User.getUsername();
-	for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
-		local sLabel = DB.getValue(nodeEffect, "label", "");
-		local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-		-- see if the node exists and if it's in an inventory node
-		local nodeFound = DB.findNode(sEffSource);
-		local bDeleted = ((nodeFound == nil) and string.match(sEffSource,"inventorylist"));
-		if (bDeleted) then
-			local msg = {font = "msgfont", icon = "roll_effect"};
-			msg.text = "Effect ['" .. sLabel .. "'] ";
-			msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
-			-- HANDLE APPLIED BY SETTING
-			if sEffSource and sEffSource ~= "" then
-					msg.text = msg.text .. " [by Deletion]";
-			end
-			if EffectManager.isGMEffect(nodeChar, nodeEffect) then
-					if sUser == "" then
-							msg.secret = true;
-							Comm.addChatMessage(msg);
-					elseif sUser ~= "" then
-							Comm.addChatMessage(msg);
-							Comm.deliverChatMessage(msg, sUser);
-					end
-			else
-					Comm.deliverChatMessage(msg);
-			end
-			nodeEffect.delete();
-		end
-	end
-end
-
 function updateItemEffects(nodeItem)
 	local nodeChar = DB.getChild(nodeItem, "...");
 		if not nodeChar then
@@ -77,13 +43,13 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 		local bFound = false;
 		for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
 			local nActive = DB.getValue(nodeEffect, "isactive", 0);
-			local nDMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
+			local nGMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
 			if (nActive ~= 0) then
 				local sEffSource = DB.getValue(nodeEffect, "source_name", "");
 				if (sEffSource == sItemSource) then
 					bFound = true;
 					if (not bEquipped) then
-						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly, sUser)
+						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly, sUser)
 						nodeEffect.delete();
 						break;
 					end -- not equipped
@@ -102,22 +68,22 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 			else
 				nRollDuration = nModDice;
 			end
-			local nDMOnly = 0;
+			local nGMOnly = 0;
 			local sVisibility = DB.getValue(nodeItemEffect, "visibility", "hide");
 			if sVisibility == "hide" then
-				nDMOnly = 1;
+				nGMOnly = 1;
 			elseif sVisibility == "show" then
-				nDMOnly = 0;
+				nGMOnly = 0;
 			elseif nIdentified == 0 then
-				nDMOnly = 1;
+				nGMOnly = 1;
 			elseif nIdentified > 0	then
-				nDMOnly = 0;
+				nGMOnly = 0;
 			end
 
 			if not ActorManager.isPC(nodeChar) then
 				local bTokenVis = (DB.getValue(nodeChar,"tokenvis") == 1);
 				if not bTokenVis then
-					nDMOnly = 1; -- hide if token not visible
+					nGMOnly = 1; -- hide if token not visible
 				end
 			end
 
@@ -131,10 +97,10 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
 			rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
 			rEffect.nInit = 0;
 			rEffect.sSource = sItemSource;
-			rEffect.nGMOnly = nDMOnly;
+			rEffect.nGMOnly = nGMOnly;
 			rEffect.sApply = "";
 		
-			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly, sUser)
+			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly, sUser)
 			EffectManager.addEffect("", "", nodeChar, rEffect, false);
 		end
 	end
@@ -569,15 +535,15 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 	else
 		nRollDuration = nModDice;
 	end
-	local nDMOnly = 0;
+	local nGMOnly = 0;
 	local sVisibility = DB.getValue(nodeCharEffect, "visibility", "");
 	if sVisibility == "show" then
-		nDMOnly = 0;
+		nGMOnly = 0;
 	elseif sVisibility == "hide" then
-		nDMOnly = 1;
+		nGMOnly = 1;
 	end
 	if not ActorManager.isPC(nodeEntry) then
-		nDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
+		nGMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
 	end
 
 	local rEffect = {};
@@ -588,10 +554,10 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 	rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
 	rEffect.nInit = 0;
 	rEffect.sSource = nodeEntry.getPath();
-	rEffect.nGMOnly = nDMOnly;
+	rEffect.nGMOnly = nGMOnly;
 	rEffect.sApply = "";
 
-	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly, sUser);
+	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, sUser);
 	EffectManager.addEffect("", "", nodeEntry, rEffect, false);
 end
 
@@ -637,8 +603,29 @@ function addNPC_new(sClass, nodeCT, sName, ...)
 	return nodeEntry;
 end
 
+-- send message
+local function sendRawMessage(sUser, nGMOnly, msg)
+	local sIdentity = nil;
+	if sUser and sUser ~= "" then 
+		sIdentity = User.getCurrentIdentity(sUser) or nil;
+	end
+	if sIdentity then
+		msg.icon = "portrait_" .. User.getCurrentIdentity(sUser) .. "_chat";
+	else
+		msg.font = "msgfont";
+		msg.icon = "roll_effect";
+	end
+	if nGMOnly == 1 then
+		msg.secret = true;
+		Comm.addChatMessage(msg);
+	elseif nGMOnly ~= 1 then 
+		--Comm.addChatMessage(msg);
+		Comm.deliverChatMessage(msg);
+	end
+end
+
 -- build message to send that effect removed
-function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
+function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
 	local sUser = nodeChar.getOwner();
 --Debug.console("manager_effect_adnd.lua","sendEffectRemovedMessage","sUser",sUser);	
 	local sCharacterName = DB.getValue(nodeChar, "name", "");
@@ -651,11 +638,11 @@ function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
 	if sEffSource and sEffSource ~= "" then
 		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(sEffSource), "name", "") .. "]";
 	end
-	sendRawMessage(sUser,nDMOnly,msg);
+	sendRawMessage(sUser,nGMOnly,msg);
 end
 
 -- build message to send that effect added
-function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
+function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
 	local sUser = nodeCT.getOwner();
 --Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);	
 	-- Build output message
@@ -665,32 +652,11 @@ function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
 	if rNewEffect.sSource and rNewEffect.sSource ~= "" then
 		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(rNewEffect.sSource), "name", "") .. "]";
 	end
-		sendRawMessage(sUser,nDMOnly,msg);
-end
-
--- send message
-function sendRawMessage(sUser, nDMOnly, msg)
-	local sIdentity = nil;
-	if sUser and sUser ~= "" then 
-		sIdentity = User.getCurrentIdentity(sUser) or nil;
-	end
-	if sIdentity then
-		msg.icon = "portrait_" .. User.getCurrentIdentity(sUser) .. "_chat";
-	else
-		msg.font = "msgfont";
-		msg.icon = "roll_effect";
-	end
-	if nDMOnly == 1 then
-		msg.secret = true;
-		Comm.addChatMessage(msg);
-	elseif nDMOnly ~= 1 then 
-		--Comm.addChatMessage(msg);
-		Comm.deliverChatMessage(msg);
-	end
+		sendRawMessage(sUser,nGMOnly,msg);
 end
 
 ---	This function returns false if the effect is tied to an item but the item isn't being used.
-function isValidCheckEffect(rActor, nodeEffect)
+local function isValidCheckEffect(rActor, nodeEffect)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
 		local bItem, bActionItemUsed, bActionOnly, nodeItem
 
@@ -733,8 +699,9 @@ end
 
 local itemPathKey = "ItemPath"
 
+--	replace CoreRPG ActionsManager manager_actions.lua encodeActionForDrag() with this
 local encodeActionForDrag_old
-function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
+local function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
 	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
 	if rSource and rSource.itemPath then
@@ -747,7 +714,7 @@ end
 
 --	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
 local decodeActors_old
-function decodeActors_new(draginfo, ...)
+local function decodeActors_new(draginfo, ...)
 	local rSource, aTargets = decodeActors_old(draginfo, ...)
 
 	local sItemPath = draginfo.getMetaData(itemPathKey)
@@ -1091,69 +1058,95 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 	return false;
 end
 
---	run from addHandler for updated item effect options
-local function inventoryUpdateItemEffects(nodeField)
-	updateItemEffects(nodeField.getParent());
-end
+--
+--	TRIGGERS/HANDLER FUNCTIONS
+--
 
---	This function changes the visibility of effects when items are identified.
-local function updateItemEffectsForID(nodeField)
-	local nodeItem = nodeField.getParent();
+---	This function removes existing effects and re-parses them.
+--	First it finds any effects that have this item as the source and removes those effects.
+--	Then it calls updateItemEffects to re-parse the current/correct effects.
+local function replaceItemEffects(nodeItem)
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
 	local nCarried = DB.getValue(nodeItem, "carried", 0);
-	if nodeCT and nCarried == 2 then
+	if nodeCT and DB.getValue(nodeItem, "carried") == 2 then
 		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
 			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
 			-- see if the node exists and if it's in an inventory node
-			local nodeEffectFound = DB.findNode(sEffSource);
-			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
-				local nodeEffectItem = nodeEffectFound.getChild("...");
-				if nodeEffectItem == nodeItem then
-					nodeEffect.delete();
-					updateItemEffects(nodeEffectItem);
+			local nodeItemSource = DB.findNode(sEffSource);
+			if (nodeItemSource and string.match(sEffSource,"inventorylist")) then
+				if nodeItemSource.getChild("...") == nodeItem then
+					nodeEffect.delete(); -- remove existing effect
+					updateItemEffects(nodeItem);
 				end
 			end
 		end
+	end
+end
+
+local function inventoryUpdateItemEffects(node)
+	local nodeItem = (node.getParent());
+	if nodeItem then
+		updateItemEffects(nodeItem);
+	end
+end
+
+--	This function changes the visibility of effects when items are identified.
+local function updateItemEffectsForID(node)
+	local nodeItem = (node.getParent());
+	if nodeItem then
+		replaceItemEffects(nodeItem);
 	end
 end
 
 --	This function changes the associated effects when item effect lists are changed while item is equipped.
-local function updateItemEffectsForEdit(nodeField)
-	local nodeEffectItem = nodeField.getParent();
-	local nodeItem = nodeEffectItem.getChild('...');
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
-	local nCarried = DB.getValue(nodeItem, "carried", 0);
-	if nodeCT and nCarried == 2 then
-		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-			-- see if the node exists and if it's in an inventory node
-			local nodeEffectFound = DB.findNode(sEffSource);
-			if (nodeEffectFound	and string.match(sEffSource,"inventorylist")) then
-				if nodeEffectFound == nodeEffectItem then
-					nodeEffect.delete();
-					updateItemEffects(DB.getChild(nodeEffectItem, "..."));
-				end
+local function updateItemEffectsForEdit(node)
+	local nodeItem = (node.getChild('....'));
+	if nodeItem then
+		replaceItemEffects(nodeItem);
+	end
+end
+
+---	This function checks to see if an effect is missing its associated item.
+--	If an associated item isn't found, it removes the effect as the item has been removed
+local function checkEffectsAfterDelete(nodeChar)
+	local sUser = User.getUsername();
+	for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
+		local sLabel = DB.getValue(nodeEffect, "label", "");
+		local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+		-- see if the node exists and if it's in an inventory node
+		local nodeFound = DB.findNode(sEffSource);
+		local bDeleted = ((nodeFound == nil) and string.match(sEffSource,"inventorylist"));
+		if (bDeleted) then
+			local msg = {font = "msgfont", icon = "roll_effect"};
+			msg.text = "Effect ['" .. sLabel .. "'] ";
+			msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
+			-- HANDLE APPLIED BY SETTING
+			if sEffSource and sEffSource ~= "" then
+					msg.text = msg.text .. " [by Deletion]";
 			end
+			if EffectManager.isGMEffect(nodeChar, nodeEffect) then
+					if sUser == "" then
+							msg.secret = true;
+							Comm.addChatMessage(msg);
+					elseif sUser ~= "" then
+							Comm.addChatMessage(msg);
+							Comm.deliverChatMessage(msg, sUser);
+					end
+			else
+					Comm.deliverChatMessage(msg);
+			end
+			nodeEffect.delete();
 		end
 	end
 end
 
---	this checks to see if an effect is missing its associated item
---	if the item isn't found, it removes the effect as the item has been removed
+---	This function checks to see if an effect is missing its associated item.
+--	If an associated item isn't found, it removes the effect as the item has been removed
 local function updateFromDeletedInventory(node)
-	--Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
-	local nodeChar = node.getParent();
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
-	-- if we're already in a combattracker situation (npcs)
-	if not ActorManager.isPC(nodeChar) and string.match(nodeChar.getPath(),"^combattracker") then
-		nodeCT = nodeChar;
-	end
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(node.getParent()));
 	if nodeCT then
-		-- check that we still have the combat effect source item
-		-- otherwise remove it
 		checkEffectsAfterDelete(nodeCT);
 	end
-	--onEncumbranceChanged();
 end
 
 local function usingKelrugemFOP()
