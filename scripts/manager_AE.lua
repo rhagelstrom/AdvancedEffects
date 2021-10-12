@@ -307,7 +307,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 		-- to add support for AE in other extensions, make this change
 		-- Check effect is from used weapon.
 		-- original line: if nActive ~= 0 then
-		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
+		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Check targeting
@@ -712,7 +712,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 then
-		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
+		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
@@ -789,7 +789,7 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 then
-		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) then
+		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
@@ -895,7 +895,7 @@ local function checkConditionalHelper_kel(rActor, sEffect, rTarget, aIgnore)
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
-		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
+		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
@@ -990,7 +990,7 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
-		if ((not EffectManagerAE and nActive ~= 0) or (EffectManagerAE and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
+		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath()) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
@@ -1030,96 +1030,6 @@ local function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 	return false;
 end
 
---
---	TRIGGERS/HANDLER FUNCTIONS
---
-
----	This function removes existing effects and re-parses them.
---	First it finds any effects that have this item as the source and removes those effects.
---	Then it calls updateItemEffects to re-parse the current/correct effects.
-local function replaceItemEffects(nodeItem)
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
-	if nodeCT and DB.getValue(nodeItem, "carried") == 2 then
-		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-			-- see if the node exists and if it's in an inventory node
-			local nodeItemSource = DB.findNode(sEffSource);
-			if (nodeItemSource and string.match(sEffSource,"inventorylist")) then
-				if nodeItemSource.getChild("...") == nodeItem then
-					nodeEffect.delete(); -- remove existing effect
-					updateItemEffects(nodeItem);
-				end
-			end
-		end
-	end
-end
-
-local function inventoryUpdateItemEffects(node)
-	local nodeItem = (node.getParent());
-	if nodeItem then
-		updateItemEffects(nodeItem);
-	end
-end
-
---	This function changes the visibility of effects when items are identified.
-local function updateItemEffectsForID(node)
-	local nodeItem = (node.getParent());
-	if nodeItem then
-		replaceItemEffects(nodeItem);
-	end
-end
-
---	This function changes the associated effects when item effect lists are changed while item is equipped.
-local function updateItemEffectsForEdit(node)
-	local nodeItem = (node.getChild('....'));
-	if nodeItem then
-		replaceItemEffects(nodeItem);
-	end
-end
-
----	This function checks to see if an effect is missing its associated item.
---	If an associated item isn't found, it removes the effect as the item has been removed
-local function checkEffectsAfterDelete(nodeChar)
-	local sUser = User.getUsername();
-	for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
-		local sLabel = DB.getValue(nodeEffect, "label", "");
-		local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-		-- see if the node exists and if it's in an inventory node
-		local nodeFound = DB.findNode(sEffSource);
-		local bDeleted = ((nodeFound == nil) and string.match(sEffSource,"inventorylist"));
-		if bDeleted then
-			local msg = {font = "msgfont", icon = "roll_effect"};
-			msg.text = "Effect ['" .. sLabel .. "'] ";
-			msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
-			-- HANDLE APPLIED BY SETTING
-			if sEffSource and sEffSource ~= "" then
-				msg.text = msg.text .. " [by Deletion]";
-			end
-			if EffectManager.isGMEffect(nodeChar, nodeEffect) then
-				if sUser == "" then
-					msg.secret = true;
-					Comm.addChatMessage(msg);
-				elseif sUser ~= "" then
-					Comm.addChatMessage(msg);
-					Comm.deliverChatMessage(msg, sUser);
-				end
-			else
-				Comm.deliverChatMessage(msg);
-			end
-			nodeEffect.delete();
-		end
-	end
-end
-
----	This function checks to see if an effect is missing its associated item.
---	If an associated item isn't found, it removes the effect as the item has been removed
-local function updateFromDeletedInventory(node)
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(node.getParent()));
-	if nodeCT then
-		checkEffectsAfterDelete(nodeCT);
-	end
-end
-
 local function usingKelrugemFOP()
 	return (StringManager.contains(Extension.getExtensions(), "Full OverlayPackage") or
 			StringManager.contains(Extension.getExtensions(), "Full OverlayPackage with alternative icons") or
@@ -1128,20 +1038,6 @@ end
 
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
-	if Session.IsHost then
-		-- watch the character/pc inventory list
-		DB.addHandler("charsheet.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
-		DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForID);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durdice", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durmod", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.name", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
-		DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
-	end
-
 	-- CoreRPG replacements
 	encodeActionForDrag_old = ActionsManager.encodeActionForDrag
 	ActionsManager.encodeActionForDrag = encodeActionForDrag_new
