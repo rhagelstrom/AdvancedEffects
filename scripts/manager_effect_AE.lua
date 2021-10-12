@@ -4,13 +4,11 @@
 
 --	run from addHandler for updated item effect options
 function inventoryUpdateItemEffects(nodeField)
-	nodeItem = DB.getChild(nodeField, "..");
-
-	updateItemEffects(DB.getChild(nodeField, ".."));
+	updateItemEffects(nodeField.getParent());
 end
 --	update single item from edit for *.effect handler
 function updateItemEffectsForEdit(nodeField)
-	checkEffectsAfterEdit(nodeField.getChild(".."));
+	checkEffectsAfterEdit(nodeField.getParent());
 end
 --	find the effect for this source and delete and re-build
 function checkEffectsAfterEdit(nodeItem)
@@ -46,7 +44,7 @@ end
 --	if the item isn't found, it removes the effect as the item has been removed
 function updateFromDeletedInventory(node)
 --Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
-		local nodeChar = DB.getChild(node, "..");
+		local nodeChar = node.getParent();
 		local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
 		-- if we're already in a combattracker situation (npcs)
 		if not ActorManager.isPC(nodeChar) and string.match(nodeChar.getPath(),"^combattracker") then
