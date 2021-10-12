@@ -61,35 +61,35 @@ end
 -- this checks to see if an effect is missing a associated item that applied the effect 
 -- when items are deleted and then clears that effect if it's missing.
 function checkEffectsAfterDelete(nodeChar)
-		local sUser = User.getUsername();
-		for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
-				local sLabel = DB.getValue(nodeEffect, "label", "");
-				local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-				-- see if the node exists and if it's in an inventory node
-				local nodeFound = DB.findNode(sEffSource);
-				local bDeleted = ((nodeFound == nil) and string.match(sEffSource,"inventorylist"));
-				if (bDeleted) then
-						local msg = {font = "msgfont", icon = "roll_effect"};
-						msg.text = "Effect ['" .. sLabel .. "'] ";
-						msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
-						-- HANDLE APPLIED BY SETTING
-						if sEffSource and sEffSource ~= "" then
-								msg.text = msg.text .. " [by Deletion]";
-						end
-						if EffectManager.isGMEffect(nodeChar, nodeEffect) then
-								if sUser == "" then
-										msg.secret = true;
-										Comm.addChatMessage(msg);
-								elseif sUser ~= "" then
-										Comm.addChatMessage(msg);
-										Comm.deliverChatMessage(msg, sUser);
-								end
-						else
-								Comm.deliverChatMessage(msg);
-						end
-						nodeEffect.delete();
-				end
+	local sUser = User.getUsername();
+	for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
+		local sLabel = DB.getValue(nodeEffect, "label", "");
+		local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+		-- see if the node exists and if it's in an inventory node
+		local nodeFound = DB.findNode(sEffSource);
+		local bDeleted = ((nodeFound == nil) and string.match(sEffSource,"inventorylist"));
+		if (bDeleted) then
+			local msg = {font = "msgfont", icon = "roll_effect"};
+			msg.text = "Effect ['" .. sLabel .. "'] ";
+			msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
+			-- HANDLE APPLIED BY SETTING
+			if sEffSource and sEffSource ~= "" then
+					msg.text = msg.text .. " [by Deletion]";
+			end
+			if EffectManager.isGMEffect(nodeChar, nodeEffect) then
+					if sUser == "" then
+							msg.secret = true;
+							Comm.addChatMessage(msg);
+					elseif sUser ~= "" then
+							Comm.addChatMessage(msg);
+							Comm.deliverChatMessage(msg, sUser);
+					end
+			else
+					Comm.deliverChatMessage(msg);
+			end
+			nodeEffect.delete();
 		end
+	end
 end
 
 function updateItemEffects(nodeItem)
