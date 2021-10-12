@@ -2,6 +2,55 @@
 -- Effects on Items, apply to character in CT
 --
 
+-- send message
+local function sendRawMessage(sUser, nGMOnly, msg)
+	local sIdentity = nil;
+	if sUser and sUser ~= "" then 
+		sIdentity = User.getCurrentIdentity(sUser) or nil;
+	end
+	if sIdentity then
+		msg.icon = "portrait_" .. User.getCurrentIdentity(sUser) .. "_chat";
+	else
+		msg.font = "msgfont";
+		msg.icon = "roll_effect";
+	end
+	if nGMOnly == 1 then
+		msg.secret = true;
+		Comm.addChatMessage(msg);
+	elseif nGMOnly ~= 1 then 
+		--Comm.addChatMessage(msg);
+		Comm.deliverChatMessage(msg);
+	end
+end
+
+-- build message to send that effect removed
+local function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
+	local sUser = nodeChar.getOwner();
+	-- Build output message
+	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeChar),sUser);
+	msg.text = "Advanced Effect ['" .. sLabel .. "'] ";
+	msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
+	-- HANDLE APPLIED BY SETTING
+	local sEffSource = DB.getValue(nodeEffect, "source_name", "");		
+	if sEffSource and sEffSource ~= "" then
+		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(sEffSource), "name", "") .. "]";
+	end
+	sendRawMessage(sUser,nGMOnly,msg);
+end
+
+-- build message to send that effect added
+local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
+	local sUser = nodeCT.getOwner();
+	-- Build output message
+	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
+	msg.text = "Advanced Effect ['" .. rNewEffect.sName .. "'] ";
+	msg.text = msg.text .. "-> [to " .. DB.getValue(nodeCT, "name", "") .. "]";
+	if rNewEffect.sSource and rNewEffect.sSource ~= "" then
+		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(rNewEffect.sSource), "name", "") .. "]";
+	end
+	sendRawMessage(sUser,nGMOnly,msg);
+end
+
 function updateItemEffects(nodeItem)
 	local nodeChar = DB.getChild(nodeItem, "...");
 		if not nodeChar then
@@ -510,21 +559,10 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 	return results;
 end
 
-
--- flip through all npc effects (generally do this in addNPC()/addPC()
--- nodeChar: node of PC/NPC in PC/NPCs record list
--- nodeEntry: node in combat tracker for PC/NPC
-function updateCharEffects(nodeChar,nodeEntry)
-	for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
-		updateCharEffect(nodeCharEffect,nodeEntry);
-	end -- for item's effects list 
-end
-
 -- this will be used to manage PC/NPC effectslist objects
 -- nodeCharEffect: node in effectlist on PC/NPC
 -- nodeEntry: node in combat tracker for PC/NPC
-function updateCharEffect(nodeCharEffect,nodeEntry)
-	local sUser = User.getUsername();
+local function updateCharEffect(nodeCharEffect, nodeEntry)
 	local sName = DB.getValue(nodeEntry, "name", "");
 	local sLabel = DB.getValue(nodeCharEffect, "effect", "");
 	local nRollDuration = 0;
@@ -536,7 +574,7 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 		nRollDuration = nModDice;
 	end
 	local nGMOnly = 0;
-	local sVisibility = DB.getValue(nodeCharEffect, "visibility", "");
+	local sVisibility = DB.getValue(nodeCharEffect, "visibility");
 	if sVisibility == "show" then
 		nGMOnly = 0;
 	elseif sVisibility == "hide" then
@@ -557,102 +595,17 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
 	rEffect.nGMOnly = nGMOnly;
 	rEffect.sApply = "";
 
-	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, sUser);
+	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, User.getUsername());
 	EffectManager.addEffect("", "", nodeEntry, rEffect, false);
 end
 
--- custom version of the one in CoreRPG to deal with adding new 
--- pcs to the combat tracker to deal with advanced effects. --celestian
-local addPC_old
-function addPC_new(nodeChar, ...)
-	-- Parameter validation
-	if not nodeChar then
-		return;
-	end
-
-	-- Call original function for better compatibility
-	addPC_old(nodeChar, ...)
-
-	-- now flip through inventory and pass each to updateEffects()
-	-- so that if they have a combat_effect it will be applied.
-	for _,nodeItem in pairs(DB.getChildren(nodeChar, "inventorylist")) do
-		updateItemEffects(nodeItem,true);
-	end
-	-- end
-
-	local rActor = ActorManager.resolveActor(nodeChar)
-	local nodeCT = ActorManager.getCTNode(rActor)
-
-	-- check to see if npc effects exists and if so apply --celestian
-	updateCharEffects(nodeChar,nodeCT);
-
-	-- make sure active users get ownership of their CT nodes
-	-- otherwise effects applied by items/etc won't work.
-	--AccessManagerADND.manageCTOwners(nodeEntry);
-end
-
--- call the base addNPC from manager_combat2.lua from 5E ruleset for this and
--- then check for PC effects to add -- celestian
-local addNPC_old
-function addNPC_new(sClass, nodeCT, sName, ...)
-	-- Call original function
-	local nodeEntry = addNPC_old(sClass, nodeCT, sName, ...);
-
-	updateCharEffects(nodeCT,nodeEntry);
-
-	return nodeEntry;
-end
-
--- send message
-local function sendRawMessage(sUser, nGMOnly, msg)
-	local sIdentity = nil;
-	if sUser and sUser ~= "" then 
-		sIdentity = User.getCurrentIdentity(sUser) or nil;
-	end
-	if sIdentity then
-		msg.icon = "portrait_" .. User.getCurrentIdentity(sUser) .. "_chat";
-	else
-		msg.font = "msgfont";
-		msg.icon = "roll_effect";
-	end
-	if nGMOnly == 1 then
-		msg.secret = true;
-		Comm.addChatMessage(msg);
-	elseif nGMOnly ~= 1 then 
-		--Comm.addChatMessage(msg);
-		Comm.deliverChatMessage(msg);
-	end
-end
-
--- build message to send that effect removed
-function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
-	local sUser = nodeChar.getOwner();
---Debug.console("manager_effect_adnd.lua","sendEffectRemovedMessage","sUser",sUser);	
-	local sCharacterName = DB.getValue(nodeChar, "name", "");
-	-- Build output message
-	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeChar),sUser);
-	msg.text = "Advanced Effect ['" .. sLabel .. "'] ";
-	msg.text = msg.text .. "removed [from " .. sCharacterName .. "]";
-	-- HANDLE APPLIED BY SETTING
-	local sEffSource = DB.getValue(nodeEffect, "source_name", "");		
-	if sEffSource and sEffSource ~= "" then
-		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(sEffSource), "name", "") .. "]";
-	end
-	sendRawMessage(sUser,nGMOnly,msg);
-end
-
--- build message to send that effect added
-function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
-	local sUser = nodeCT.getOwner();
---Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);	
-	-- Build output message
-	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
-	msg.text = "Advanced Effect ['" .. rNewEffect.sName .. "'] ";
-	msg.text = msg.text .. "-> [to " .. DB.getValue(nodeCT, "name", "") .. "]";
-	if rNewEffect.sSource and rNewEffect.sSource ~= "" then
-		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(rNewEffect.sSource), "name", "") .. "]";
-	end
-		sendRawMessage(sUser,nGMOnly,msg);
+-- flip through all npc effects (generally do this in addNPC()/addPC()
+-- nodeChar: node of PC/NPC in PC/NPCs record list
+-- nodeEntry: node in combat tracker for PC/NPC
+local function updateCharEffects(nodeChar, nodeEntry)
+	for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
+		updateCharEffect(nodeCharEffect,nodeEntry);
+	end -- for item's effects list 
 end
 
 ---	This function returns false if the effect is tied to an item but the item isn't being used.
@@ -723,6 +676,37 @@ local function decodeActors_new(draginfo, ...)
 	end
 
 	return rSource, aTargets;
+end
+
+local addPC_old
+function addPC_new(nodeChar, ...)
+	if not nodeChar then
+		return;
+	end
+
+	-- Call original function for better compatibility
+	addPC_old(nodeChar, ...)
+
+	-- check each inventory item for effects that need to be applied
+	for _,nodeItem in pairs(DB.getChildren(nodeChar, "inventorylist")) do
+		if DB.getValue(nodeItem, "carried") == 2 then
+			updateItemEffects(nodeItem);
+		end
+	end
+
+	-- check for and apply character effects
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
+	updateCharEffects(nodeChar, nodeCT);
+end
+
+local addNPC_old
+function addNPC_new(sClass, nodeCT, sName, ...)
+	-- Call original function
+	local nodeEntry = addNPC_old(sClass, nodeCT, sName, ...);
+
+	updateCharEffects(nodeCT, nodeEntry);
+
+	return nodeEntry;
 end
 
 --	replace 3.5E EffectManager35E manager_effect_35E.lua hasEffect() with this
@@ -1067,7 +1051,6 @@ end
 --	Then it calls updateItemEffects to re-parse the current/correct effects.
 local function replaceItemEffects(nodeItem)
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
-	local nCarried = DB.getValue(nodeItem, "carried", 0);
 	if nodeCT and DB.getValue(nodeItem, "carried") == 2 then
 		for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
 			local sEffSource = DB.getValue(nodeEffect, "source_name", "");
