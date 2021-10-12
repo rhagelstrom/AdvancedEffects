@@ -52,33 +52,21 @@ local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
 end
 
 function updateItemEffects(nodeItem)
-	local nodeChar = DB.getChild(nodeItem, "...");
-		if not nodeChar then
-			return;
-		end
-		local sUser = User.getUsername();
-		local sName = DB.getValue(nodeItem, "name", "");
-		-- we swap the node to the combat tracker node
-		-- so the "effect" is written to the right node
-		if not string.match(nodeChar.getPath(),"^combattracker") then
-			nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
-		end
-		-- if not in the combat tracker bail
-		if not nodeChar then
-			return;
-		end
+	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild("...")));
+	if not nodeChar then
+		return;
+	end
 
-		local nCarried = DB.getValue(nodeItem, "carried", 0);
-		local bEquipped = (nCarried == 2);
-		local nIdentified = DB.getValue(nodeItem, "isidentified", 1);
-		-- local bOptionID = OptionsManager.isOption("MIID", "on");
-		-- if not bOptionID then 
-			-- nIdentified = 1;
-		-- end
+	local bEquipped = (DB.getValue(nodeItem, "carried") == 2);
+	local nIdentified = DB.getValue(nodeItem, "isidentified", 1);
+	-- local bOptionID = OptionsManager.isOption("MIID", "on");
+	-- if not bOptionID then 
+		-- nIdentified = 1;
+	-- end
 
-		for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
-			updateItemEffect(nodeItemEffect, sName, nodeChar, nil, bEquipped, nIdentified);
-		end -- for item's effects list
+	for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
+		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, "name", ""), nodeChar, nil, bEquipped, nIdentified);
+	end
 end
 
 -- update single effect for item
