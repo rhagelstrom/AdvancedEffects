@@ -164,7 +164,6 @@
         <basicnumber>
             <default>0</default>
             <hideonvalue>0</hideonvalue>
-            <gmeditonly />
         </basicnumber>
     </template>
 
