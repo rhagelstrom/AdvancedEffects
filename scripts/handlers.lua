@@ -88,6 +88,14 @@ local function updateFromDeletedInventory(node)
 	end
 end
 
+---	Triggers after an effect on an item is deleted, causing a recheck of the effects in the combat tracker
+local function removeEffectOnItemEffectDelete(node)
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(node, "....")));
+	if nodeCT then
+		checkEffectsAfterDelete(nodeCT);
+	end
+end
+
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
 	if Session.IsHost then
@@ -101,6 +109,7 @@ function onInit()
 		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
 		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
 		DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
+		DB.addHandler("charsheet.*.inventorylist.*.effectlist", "onChildDeleted", removeEffectOnItemEffectDelete);
 		DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
 	end
 end
