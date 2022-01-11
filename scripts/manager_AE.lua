@@ -323,28 +323,28 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 					-- Handle conditionals
 					-- KEL adding TAG for SAVE
 					if rEffectComp.type == "IF" then
-						if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+						if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, rFilterActor, false, rEffectSpell) then
 							break;
 						end
 					elseif rEffectComp.type == "NIF" then
-						if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+						if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, rFilterActor, false, rEffectSpell) then
 							break;
 						end
 					elseif rEffectComp.type == "IFTAG" then
 						if not rEffectSpell then
 							break;
-						elseif not EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+						elseif not EffectManager35E.checkTagConditional(rEffectComp.remainder, rEffectSpell) then
 							break;
 						end
 					elseif rEffectComp.type == "NIFTAG" then
-						if EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+						if EffectManager35E.checkTagConditional(rEffectComp.remainder, rEffectSpell) then
 							break;
 						end
 					elseif rEffectComp.type == "IFT" then
 						if not rFilterActor then
 							break;
 						end
-						if not EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+						if not EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor, false, rEffectSpell) then
 							break;
 						end
 						bTargeted = true;
@@ -354,7 +354,7 @@ local function getEffectsByType_kel(rActor, sEffectType, aFilter, rFilterActor, 
 							break;
 							-- end
 						end
-						if EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+						if EffectManager35E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor, false, rEffectSpell) then
 							break;
 						end
 						if rFilterActor then
