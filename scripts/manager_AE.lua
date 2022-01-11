@@ -655,7 +655,7 @@ function updateItemEffects(nodeItem)
 	end
 
 	local bEquipped = DB.getValue(nodeItem, "carried") == 2;
-	local bIdentified = DB.getValue(nodeItem, "isidentified") == 1;
+	local bIdentified = DB.getValue(nodeItem, "isidentified", 1) == 1;
 	-- local bOptionID = OptionsManager.isOption("MIID", "on");
 	-- if not bOptionID then 
 		-- bIdentified = true;
