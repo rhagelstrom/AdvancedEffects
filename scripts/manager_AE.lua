@@ -836,11 +836,11 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 				elseif rEffectComp.type == "IFTAG" then
 					if not rEffectSpell then
 						break;
-					elseif not checkTagConditional(rEffectComp.remainder, rEffectSpell) then
+					elseif not EffectManager35E.checkTagConditional(rEffectComp.remainder, rEffectSpell) then
 						break;
 					end
 				elseif rEffectComp.type == "NIFTAG" then
-					if checkTagConditional(rEffectComp.remainder, rEffectSpell) then
+					if EffectManager35E.checkTagConditional(rEffectComp.remainder, rEffectSpell) then
 						break;
 					end
 				
