@@ -777,7 +777,7 @@ end
 
 local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets, rEffectSpell)
 	if not sEffect or not rActor then
-		return false;
+		return false, 0;
 	end
 	local sLowerEffect = sEffect:lower();
 
@@ -806,18 +806,18 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 				-- Check conditionals
 				-- KEL Adding TAG for SIMMUNE
 				if rEffectComp.type == "IF" then
-					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, rTarget, false, rEffectSpell) then
 						break;
 					end
 				elseif rEffectComp.type == "NIF" then
-					if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder) then
+					if EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, rTarget, false, rEffectSpell) then
 						break;
 					end
 				elseif rEffectComp.type == "IFT" then
 					if not rTarget then
 						break;
 					end
-					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, false, rEffectSpell) then
 						break;
 					end
 					bIFT = true;
@@ -827,7 +827,7 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 						break;
 						-- end
 					end
-					if EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+					if EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, false, rEffectSpell) then
 						break;
 					end
 					if rTarget then
@@ -836,13 +836,14 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 				elseif rEffectComp.type == "IFTAG" then
 					if not rEffectSpell then
 						break;
-					elseif not EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+					elseif not checkTagConditional(rEffectComp.remainder, rEffectSpell) then
 						break;
 					end
 				elseif rEffectComp.type == "NIFTAG" then
-					if EffectManager35E.checkTagConditional(rActor, v, rEffectComp.remainder, rEffectSpell) then
+					if checkTagConditional(rEffectComp.remainder, rEffectSpell) then
 						break;
 					end
+				
 				-- Check for match
 				elseif rEffectComp.original:lower() == sLowerEffect then
 					if bTargeted and not bIgnoreEffectTargets then
@@ -878,9 +879,9 @@ local function hasEffect_kel(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 	end
 
 	if #aMatch > 0 then
-		return true;
+		return true, #aMatch;
 	end
-	return false;
+	return false, 0;
 end
 
 local function usingKelrugemFOP()
