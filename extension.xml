@@ -4,7 +4,7 @@
 	<properties>
 		<name>Feature: Advanced Effects</name>
 		<version>1.7</version>
-		<loadorder>40</loadorder>
+		<loadorder>34</loadorder>
 		<description>
 			<text>Add effects to pcs, npcs and items.</text>
 			<website></website>
