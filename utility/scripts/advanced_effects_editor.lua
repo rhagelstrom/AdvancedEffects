@@ -79,7 +79,7 @@ function update()
     local bSusceptiblity = (sType == "susceptiblity");
 	local bIsResist = (DB.getValue(node, "susceptiblity_type", "") == "resist");
 
-    local bMisc = (sType == "misc");
+    local bMisc = (sType == "misc_ae");
 
     local bLabel = (sType == "label");
 	

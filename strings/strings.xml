@@ -51,7 +51,7 @@
     <string name="immune">Immunity</string>
     <string name="vuln">Vulnerability</string>
     <string name="susceptiblity">Susceptiblity</string>
-    <string name="misc">Miscellaneous</string>
+    <string name="misc_ae">Miscellaneous</string>
     <string name="label">Label Only</string>
 
     <string name="modifier">Modifier</string>
