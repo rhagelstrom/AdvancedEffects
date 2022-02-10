@@ -3,6 +3,9 @@ Original extension by [Celestian](https://www.fantasygrounds.com/forums/member.p
 
 Attach effects to PCs, NPCs and items.
 
+# Compatibility
+This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.1.13 (2022-01-05).
+
 # How does it work?
 When you apply the extension to a 5E campaign you'll notice a new field on items, npcs and character sheets (under Abilities tab) called "Effect Features".
 
