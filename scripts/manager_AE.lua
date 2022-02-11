@@ -556,14 +556,6 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 	return false;
 end
 
-local function usingKelrugemFOP()
-	return (StringManager.contains(Extension.getExtensions(), "Full OverlayPackage") or
-			StringManager.contains(Extension.getExtensions(), "Full OverlayPackage with alternative icons") or
-			StringManager.contains(Extension.getExtensions(), "Full OverlayPackage with other icons") or
-			StringManager.contains(Extension.getExtensions(), "StrainInjury with Full OverlayPackage") or
-			StringManager.contains(Extension.getExtensions(), "StrainInjury with Full OverlayPackage with new icons"));
-end
-
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
 	-- CoreRPG replacements
@@ -580,7 +572,7 @@ function onInit()
 	CombatManager.addNPC = addNPC_new;
 	
 	-- 3.5E replacements
-	if not usingKelrugemFOP() then
+	if not CombatManagerKel then
 		EffectManager35E.getEffectsByType = getEffectsByType_new;
 		EffectManager35E.hasEffect = hasEffect_new;
 	end
