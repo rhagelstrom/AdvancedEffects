@@ -7,11 +7,19 @@ local getWeaponDamageRollStructures_old
 function getWeaponDamageRollStructures(nodeWeapon, ...)
 	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...);
 
-    -- add itemPath to rActor so that when effects are checked we can 
+    -- add nodeWeapon to rActor so that when effects are checked we can 
 	-- make compare against action only effects
 	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
-	rActor.itemPath = sRecord;
-	
+	rActor.nodeWeapon = sRecord;
+
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.nodeAmmo = nodeAmmo.getPath()
+		end
+	end
+
 	return rActor, rDamage;
 end
 
@@ -19,10 +27,18 @@ local getWeaponAttackRollStructures_old
 function getWeaponAttackRollStructures(nodeWeapon, nAttack, ...)
 	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack, ...);
 
-    -- add itemPath to rActor so that when effects are checked we can 
+    -- add nodeWeapon to rActor so that when effects are checked we can
 	-- make compare against action only effects
 	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
-	rActor.itemPath = sRecord;
+	rActor.nodeWeapon = sRecord;
+
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.nodeAmmo = nodeAmmo.getPath()
+		end
+	end
 
 	return rActor, rAttack;
 end

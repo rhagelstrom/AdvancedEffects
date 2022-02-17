@@ -51,39 +51,47 @@ local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
 	sendRawMessage(sUser,nGMOnly,msg);
 end
 
----	This function returns false if the effect is tied to an item but the item isn't being used.
+---	This function returns true if the effect is tied to an item and the item is being used.
 function isValidCheckEffect(rActor, nodeEffect)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
-		local bItem, bActionItemUsed, bActionOnly, nodeItem
+		local bItem, bActionItemUsed, bActionOnly = false, false, false
+		local sItemPath = ""
 
 		local sSource = DB.getValue(nodeEffect,"source_name","");
 		-- if source is a valid node and we can find "actiononly"
 		-- setting then we set it.
 		local node = DB.findNode(sSource);
-		if (node and node ~= nil) then
-			nodeItem = node.getChild("...");
-			if nodeItem and nodeItem ~= nil then
+		if node then
+			local nodeItem = node.getChild("...");
+			if nodeItem then
+				sItemPath = nodeItem.getPath();
 				bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
 			end
 		end
 
-		-- if there is a itemPath do some sanity checking
-		if (rActor.itemPath and rActor.itemPath ~= "") then
-			-- here is where we get the node path of the item, not the
-			-- effectslist entry
-			if DB.findNode(rActor.itemPath) and nodeItem then
-				local sNodePath = nodeItem.getPath();
-				if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
+		if sItemPath and sItemPath ~= "" then
+			-- if there is a nodeWeapon do some sanity checking
+			if rActor.nodeWeapon then
+				-- here is where we get the node path of the item, not the
+				-- effectslist entry
+				if bActionOnly and (sItemPath == rActor.nodeWeapon) then
 					bActionItemUsed = true;
-					bItem = true;
-				else
-					bActionItemUsed = false;
-					bItem = true; -- is item but doesn't match source path for this effect
+				end
+			end
+
+			-- if there is a nodeAmmo do some sanity checking
+			if AmmunitionManager and rActor.nodeAmmo then
+				-- here is where we get the node path of the item, not the
+				-- effectslist entry
+				if bActionOnly and (sItemPath == rActor.nodeAmmo) then
+					bActionItemUsed = true;
 				end
 			end
 		end
-
-		if not (bActionOnly and not bActionItemUsed) then
+		
+		if bActionOnly and not bActionItemUsed then
+			return false;
+		else
 			return true;
 		end
 	end
@@ -327,17 +335,24 @@ end
 --	REPLACEMENT FUNCTIONS
 --
 
-local itemPathKey = "ItemPath"
+local weaponPathKey = "nodeWeapon"
+local ammoPathKey = "nodeAmmo"
 
 --	replace CoreRPG ActionsManager manager_actions.lua encodeActionForDrag() with this
 local encodeActionForDrag_old
 local function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
 	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
-	if rSource and rSource.itemPath then
-		local itemPath = rSource.itemPath
-		if itemPath ~= "" then
-			draginfo.setMetaData(itemPathKey, itemPath)
+	if rSource and rSource.nodeWeapon then
+		local nodeWeapon = rSource.nodeWeapon
+		if nodeWeapon ~= "" then
+			draginfo.setMetaData(weaponPathKey, nodeWeapon)
+		end
+	end
+	if AmmunitionManager and rSource and rSource.nodeAmmo then
+		local nodeAmmo = rSource.nodeAmmo
+		if nodeAmmo ~= "" then
+			draginfo.setMetaData(ammoPathKey, nodeAmmo)
 		end
 	end
 end
@@ -347,9 +362,14 @@ local decodeActors_old
 local function decodeActors_new(draginfo, ...)
 	local rSource, aTargets = decodeActors_old(draginfo, ...)
 
-	local sItemPath = draginfo.getMetaData(itemPathKey)
-	if (sItemPath and sItemPath ~= "") then
-		rSource.itemPath = sItemPath
+	local sNodeWeapon = draginfo.getMetaData(weaponPathKey)
+	if (sNodeWeapon and sNodeWeapon ~= "") then
+		rSource.nodeWeapon = sNodeWeapon
+	end
+	
+	local sNodeAmmo = draginfo.getMetaData(ammoPathKey)
+	if AmmunitionManager and (sNodeAmmo and sNodeAmmo ~= "") then
+		rSource.nodeAmmo = sNodeAmmo
 	end
 
 	return rSource, aTargets;
@@ -493,7 +513,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 then
-		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and isValidCheckEffect(rActor,v))) then
+		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and AdvancedEffects.isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 
 			-- Parse each effect label
