@@ -51,7 +51,7 @@ local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
 	sendRawMessage(sUser,nGMOnly,msg);
 end
 
----	This function returns true if the effect is tied to an item and the item is being used.
+---	This function returns false if the effect is tied to an item and the item is not being used.
 function isValidCheckEffect(rActor, nodeEffect)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
 		local bItem, bActionItemUsed, bActionOnly = false, false, false
