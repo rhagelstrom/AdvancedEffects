@@ -36,7 +36,7 @@ function update()
     local sDuration = "";
     local dDurationDice = DB.getValue(node, "durdice");
     local nDurationMod = DB.getValue(node, "durmod", 0);
-    local sDurDice = StringManager.convertDiceToString(dDurationDice);
+    local sDurDice = DiceManager.convertDiceToString(dDurationDice);
     if (sDurDice ~= "") then 
         sDuration = sDuration .. sDurDice;
     end

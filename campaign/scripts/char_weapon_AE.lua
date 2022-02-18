@@ -38,7 +38,7 @@ function onDamageChanged()
 		end
 		
 		if #aDice > 0 or nMod ~= 0 then
-			local sDamage = StringManager.convertDiceToString(DB.getValue(v, "dice", {}), nMod);
+			local sDamage = DiceManager.convertDiceToString(DB.getValue(v, "dice", {}), nMod);
 			local sType = DB.getValue(v, "type", "");
 			if sType ~= "" then
 				sDamage = sDamage .. " " .. sType;
