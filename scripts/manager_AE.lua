@@ -292,7 +292,7 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	local dDurationDice = DB.getValue(nodeCharEffect, "durdice");
 	local nModDice = DB.getValue(nodeCharEffect, "durmod", 0);
 	if (dDurationDice and dDurationDice ~= "") then
-		nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+		nRollDuration = DiceManager.evalDice(dDurationDice, nModDice);
 	else
 		nRollDuration = nModDice;
 	end
@@ -407,7 +407,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 			local bLabelOnly = (DB.getValue(nodeItemEffect, "type", "") == "label");
 
 			if (dDurationDice and dDurationDice ~= "") then
-				nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+				nRollDuration = DiceManager.evalDice(dDurationDice, nModDice);
 			else
 				nRollDuration = nModDice;
 			end

@@ -1,5 +1,5 @@
 -- 
--- Please see the license.html file included with this distribution for 
+-- Please see the LICENSE.md file included with this distribution for 
 -- attribution and copyright information.
 --
 
@@ -14,7 +14,7 @@ function getWeaponDamageRollStructures(nodeWeapon, ...)
 
 	-- bmos adding AmmunitionManager integration
 	if AmmunitionManager then
-		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
 		if nodeAmmo then
 			rActor.nodeAmmo = nodeAmmo.getPath()
 		end
@@ -34,7 +34,7 @@ function getWeaponAttackRollStructures(nodeWeapon, nAttack, ...)
 
 	-- bmos adding AmmunitionManager integration
 	if AmmunitionManager then
-		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
 		if nodeAmmo then
 			rActor.nodeAmmo = nodeAmmo.getPath()
 		end
