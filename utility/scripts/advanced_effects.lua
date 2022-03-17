@@ -1,35 +1,8 @@
 --
--- handles advanced effects
+-- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
---
 
-function onInit()
-    local node = getDatabaseNode();
-    local nodeItem = DB.getChild(node, "...");
-    -- set name of effect to name of item so when effect
-    -- is applied to someone it shows where it came from properly
-    local sName = DB.getValue(nodeItem,"name","");
-    name.setValue(sName);
-
-    -- watch these variables and update display string if they change
-    DB.addHandler(DB.getPath(node, ".effect"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
-    update();
-end
-function onClose()
-    DB.removeHandler(DB.getPath(node, ".effect"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
-end
-
--- update display string 
+-- update display string
 function update()
     local node = getDatabaseNode();
     -- display dice/mods for duration --celestian
@@ -37,7 +10,7 @@ function update()
     local dDurationDice = DB.getValue(node, "durdice");
     local nDurationMod = DB.getValue(node, "durmod", 0);
     local sDurDice = DiceManager.convertDiceToString(dDurationDice);
-    if (sDurDice ~= "") then 
+    if (sDurDice ~= "") then
         sDuration = sDuration .. sDurDice;
     end
     if (nDurationMod ~= 0 and sDurDice ~= "") then
@@ -49,7 +22,7 @@ function update()
     elseif (nDurationMod ~= 0) then
         sDuration = sDuration .. nDurationMod;
     end
-    
+
     local sUnits = DB.getValue(node, "durunit", "");
     if sDuration ~= "" then
         --local nDuration = tonumber(sDuration);
@@ -84,3 +57,29 @@ function update()
     effect_description.setValue(sFinal);
 end
 
+function onInit()
+    local node = getDatabaseNode();
+    local nodeItem = DB.getChild(node, "...");
+    -- set name of effect to name of item so when effect
+    -- is applied to someone it shows where it came from properly
+    local sName = DB.getValue(nodeItem,"name","");
+    name.setValue(sName);
+
+    -- watch these variables and update display string if they change
+    DB.addHandler(DB.getPath(node, ".effect"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
+    update();
+end
+
+function onClose()
+    DB.removeHandler(DB.getPath(node, ".effect"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
+end
