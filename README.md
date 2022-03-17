@@ -1,4 +1,6 @@
-# FG-PFRPG-Advanced-Effects
+[![Build FG-Usable File](https://github.com/FG-Unofficial-Developers-Guild/FG-PFRPG-Advanced-Effects/actions/workflows/create-ext.yml/badge.svg)](https://github.com/FG-Unofficial-Developers-Guild/FG-PFRPG-Advanced-Effects/actions/workflows/create-ext.yml) [![Luacheck](https://github.com/FG-Unofficial-Developers-Guild/FG-PFRPG-Advanced-Effects/actions/workflows/luacheck.yml/badge.svg)](https://github.com/FG-Unofficial-Developers-Guild/FG-PFRPG-Advanced-Effects/actions/workflows/luacheck.yml)
+
+# Advanced Effects
 Original extension by [Celestian](https://www.fantasygrounds.com/forums/member.php?54726-celestian). Ported to PFRPG/3.5E by [rmilmine](https://www.fantasygrounds.com/forums/member.php?215591-rmilmine) and [bmos](https://www.fantasygrounds.com/forums/member.php?194283-bmos).
 
 Attach effects to PCs, NPCs and items.
