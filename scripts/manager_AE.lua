@@ -5,7 +5,7 @@
 -- send message
 local function sendRawMessage(sUser, nGMOnly, msg)
 	local sIdentity = nil;
-	if sUser and sUser ~= "" then 
+	if sUser and sUser ~= "" then
 		sIdentity = User.getCurrentIdentity(sUser) or nil;
 	end
 	if sIdentity then
@@ -17,7 +17,7 @@ local function sendRawMessage(sUser, nGMOnly, msg)
 	if nGMOnly == 1 then
 		msg.secret = true;
 		Comm.addChatMessage(msg);
-	elseif nGMOnly ~= 1 then 
+	elseif nGMOnly ~= 1 then
 		--Comm.addChatMessage(msg);
 		Comm.deliverChatMessage(msg);
 	end
@@ -31,7 +31,7 @@ local function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
 	msg.text = "Advanced Effect ['" .. sLabel .. "'] ";
 	msg.text = msg.text .. "removed [from " .. DB.getValue(nodeChar, "name", "") .. "]";
 	-- HANDLE APPLIED BY SETTING
-	local sEffSource = DB.getValue(nodeEffect, "source_name", "");		
+	local sEffSource = DB.getValue(nodeEffect, "source_name", "");
 	if sEffSource and sEffSource ~= "" then
 		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(sEffSource), "name", "") .. "]";
 	end
@@ -39,7 +39,7 @@ local function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
 end
 
 -- build message to send that effect added
-local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
+local function sendEffectAddedMessage(nodeCT, rNewEffect, _, nGMOnly)
 	local sUser = nodeCT.getOwner();
 	-- Build output message
 	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
@@ -52,9 +52,10 @@ local function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nGMOnly)
 end
 
 ---	This function returns false if the effect is tied to an item and the item is not being used.
+--	luacheck: globals isValidCheckEffect
 function isValidCheckEffect(rActor, nodeEffect)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
-		local bItem, bActionItemUsed, bActionOnly = false, false, false
+		local bActionItemUsed, bActionOnly = false, false
 		local sItemPath = ""
 
 		local sSource = DB.getValue(nodeEffect,"source_name","");
@@ -88,7 +89,7 @@ function isValidCheckEffect(rActor, nodeEffect)
 				end
 			end
 		end
-		
+
 		if bActionOnly and not bActionItemUsed then
 			return false;
 		else
@@ -117,9 +118,6 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			end
 		end
 	end
-
-	-- Determine effect type targeting
-	local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
 
 	-- Iterate through effects
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
@@ -187,7 +185,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 						end
 						local j = 1;
 						while aComponents[j] do
-							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or 
+							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or
 									StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
 									aComponents[j] == "all" then
 								-- Skip
@@ -196,7 +194,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 							else
 								table.insert(aEffectOtherFilter, aComponents[j]);
 							end
-							
+
 							j = j + 1;
 						end
 
@@ -229,7 +227,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 								for _,v2 in pairs(aOtherFilter) do
 									if type(v2) == "table" then
 										local bOtherTableMatch = true;
-										for k3, v3 in pairs(v2) do
+										for _, v3 in pairs(v2) do
 											if not StringManager.contains(aEffectOtherFilter, v3) then
 												bOtherTableMatch = false;
 												break;
@@ -286,9 +284,8 @@ end
 -- nodeCharEffect: node in effectlist on PC/NPC
 -- nodeEntry: node in combat tracker for PC/NPC
 local function updateCharEffect(nodeCharEffect, nodeEntry)
-	local sName = DB.getValue(nodeEntry, "name", "");
 	local sLabel = DB.getValue(nodeCharEffect, "effect", "");
-	local nRollDuration = 0;
+	local nRollDuration;
 	local dDurationDice = DB.getValue(nodeCharEffect, "durdice");
 	local nModDice = DB.getValue(nodeCharEffect, "durmod", 0);
 	if (dDurationDice and dDurationDice ~= "") then
@@ -311,7 +308,7 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	rEffect.nDuration = nRollDuration;
 	--rEffect.sName = sName .. ";" .. sLabel;
 	rEffect.sName = sLabel;
-	rEffect.sLabel = sLabel; 
+	rEffect.sLabel = sLabel;
 	rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
 	rEffect.nInit = 0;
 	rEffect.sSource = nodeEntry.getPath();
@@ -328,7 +325,7 @@ end
 local function updateCharEffects(nodeChar, nodeEntry)
 	for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
 		updateCharEffect(nodeCharEffect,nodeEntry);
-	end -- for item's effects list 
+	end -- for item's effects list
 end
 
 --
@@ -366,7 +363,7 @@ local function decodeActors_new(draginfo, ...)
 	if (sNodeWeapon and sNodeWeapon ~= "") then
 		rSource.nodeWeapon = sNodeWeapon
 	end
-	
+
 	local sNodeAmmo = draginfo.getMetaData(ammoPathKey)
 	if AmmunitionManager and (sNodeAmmo and sNodeAmmo ~= "") then
 		rSource.nodeAmmo = sNodeAmmo
@@ -377,11 +374,10 @@ end
 
 -- update single effect for item
 local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, bIdentified)
-	local sCharacterName = DB.getValue(nodeChar, "name", "");
 	local sItemSource = nodeItemEffect.getPath();
 	local sLabel = DB.getValue(nodeItemEffect, "effect", "");
--- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);		
--- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);	
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
 	if sLabel and sLabel ~= "" then -- if we have effect string
 		local bFound = false;
 		for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
@@ -401,7 +397,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 		end -- nodeEffect for
 		if (not bFound and bEquipped) then
 			local rEffect = {};
-			local nRollDuration = 0;
+			local nRollDuration;
 			local dDurationDice = DB.getValue(nodeItemEffect, "durdice");
 			local nModDice = DB.getValue(nodeItemEffect, "durmod", 0);
 			local bLabelOnly = (DB.getValue(nodeItemEffect, "type", "") == "label");
@@ -436,13 +432,13 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 			else
 				rEffect.sName = sLabel;
 			end
-			rEffect.sLabel = sLabel; 
+			rEffect.sLabel = sLabel;
 			rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
 			rEffect.nInit = 0;
 			rEffect.sSource = sItemSource;
 			rEffect.nGMOnly = nGMOnly;
 			rEffect.sApply = "";
-		
+
 			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly, sUser)
 			EffectManager.addEffect("", "", nodeChar, rEffect, false);
 		end
@@ -458,7 +454,7 @@ function updateItemEffects(nodeItem)
 	local bEquipped = DB.getValue(nodeItem, "carried") == 2;
 	local bIdentified = DB.getValue(nodeItem, "isidentified", 1) == 1;
 	-- local bOptionID = OptionsManager.isOption("MIID", "on");
-	-- if not bOptionID then 
+	-- if not bOptionID then
 		-- bIdentified = true;
 	-- end
 
@@ -468,7 +464,7 @@ function updateItemEffects(nodeItem)
 end
 
 local addPC_old
-function addPC_new(nodeChar, ...)
+local function addPC_new(nodeChar, ...)
 	if not nodeChar then
 		return;
 	end
@@ -489,7 +485,7 @@ function addPC_new(nodeChar, ...)
 end
 
 local addNPC_old
-function addNPC_new(sClass, nodeCT, sName, ...)
+local function addNPC_new(sClass, nodeCT, sName, ...)
 	-- Call original function
 	local nodeEntry = addNPC_old(sClass, nodeCT, sName, ...);
 
@@ -548,7 +544,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 						nMatch = kEffectComp;
 					end
 				end
-				
+
 			end
 
 			-- If matched, then remove one-off effects
@@ -590,7 +586,7 @@ function onInit()
 
 	addNPC_old = CombatManager.addNPC;
 	CombatManager.addNPC = addNPC_new;
-	
+
 	-- 3.5E replacements
 	if not CombatManagerKel then
 		EffectManager35E.getEffectsByType = getEffectsByType_new;
@@ -598,6 +594,6 @@ function onInit()
 	end
 
 	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
-	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler", 
-			{ labels = "option_val_on" , values = "enabled", baselabel = "option_val_off", baseval = "disabled", default = "disabled" });		
+	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler",
+			{ labels = "option_val_on" , values = "enabled", baselabel = "option_val_off", baseval = "disabled", default = "disabled" });
 end
