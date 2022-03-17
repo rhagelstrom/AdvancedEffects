@@ -315,11 +315,8 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	rEffect.nGMOnly = nGMOnly;
 	rEffect.sApply = "";
 
-	-- sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, User.getUsername());
-	-- EffectManager.addEffect("", "", nodeEntry, rEffect, false);
 	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, User.getUsername());
-	local sParsedEffect = EffectManager35E.evalEffect(nodeEntry,rEffect.sLabel, nil);
-	rEffect.sName = sParsedEffect;
+	rEffect.sName = EffectManager35E.evalEffect(nodeEntry, rEffect.sLabel);
 	EffectManager.addEffect("", "", nodeEntry, rEffect, false);
 end
 
