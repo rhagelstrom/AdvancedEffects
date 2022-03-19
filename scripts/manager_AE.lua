@@ -98,7 +98,7 @@ function isValidCheckEffect(rActor, nodeEffect)
 	end
 end
 
-local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
+local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly) -- luacheck: ignore (cyclomatic complexity)
 	local results = {};
 	if not rActor then
 		return results;
@@ -187,7 +187,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 						while aComponents[j] do
 							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or
 									StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
-									aComponents[j] == "all" then
+									aComponents[j] == "all" then -- luacheck: ignore
 								-- Skip
 							elseif StringManager.contains(DataCommon.rangetypes, aComponents[j]) then
 								table.insert(aEffectRangeFilter, aComponents[j]);
@@ -322,10 +322,10 @@ end
 
 -- flip through all npc effects (generally do this in addNPC()/addPC()
 -- nodeChar: node of PC/NPC in PC/NPCs record list
--- nodeEntry: node in combat tracker for PC/NPC
-local function updateCharEffects(nodeChar, nodeEntry)
+-- nodeCT: node in combat tracker for PC/NPC
+local function updateCharEffects(nodeChar, nodeCT)
 	for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
-		updateCharEffect(nodeCharEffect,nodeEntry);
+		updateCharEffect(nodeCharEffect, nodeCT);
 	end -- for item's effects list
 end
 
@@ -446,7 +446,8 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 	end
 end
 
-function updateItemEffects(nodeItem)
+ -- luacheck: globals updateItemEffects
+ function updateItemEffects(nodeItem)
 	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild("...")));
 	if not nodeChar then
 		return;
@@ -464,6 +465,12 @@ function updateItemEffects(nodeItem)
 	end
 end
 
+-- This function calls the original addPC function.
+-- Then it looks through the character's inventory for carried items with attached effects.
+-- While effects are checked for item carried status in the updateItemEffect function,
+-- the items are first checked here to reduce excess calculations (since the check in updateItemEffect
+-- is to facilitate deletion of effects that are no longer applicable).
+-- Lastly it looks through the character's attached effects and adds those.
 local addPC_old
 local function addPC_new(nodeChar, ...)
 	if not nodeChar then
@@ -482,17 +489,18 @@ local function addPC_new(nodeChar, ...)
 
 	-- check for and apply character effects
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
+
 	updateCharEffects(nodeChar, nodeCT);
 end
 
 local addNPC_old
-local function addNPC_new(sClass, nodeCT, sName, ...)
+local function addNPC_new(sClass, nodeNPC, sName, ...)
 	-- Call original function
-	local nodeEntry = addNPC_old(sClass, nodeCT, sName, ...);
+	local nodeCT = addNPC_old(sClass, nodeNPC, sName, ...);
 
-	updateCharEffects(nodeCT, nodeEntry);
+	updateCharEffects(nodeNPC, nodeCT);
 
-	return nodeEntry;
+	return nodeCT;
 end
 
 --	replace 3.5E EffectManager35E manager_effect_35E.lua hasEffect() with this

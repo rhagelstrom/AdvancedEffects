@@ -1,5 +1,5 @@
--- 
--- Please see the LICENSE.md file included with this distribution for 
+--
+-- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
 
@@ -7,8 +7,8 @@ local getWeaponDamageRollStructures_old
 function getWeaponDamageRollStructures(nodeWeapon, ...)
 	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...);
 
-    -- add nodeWeapon to rActor so that when effects are checked we can 
-	-- make compare against action only effects
+  -- add nodeWeapon to rActor so that when effects are checked we can
+	-- compare them against action only effects
 	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	rActor.nodeWeapon = sRecord;
 
@@ -27,8 +27,8 @@ local getWeaponAttackRollStructures_old
 function getWeaponAttackRollStructures(nodeWeapon, nAttack, ...)
 	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack, ...);
 
-    -- add nodeWeapon to rActor so that when effects are checked we can
-	-- make compare against action only effects
+	-- add nodeWeapon to rActor so that when effects are checked we can
+	-- compare them against action only effects
 	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	rActor.nodeWeapon = sRecord;
 
