@@ -1,7 +1,9 @@
--- 
--- Please see the LICENSE.md file included with this distribution for 
+--
+-- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
+
+-- luacheck: globals type
 
 function onDamageChanged()
 	local nodeWeapon = getDatabaseNode();
@@ -14,7 +16,7 @@ function onDamageChanged()
 		sBaseAbility = "dexterity";
 	end
 	-- END ADDITION FOR ADVANCED EFFECTS
-	
+
 	local aDamage = {};
 	local aDamageNodes = UtilityManager.getSortedTable(DB.getChildren(nodeWeapon, "damagelist"));
 	for _,v in ipairs(aDamageNodes) do
@@ -36,7 +38,7 @@ function onDamageChanged()
 			end
 			nMod = nMod + nAbilityBonus;
 		end
-		
+
 		if #aDice > 0 or nMod ~= 0 then
 			local sDamage = DiceManager.convertDiceToString(DB.getValue(v, "dice", {}), nMod);
 			local sType = DB.getValue(v, "type", "");
