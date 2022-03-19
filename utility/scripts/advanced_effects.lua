@@ -1,5 +1,6 @@
 --
--- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
+-- Please see the LICENSE.md file included with this distribution for
+-- attribution and copyright information.
 --
 
 -- update display string
@@ -45,8 +46,8 @@ function update()
     if (not bActionOnly) then
         sActionOnly = "";
     end
-    local sEffect = DB.getValue(node,"effect","");
-    local sVis = DB.getValue(node,"visibility","");
+    local sEffect = DB.getValue(node, "effect", "");
+    local sVis = DB.getValue(node, "visibility", "");
     if (sVis ~= "") then
         sVis = " visibility [" .. sVis .. "]";
     end
@@ -59,27 +60,28 @@ end
 
 function onInit()
     local node = getDatabaseNode();
-    local nodeItem = DB.getChild(node, "...");
+
     -- set name of effect to name of item so when effect
     -- is applied to someone it shows where it came from properly
-    local sName = DB.getValue(nodeItem,"name","");
+    local sName = DB.getValue(DB.getChild(node, "..."), "name", "");
     name.setValue(sName);
 
     -- watch these variables and update display string if they change
-    DB.addHandler(DB.getPath(node, ".effect"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".effect"), "onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".durdice"), "onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".durmod"), "onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".durunit"), "onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".visibility"), "onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".actiononly"), "onUpdate", update);
+
     update();
 end
 
 function onClose()
-    DB.removeHandler(DB.getPath(node, ".effect"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".effect"), "onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".durdice"), "onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".durmod"), "onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".durunit"), "onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".visibility"), "onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".actiononly"), "onUpdate", update);
 end

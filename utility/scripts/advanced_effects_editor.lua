@@ -1,29 +1,29 @@
 --
--- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
+-- Please see the LICENSE.md file included with this distribution for
+-- attribution and copyright information.
 --
 
-local function updateAbilityEffects()
+local function updateAbilityEffects(nodeRecord)
   if not Session.IsHost then
     return;
   end
 
-  local nodeRecord = getDatabaseNode();
   local sEffectString = "";
-  local sType = DB.getValue(nodeRecord,"ability_type","modified");
+  local sType = DB.getValue(nodeRecord, "ability_type", "modified");
   local bIsCheck = (sType == "check");
   local sAbility;
   if bIsCheck then
-    sAbility = DB.getValue(nodeRecord,"ability_check","strength");
+    sAbility = DB.getValue(nodeRecord, "ability_check", "strength");
     if (sAbility == "") then
       sAbility = "strength";
     end
   else
-    sAbility = DB.getValue(nodeRecord,"ability","str");
+    sAbility = DB.getValue(nodeRecord, "ability", "str");
     if (sAbility == "") then
         sAbility = "str";
     end
   end
-  local nModifier = DB.getValue(nodeRecord,"ability_modifier",0);
+  local nModifier = DB.getValue(nodeRecord, "ability_modifier", 0);
   local sBonusType = DB.getValue(nodeRecord, "ability_bonus_type", "");
 
   local sTypeChar = "";
@@ -39,10 +39,6 @@ local function updateAbilityEffects()
   elseif (sType == "base_percent") then
     sTypeChar = "BP";
   end
-
-  -- Debug.console("advanced_effects_editor.lua","updateAbilityEffects","sType",sType);
-  -- Debug.console("advanced_effects_editor.lua","updateAbilityEffects","sAbility",sAbility);
-  -- Debug.console("advanced_effects_editor.lua","updateAbilityEffects","nModifier",nModifier);
 
   if (sAbility ~= "") then
     if (bIsCheck) then
@@ -60,20 +56,18 @@ local function updateAbilityEffects()
 		end
   end
 
-  DB.setValue(nodeRecord,"effect","string",sEffectString);
+  DB.setValue(nodeRecord, "effect", "string", sEffectString);
 end
 
-local function updateSaveEffects()
+local function updateSaveEffects(nodeRecord)
   if not Session.IsHost then
     return;
   end
-  local nodeRecord = getDatabaseNode();
-  -- Debug.console("advanced_effects_editor.lua","updatesaveEffects","nodeRecord",nodeRecord);
   local sEffectString = "";
-  local sType = DB.getValue(nodeRecord,"save_type","modifier");
-  local sSave = DB.getValue(nodeRecord,"save","fortitude");
-  local nModifier = DB.getValue(nodeRecord,"save_modifier",0);
-  local sBonusType = DB.getValue(nodeRecord, "save_bonus_type","");
+  local sType = DB.getValue(nodeRecord, "save_type", "modifier");
+  local sSave = DB.getValue(nodeRecord, "save", "fortitude");
+  local nModifier = DB.getValue(nodeRecord, "save_modifier", 0);
+  local sBonusType = DB.getValue(nodeRecord, "save_bonus_type", "");
 
   local sTypeChar = "";
 
@@ -86,28 +80,22 @@ local function updateSaveEffects()
     sSave = "fortitude";
   end
 
-  -- Debug.console("advanced_effects_editor.lua","updatesaveEffects","sSave",sSave);
-  -- Debug.console("advanced_effects_editor.lua","updatesaveEffects","sType",sType);
-  -- Debug.console("advanced_effects_editor.lua","updatesaveEffects","nModifier",nModifier);
   if sBonusType ~= "" and sBonusType ~= "none" then
     sEffectString = sEffectString .. sTypeChar .. nModifier .. " " .. sBonusType .. ", " .. sSave:lower() .. ";";
   else
     sEffectString = sEffectString .. sTypeChar .. nModifier .. " " .. sSave:lower() .. ";";
   end
 
-  DB.setValue(nodeRecord,"effect","string",sEffectString);
+  DB.setValue(nodeRecord, "effect", "string", sEffectString);
 end
 
-local function updateMiscEffects()
+local function updateMiscEffects(nodeRecord)
   if not Session.IsHost then
     return;
   end
-  local nodeRecord = getDatabaseNode();
-  -- Debug.console("advanced_effects_editor.lua","updateMiscEffects","nodeRecord",nodeRecord);
   local sEffectString = "";
-  local sType = DB.getValue(nodeRecord,"misc_type","");
-  --local sSuscept = DB.getValue(nodeRecord,"susceptiblity","");
-  local nModifier = DB.getValue(nodeRecord,"misc_modifier",0);
+  local sType = DB.getValue(nodeRecord, "misc_type", "");
+  local nModifier = DB.getValue(nodeRecord, "misc_modifier", 0);
   local bIsNotHeal = (sType ~= "heal");
   local sBonusType = DB.getValue(nodeRecord, "misc_bonus_type", "");
 
@@ -115,9 +103,6 @@ local function updateMiscEffects()
     sType = "ac";
   end
 
-  --Debug.console("advanced_effects_editor.lua","updateMiscEffects","sType",sType);
-  --Debug.console("advanced_effects_editor.lua","updateMiscEffects","sSuscept",sSuscept);
-  --Debug.console("advanced_effects_editor.lua","updateMiscEffects","nModifier",nModifier);
   if (nModifier ~= 0) then
 		if bIsNotHeal and sBonusType ~= "" and sBonusType ~= "none" then
 			sEffectString = sEffectString .. sType:upper() .. ": " .. nModifier .. " " .. sBonusType .. ";";
@@ -126,12 +111,43 @@ local function updateMiscEffects()
 		end
   end
 
-  DB.setValue(nodeRecord,"effect","string",sEffectString);
+  DB.setValue(nodeRecord, "effect", "string", sEffectString);
+end
+
+local function updateSusceptibleEffects()
+  if not Session.IsHost then
+    return;
+  end
+
+  local nodeRecord = getDatabaseNode();
+  -- Debug.console("advanced_effects_editor.lua", "updateSusceptibleEffects", "nodeRecord",nodeRecord);
+  local sEffectString = "";
+  local sType = DB.getValue(nodeRecord, "susceptiblity_type", "");
+  local sSuscept = DB.getValue(nodeRecord, "susceptiblity", "");
+  local nModifier = DB.getValue(nodeRecord, "susceptiblity_modifier", 0);
+
+  if (sType == "") then
+    sType = "immune";
+  end
+  if (sSuscept == "") then
+    sSuscept = "acid";
+		DB.setValue(nodeRecord, "susceptiblity", "string", "acid");
+  end
+
+  if (sSuscept ~= "") then
+		if sType == "resist" then
+			sEffectString = sEffectString .. sType:upper() .. ": " .. nModifier .. " " .. sSuscept .. ";";
+		else
+			sEffectString = sEffectString .. sType:upper() .. ": " .. sSuscept .. ";";
+		end
+  end
+
+  DB.setValue(nodeRecord, "effect", "string", sEffectString);
 end
 
 function update()
   local node = getDatabaseNode();
-  local sType = DB.getValue(node,"type","");
+  local sType = DB.getValue(node, "type", "");
 
   -- <values>save|ability|resist|immune|vulnerable</values>
   local bCustom = (sType == "");
@@ -207,8 +223,7 @@ local function updateAbilityType()
   updateAbilityEffects();
 end
 
-function updateMiscType()
-  local node = getDatabaseNode();
+local function updateMiscType(node)
   local bIsNotHeal = (DB.getValue(node, "misc_type", "ac") ~= "heal");
 
 	misc_bonus_type.setComboBoxVisible(bIsNotHeal);
@@ -216,51 +231,16 @@ function updateMiscType()
 	updateMiscEffects()
 end
 
-local function updateLabelOnlyEffects()
+local function updateLabelOnlyEffects(nodeRecord)
 	if not Session.IsHost then
 		return;
 	end
-    local nodeRecord = getDatabaseNode();
-    local sLabelOnly = DB.getValue(nodeRecord, "label_only", "");
+  local sLabelOnly = DB.getValue(nodeRecord, "label_only", "");
+
 	DB.setValue(nodeRecord, "effect", "string", sLabelOnly);
 end
 
-local function updateSusceptibleEffects()
-  if not Session.IsHost then
-    return;
-  end
-
-  local nodeRecord = getDatabaseNode();
-  -- Debug.console("advanced_effects_editor.lua","updateSusceptibleEffects","nodeRecord",nodeRecord);
-  local sEffectString = "";
-  local sType = DB.getValue(nodeRecord,"susceptiblity_type","");
-  local sSuscept = DB.getValue(nodeRecord,"susceptiblity","");
-  local nModifier = DB.getValue(nodeRecord,"susceptiblity_modifier",0);
-
-  if (sType == "") then
-    sType = "immune";
-  end
-  if (sSuscept == "") then
-    sSuscept = "acid";
-		DB.setValue(nodeRecord, "susceptiblity", "string", "acid");
-  end
-
-  -- Debug.console("advanced_effects_editor.lua","updateSusceptibleEffects","sType",sType);
-  -- Debug.console("advanced_effects_editor.lua","updateSusceptibleEffects","sSuscept",sSuscept);
-  -- Debug.console("advanced_effects_editor.lua","updateSusceptibleEffects","nModifier",nModifier);
-  if (sSuscept ~= "") then
-		if sType == "resist" then
-			sEffectString = sEffectString .. sType:upper() .. ": " .. nModifier .. " " .. sSuscept .. ";";
-		else
-			sEffectString = sEffectString .. sType:upper() .. ": " .. sSuscept .. ";";
-		end
-  end
-
-  DB.setValue(nodeRecord,"effect","string",sEffectString);
-end
-
-function updateSusceptibleType()
-  local node = getDatabaseNode();
+local function updateSusceptibleType(node)
   local bIsResist = (DB.getValue(node, "susceptiblity_type", "") == "resist");
 
 	susceptiblity_modifier.setVisible(bIsResist);
@@ -271,18 +251,17 @@ end
 function onInit()
   local node = getDatabaseNode();
 
-  --DB.getValue(node,"save_type","modifier");
   -- if npc and no effect yet then we set the
   -- visibility default to hidden
   if (node.getPath():match("^npc%.id%-%d+")) then
-    local sVisibility = DB.getValue(node,"visibility");
-    local sEffectString = DB.getValue(node,"effect");
+    local sVisibility = DB.getValue(node, "visibility");
+    local sEffectString = DB.getValue(node, "effect");
     if (sVisibility == "" and sEffectString == "") then
-      DB.setValue(node,"visibility","string","hide");
+      DB.setValue(node, "visibility", "string", "hide");
     end
   end
 
-  DB.addHandler(DB.getPath(node, ".type"),"onUpdate", update);
+  DB.addHandler(DB.getPath(node, ".type"), "onUpdate", update);
   DB.addHandler(DB.getPath(node, ".save_type"), "onUpdate", updateSaveEffects);
   DB.addHandler(DB.getPath(node, ".save"), "onUpdate", updateSaveEffects);
   DB.addHandler(DB.getPath(node, ".save_modifier"), "onUpdate", updateSaveEffects);
@@ -309,7 +288,7 @@ end
 function onClose()
   local node = getDatabaseNode();
 
-  DB.removeHandler(DB.getPath(node, ".type"),"onUpdate", update);
+  DB.removeHandler(DB.getPath(node, ".type"), "onUpdate", update);
   DB.removeHandler(DB.getPath(node, ".save_type"), "onUpdate", updateSaveEffects);
   DB.removeHandler(DB.getPath(node, ".save"), "onUpdate", updateSaveEffects);
   DB.removeHandler(DB.getPath(node, ".save_modifier"), "onUpdate", updateSaveEffects);
