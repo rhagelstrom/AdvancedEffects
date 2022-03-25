@@ -5,116 +5,98 @@
 --	First it finds any effects that have this item as the source and removes those effects.
 --	Then it calls updateItemEffects to re-parse the current/correct effects.
 local function replaceItemEffects(nodeItem)
-    local nodeCT = ActorManager.getCTNode(
-                       ActorManager.resolveActor(DB.getChild(nodeItem, "...")));
-    if nodeCT and DB.getValue(nodeItem, "carried") == 2 then
-        for _, nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-            local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-            -- see if the node exists and if it's in an inventory node
-            local nodeItemSource = DB.findNode(sEffSource);
-            if (nodeItemSource and string.match(sEffSource, "inventorylist")) then
-                if nodeItemSource.getChild("...") == nodeItem then
-                    nodeEffect.delete(); -- remove existing effect
-                    AdvancedEffects.updateItemEffects(nodeItem);
-                end
-            end
-        end
-    end
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, '...')));
+	if nodeCT and DB.getValue(nodeItem, 'carried') == 2 then
+		for _, nodeEffect in pairs(DB.getChildren(nodeCT, 'effects')) do
+			local sEffSource = DB.getValue(nodeEffect, 'source_name', '');
+			-- see if the node exists and if it's in an inventory node
+			local nodeItemSource = DB.findNode(sEffSource);
+			if (nodeItemSource and string.match(sEffSource, 'inventorylist')) then
+				if nodeItemSource.getChild('...') == nodeItem then
+					nodeEffect.delete(); -- remove existing effect
+					AdvancedEffects.updateItemEffects(nodeItem);
+				end
+			end
+		end
+	end
 end
 
 local function inventoryUpdateItemEffects(node)
-    local nodeItem = (node.getParent());
-    if nodeItem then AdvancedEffects.updateItemEffects(nodeItem); end
+	local nodeItem = (node.getParent());
+	if nodeItem then AdvancedEffects.updateItemEffects(nodeItem); end
 end
 
 --	This function changes the visibility of effects when items are identified.
 local function updateItemEffectsForID(node)
-    local nodeItem = (node.getParent());
-    if nodeItem then replaceItemEffects(nodeItem); end
+	local nodeItem = (node.getParent());
+	if nodeItem then replaceItemEffects(nodeItem); end
 end
 
 --	This function changes the associated effects when item effect lists are changed while item is equipped.
 local function updateItemEffectsForEdit(node)
-    local nodeItem = (node.getChild('....'));
-    if nodeItem then replaceItemEffects(nodeItem); end
+	local nodeItem = (node.getChild('....'));
+	if nodeItem then replaceItemEffects(nodeItem); end
 end
 
 ---	This function checks to see if an effect is missing its associated item.
 --	If an associated item isn't found, it removes the effect as the item has been removed
 local function checkEffectsAfterDelete(nodeChar)
-    local sUser = User.getUsername();
-    for _, nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
-        local sLabel = DB.getValue(nodeEffect, "label", "");
-        local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-        -- see if the node exists and if it's in an inventory node
-        local nodeFound = DB.findNode(sEffSource);
-        local bDeleted = ((nodeFound == nil) and
-                             string.match(sEffSource, "inventorylist"));
-        if bDeleted then
-            local msg = {font = "msgfont", icon = "roll_effect"};
-            msg.text = "Effect ['" .. sLabel .. "'] ";
-            msg.text = msg.text .. "removed [from " ..
-                           DB.getValue(nodeChar, "name", "") .. "]";
-            -- HANDLE APPLIED BY SETTING
-            if sEffSource and sEffSource ~= "" then
-                msg.text = msg.text .. " [by Deletion]";
-            end
-            if EffectManager.isGMEffect(nodeChar, nodeEffect) then
-                if sUser == "" then
-                    msg.secret = true;
-                    Comm.addChatMessage(msg);
-                elseif sUser ~= "" then
-                    Comm.addChatMessage(msg);
-                    Comm.deliverChatMessage(msg, sUser);
-                end
-            else
-                Comm.deliverChatMessage(msg);
-            end
-            nodeEffect.delete();
-        end
-    end
+	local sUser = User.getUsername();
+	for _, nodeEffect in pairs(DB.getChildren(nodeChar, 'effects')) do
+		local sLabel = DB.getValue(nodeEffect, 'label', '');
+		local sEffSource = DB.getValue(nodeEffect, 'source_name', '');
+		-- see if the node exists and if it's in an inventory node
+		local nodeFound = DB.findNode(sEffSource);
+		local bDeleted = ((nodeFound == nil) and string.match(sEffSource, 'inventorylist'));
+		if bDeleted then
+			local msg = { font = 'msgfont', icon = 'roll_effect' };
+			msg.text = 'Effect [\'' .. sLabel .. '\'] ';
+			msg.text = msg.text .. 'removed [from ' .. DB.getValue(nodeChar, 'name', '') .. ']';
+			-- HANDLE APPLIED BY SETTING
+			if sEffSource and sEffSource ~= '' then msg.text = msg.text .. ' [by Deletion]'; end
+			if EffectManager.isGMEffect(nodeChar, nodeEffect) then
+				if sUser == '' then
+					msg.secret = true;
+					Comm.addChatMessage(msg);
+				elseif sUser ~= '' then
+					Comm.addChatMessage(msg);
+					Comm.deliverChatMessage(msg, sUser);
+				end
+			else
+				Comm.deliverChatMessage(msg);
+			end
+			nodeEffect.delete();
+		end
+	end
 end
 
 ---	This function checks to see if an effect is missing its associated item.
 --	If an associated item isn't found, it removes the effect as the item has been removed
 local function updateFromDeletedInventory(node)
-    local nodeCT = ActorManager.getCTNode(
-                       ActorManager.resolveActor(node.getParent()));
-    if nodeCT then checkEffectsAfterDelete(nodeCT); end
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(node.getParent()));
+	if nodeCT then checkEffectsAfterDelete(nodeCT); end
 end
 
 ---	Triggers after an effect on an item is deleted, causing a recheck of the effects in the combat tracker
 local function removeEffectOnItemEffectDelete(node)
-    local nodeCT = ActorManager.getCTNode(
-                       ActorManager.resolveActor(DB.getChild(node, "....")));
-    if nodeCT then checkEffectsAfterDelete(nodeCT); end
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(node, '....')));
+	if nodeCT then checkEffectsAfterDelete(nodeCT); end
 end
 
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
-    if Session.IsHost then
-        -- watch the character/pc inventory list
-        DB.addHandler("charsheet.*.inventorylist.*.carried", "onUpdate",
-                      inventoryUpdateItemEffects);
-        DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate",
-                      updateItemEffectsForID);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.effect",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durdice",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durmod",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.name",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durunit",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.visibility",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.actiononly",
-                      "onUpdate", updateItemEffectsForEdit);
-        DB.addHandler("charsheet.*.inventorylist.*.effectlist",
-                      "onChildDeleted", removeEffectOnItemEffectDelete);
-        DB.addHandler("charsheet.*.inventorylist", "onChildDeleted",
-                      updateFromDeletedInventory);
-    end
+	if Session.IsHost then
+		-- watch the character/pc inventory list
+		DB.addHandler('charsheet.*.inventorylist.*.carried', 'onUpdate', inventoryUpdateItemEffects);
+		DB.addHandler('charsheet.*.inventorylist.*.isidentified', 'onUpdate', updateItemEffectsForID);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.effect', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.durdice', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.durmod', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.name', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.durunit', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.visibility', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.actiononly', 'onUpdate', updateItemEffectsForEdit);
+		DB.addHandler('charsheet.*.inventorylist.*.effectlist', 'onChildDeleted', removeEffectOnItemEffectDelete);
+		DB.addHandler('charsheet.*.inventorylist', 'onChildDeleted', updateFromDeletedInventory);
+	end
 end
