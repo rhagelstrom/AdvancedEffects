@@ -29,9 +29,7 @@ local function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
 	msg.text = msg.text .. 'removed [from ' .. DB.getValue(nodeChar, 'name', '') .. ']';
 	-- HANDLE APPLIED BY SETTING
 	local sEffSource = DB.getValue(nodeEffect, 'source_name', '');
-	if sEffSource and sEffSource ~= '' then
-		msg.text = msg.text .. ' [by ' .. DB.getValue(DB.findNode(sEffSource), 'name', '') .. ']';
-	end
+	if sEffSource and sEffSource ~= '' then msg.text = msg.text .. ' [by ' .. DB.getValue(DB.findNode(sEffSource), 'name', '') .. ']'; end
 	sendRawMessage(sUser, nGMOnly, msg);
 end
 
@@ -170,8 +168,8 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 						end
 						local j = 1;
 						while aComponents[j] do
-							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or
-											StringManager.contains(DataCommon.bonustypes, aComponents[j]) or aComponents[j] == 'all' then -- luacheck: ignore
+							if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
+											aComponents[j] == 'all' then -- luacheck: ignore
 								-- Skip
 							elseif StringManager.contains(DataCommon.rangetypes, aComponents[j]) then
 								table.insert(aEffectRangeFilter, aComponents[j]);
