@@ -12,16 +12,14 @@
         <script>
             function onInit()
                 local node = getDatabaseNode();
-                local bIDentified = DB.getValue(node, "isidentified", 1) > 0;
-                local bPCEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
-                local bIsPcItem = string.match(node.getPath(),"^charsheet") ~= null;
-                local bCanEdit = false;
-                
-                if (bIsPcItem and bIDentified and bPCEdit) then
-                    bCanEdit = true;
-                end
-                
-				local bVisible = (Session.IsHost or bCanEdit)
+
+				local bVisible = not node.isReadOnly() and (
+					Session.IsHost or (
+						string.match(node.getPath(),"^charsheet") and
+						DB.getValue(node, "isidentified", 1) > 0 and
+						OptionsManager.isOption("ADND_AE_EDIT", "enabled")
+						)
+					)
 				header_effects.setVisible(bVisible);
 				effects_iedit.setVisible(bVisible);
 				effects_list_iadd.setVisible(bVisible);
