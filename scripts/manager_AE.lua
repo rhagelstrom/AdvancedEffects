@@ -345,7 +345,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 	local sLabel = DB.getValue(nodeItemEffect, 'effect', '');
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
-	if sLabel and sLabel ~= '' then -- if we have effect string
+	if sLabel then -- if we have effect string
 		local bFound = false;
 		for _, nodeEffect in pairs(DB.getChildren(nodeChar, 'effects')) do
 			local nActive = DB.getValue(nodeEffect, 'isactive', 0);
