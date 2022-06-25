@@ -15,12 +15,16 @@ For NPCs and PCs, it automatically adds the effect when you drag/drop them into 
 
 There is one campaign option which allows PCs to see and edit enabled item effects. The option is disabled by default.
 
-![Campaign Setting](https://i.imgur.com/NQpeOQo.png)
+Items
 
-Items/NPC/Character sheet
-
-![Items/NPC/Character](https://i.imgur.com/YJSiz0X.png)
+![Item sheets add effects](https://user-images.githubusercontent.com/1916835/175786580-f83bdf2f-4a26-4894-99f3-f8828bd45546.png)
 
 The action "Action Only" effect (only used when THAT weapon/item is used for attack/damage).
 
 ![Action Only](https://i.imgur.com/QzwZaqx.png)
+
+Special Abilities
+
+![Special abilities add effects](https://user-images.githubusercontent.com/1916835/175786596-b181a9c1-6790-42d7-b314-339984c85181.png)
+
+
