@@ -46,8 +46,7 @@ local function checkEffectsAfterDelete(nodeChar)
 		local sLabel = DB.getValue(nodeEffect, 'label', '');
 		local sEffSource = DB.getValue(nodeEffect, 'source_name', '');
 		-- see if the node exists and if it's in an inventory node
-		local nodeFound = DB.findNode(sEffSource);
-		local bDeleted = ((nodeFound == nil) and string.match(sEffSource, 'inventorylist'));
+		local bDeleted = (not DB.findNode(sEffSource) and string.match(sEffSource, 'inventorylist'));
 		if bDeleted then
 			local msg = { font = 'msgfont', icon = 'roll_effect' };
 			msg.text = 'Effect [\'' .. sLabel .. '\'] ';
@@ -83,7 +82,6 @@ local function removeEffectOnItemEffectDelete(node)
 	if nodeCT then checkEffectsAfterDelete(nodeCT); end
 end
 
--- add the effect if the item is equipped and doesn't exist already
 function onInit()
 	if Session.IsHost then
 		-- watch the character/pc inventory list
