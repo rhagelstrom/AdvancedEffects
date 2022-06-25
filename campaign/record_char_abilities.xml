@@ -22,23 +22,6 @@
 		</sheetdata>
 	</windowclass>
 
-	<!-- Add Effect Features Section to Class Details -->
-	<windowclass name="ref_class_stats" merge="join">
-		<sheetdata>
-			<subwindow name="advanced_effects_contents">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
-					<left offset="5" />
-					<right offset="5" />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-		</sheetdata>
-	</windowclass>
-
 	<!-- Add Effect Features Section to Class Ability Details -->
 	<windowclass name="ref_classability_stats" merge="join">
 		<sheetdata>

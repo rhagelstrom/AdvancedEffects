@@ -450,9 +450,6 @@ local function addPC_new(nodeChar, ...)
 	end
 
 	-- check each special ability for effects that need to be applied
-	for _, nodeAbility in pairs(DB.getChildren(nodeChar, 'class')) do
-		updateItemEffects(nodeAbility);
-	end
 	for _, nodeAbility in pairs(DB.getChildren(nodeChar, 'specialabilitylist')) do
 		updateItemEffects(nodeAbility);
 	end
