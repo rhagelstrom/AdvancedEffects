@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- 
+  Please see the LICENSE.md file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<!-- Add Effect Features Section to Feature Details -->
+	<windowclass name="ref_feat_stats" merge="join">
+		<sheetdata>
+			<subwindow name="advanced_effects_contents">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
+					<left offset="5" />
+					<right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+		</sheetdata>
+	</windowclass>
+
+	<!-- Add Effect Features Section to Class Details -->
+	<windowclass name="ref_class_stats" merge="join">
+		<sheetdata>
+			<subwindow name="advanced_effects_contents">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
+					<left offset="5" />
+					<right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+		</sheetdata>
+	</windowclass>
+
+	<!-- Add Effect Features Section to Class Ability Details -->
+	<windowclass name="ref_classability_stats" merge="join">
+		<sheetdata>
+			<subwindow name="advanced_effects_contents">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
+					<left offset="5" />
+					<right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+		</sheetdata>
+	</windowclass>
+
+	<!-- Add Effect Features Section to Proficiency Details -->
+	<windowclass name="referenceproficiency" merge="join">
+		<sheetdata>
+			<ft_record name="text">
+				<anchored to="contentframe">
+					<bottom anchor="center" offset="30"/>
+				</anchored>
+			</ft_record>
+			<subwindow name="advanced_effects_contents">
+				<anchored to="contentframe">
+					<top parent="text" anchor="bottom" offset="5" />
+					<left />
+					<bottom />
+					<right />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<invisible />
+			</subwindow>
+			<scrollbar>
+				<anchored to="advanced_effects_contents" />
+				<target>advanced_effects_contents</target>
+			</scrollbar>
+		</sheetdata>
+	</windowclass>
+
+	<!-- Add Effect Features Section to Racial Trait Details -->
+	<windowclass name="referenceracialtrait" merge="join">
+		<sheetdata>
+			<ft_record name="text">
+				<anchored to="contentframe">
+					<bottom anchor="center" offset="30"/>
+				</anchored>
+			</ft_record>
+			<subwindow name="advanced_effects_contents">
+				<anchored to="contentframe">
+					<top parent="text" anchor="bottom" offset="5" />
+					<left />
+					<bottom />
+					<right />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<invisible />
+			</subwindow>
+			<scrollbar>
+				<anchored to="advanced_effects_contents" />
+				<target>advanced_effects_contents</target>
+			</scrollbar>
+		</sheetdata>
+	</windowclass>
+</root>

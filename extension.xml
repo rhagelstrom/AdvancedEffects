@@ -35,6 +35,7 @@
 
 		<includefile source="campaign/record_char_actions_AE.xml" />
 		<includefile source="campaign/record_item.xml" />
+		<includefile source="campaign/record_char_abilities.xml" />
 		<includefile source="campaign/record_npc_AE.xml" />
 		<includefile source="campaign/record_char_combat_AE.xml" />
     </base>
