@@ -2,8 +2,9 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
+-- luacheck: globals getWeaponDamageRollStructures_new
 local getWeaponDamageRollStructures_old
-function getWeaponDamageRollStructures(nodeWeapon, ...)
+function getWeaponDamageRollStructures_new(nodeWeapon, ...)
 	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...);
 
 	-- add nodeWeapon to rActor so that when effects are checked we can
@@ -20,8 +21,9 @@ function getWeaponDamageRollStructures(nodeWeapon, ...)
 	return rActor, rDamage;
 end
 
+-- luacheck: globals getWeaponAttackRollStructures_new
 local getWeaponAttackRollStructures_old
-function getWeaponAttackRollStructures(nodeWeapon, nAttack, ...)
+function getWeaponAttackRollStructures_new(nodeWeapon, nAttack, ...)
 	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack, ...);
 
 	-- add nodeWeapon to rActor so that when effects are checked we can
@@ -40,8 +42,8 @@ end
 
 function onInit()
 	getWeaponDamageRollStructures_old = CharManager.getWeaponDamageRollStructures
-	CharManager.getWeaponDamageRollStructures = getWeaponDamageRollStructures
+	CharManager.getWeaponDamageRollStructures = getWeaponDamageRollStructures_new
 
 	getWeaponAttackRollStructures_old = CharManager.getWeaponAttackRollStructures
-	CharManager.getWeaponAttackRollStructures = getWeaponAttackRollStructures
+	CharManager.getWeaponAttackRollStructures = getWeaponAttackRollStructures_new
 end
