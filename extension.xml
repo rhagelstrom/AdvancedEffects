@@ -3,7 +3,7 @@
 
 	<properties>
 		<name>Feature: Advanced Effects</name>
-		<version>1.10</version>
+		<version>1.11</version>
 		<loadorder>34</loadorder>
 		<description>
 			<text>Add effects to pcs, npcs and items.</text>
@@ -19,7 +19,7 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.10\rby Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" icon="celestian" />
+	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.11\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" icon="celestian" />
 
 	<base>
 		<icon name="celestian" file="graphics/icons/celestian.png" />
@@ -29,8 +29,10 @@
 		<script name="RollStructuresAE" file="scripts/rollstructures_AE.lua" />
 
 		<includefile source="strings/strings.xml" />
+
 		<includefile source="utility/template_utility_advanced.xml" />
 		<includefile source="utility/utility_effects_advanced.xml" />
+
 		<includefile source="campaign/record_char_actions_AE.xml" />
 		<includefile source="campaign/record_item.xml" />
 		<includefile source="campaign/record_npc_AE.xml" />
