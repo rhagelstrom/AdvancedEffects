@@ -417,8 +417,8 @@ function updateItemEffects(nodeItem)
 	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild('...')));
 	if not nodeChar then return; end
 
-	local bEquipped = nodeItem.getPath():match('inventorylist') and DB.getValue(nodeItem, 'carried', 1) == 2;
-	local bID = nodeItem.getPath():match('inventorylist') and DB.getValue(nodeItem, 'isidentified', 1) == 1;
+	local bEquipped = not nodeItem.getPath():match('inventorylist') or DB.getValue(nodeItem, 'carried', 1) == 2;
+	local bID = not nodeItem.getPath():match('inventorylist') or DB.getValue(nodeItem, 'isidentified', 1) == 1;
 	-- local bOptionID = OptionsManager.isOption("MIID", "on");
 	-- if not bOptionID then
 	-- bID = true;
