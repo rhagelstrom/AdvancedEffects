@@ -81,6 +81,17 @@ end
 
 function onInit()
 	if Session.IsHost then
+		-- watch the character/pc class lists
+		DB.addHandler('charsheet.*.class.*.effectlist', 'onChildAdded', addAbilityEffect);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
+		DB.addHandler('charsheet.*.class.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
+		DB.addHandler('charsheet.*.class', 'onChildDeleted', updateFromDeletedAbility);
 		-- watch the character/pc class ability lists
 		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist', 'onChildAdded', addAbilityEffect);
 		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
