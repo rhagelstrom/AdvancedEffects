@@ -24,7 +24,7 @@
 	<base>
 		<icon name="celestian" file="graphics/icons/celestian.png" />
 
-		<script name="AdvancedEffectsHandlers" file="scripts/handlers.lua" />
+		<script name="AdvancedEffectsItemHandlers" file="scripts/itemhandlers.lua" />
 		<script name="AdvancedEffects" file="scripts/manager_AE.lua" />
 		<script name="RollStructuresAE" file="scripts/rollstructures_AE.lua" />
 

@@ -417,15 +417,15 @@ function updateItemEffects(nodeItem)
 	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild('...')));
 	if not nodeChar then return; end
 
-	local bEquipped = DB.getValue(nodeItem, 'carried') == 2;
-	local bIdentified = DB.getValue(nodeItem, 'isidentified', 1) == 1;
+	local bEquipped = nodeItem.getPath():match('inventorylist') and DB.getValue(nodeItem, 'carried', 1) == 2;
+	local bID = nodeItem.getPath():match('inventorylist') and DB.getValue(nodeItem, 'isidentified', 1) == 1;
 	-- local bOptionID = OptionsManager.isOption("MIID", "on");
 	-- if not bOptionID then
-	-- bIdentified = true;
+	-- bID = true;
 	-- end
 
 	for _, nodeItemEffect in pairs(DB.getChildren(nodeItem, 'effectlist')) do
-		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, nil, bEquipped, bIdentified);
+		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, nil, bEquipped, bID);
 	end
 end
 
