@@ -296,7 +296,7 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	EffectManager.addEffect('', '', nodeEntry, rEffect, false);
 end
 
--- flip through all npc effects (generally do this in addNPC()/addPC()
+-- flip through all npc effects (generally do this in addNPC()/addPC())
 -- nodeChar: node of PC/NPC in PC/NPCs record list
 -- nodeCT: node in combat tracker for PC/NPC
 local function updateCharEffects(nodeChar, nodeCT)
@@ -340,12 +340,12 @@ local function decodeActors_new(draginfo, ...)
 end
 
 -- update single effect for item
-local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, bIdentified)
+local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIdentified)
 	local sItemSource = nodeItemEffect.getPath();
 	local sLabel = DB.getValue(nodeItemEffect, 'effect', '');
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
-	if sLabel then -- if we have effect string
+	if sLabel and sLabel ~= '' then -- if we have effect string
 		local bFound = false;
 		for _, nodeEffect in pairs(DB.getChildren(nodeChar, 'effects')) do
 			local nActive = DB.getValue(nodeEffect, 'isactive', 0);
@@ -406,7 +406,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquippe
 			rEffect.nGMOnly = nGMOnly;
 			rEffect.sApply = '';
 
-			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly, sUser)
+			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly)
 			EffectManager.addEffect('', '', nodeChar, rEffect, false);
 		end
 	end
@@ -425,8 +425,10 @@ function updateItemEffects(nodeItem)
 	-- end
 
 	for _, nodeItemEffect in pairs(DB.getChildren(nodeItem, 'effectlist')) do
-		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, nil, bEquipped, bID);
+		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, bEquipped, bID);
 	end
+
+	return true
 end
 
 -- This function calls the original addPC function.
