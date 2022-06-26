@@ -290,9 +290,9 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	rEffect.sSource = nodeEntry.getPath();
 	rEffect.nGMOnly = nGMOnly;
 	rEffect.sApply = '';
+	rEffect.sName = EffectManager35E.evalEffect(nodeEntry, rEffect.sLabel); -- handle (N)PC Effects
 
 	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, User.getUsername());
-	rEffect.sName = EffectManager35E.evalEffect(nodeEntry, rEffect.sLabel);
 	EffectManager.addEffect('', '', nodeEntry, rEffect, false);
 end
 
@@ -367,7 +367,6 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 			local nRollDuration;
 			local dDurationDice = DB.getValue(nodeItemEffect, 'durdice');
 			local nModDice = DB.getValue(nodeItemEffect, 'durmod', 0);
-			local bLabelOnly = (DB.getValue(nodeItemEffect, 'type', '') == 'label');
 
 			if (dDurationDice and dDurationDice ~= '') then
 				nRollDuration = DiceManager.evalDice(dDurationDice, nModDice);
@@ -375,26 +374,20 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 				nRollDuration = nModDice;
 			end
 			local nGMOnly = 0;
-			local sVisibility = DB.getValue(nodeItemEffect, 'visibility');
-			if sVisibility == 'hide' then
+			if DB.getValue(nodeItemEffect, 'visibility') == 'hide' then
 				nGMOnly = 1;
-			elseif sVisibility == 'show' then
-				nGMOnly = 0;
 			elseif not bIdentified then
 				nGMOnly = 1;
-			elseif bIdentified then
-				nGMOnly = 0;
 			end
 
 			if not ActorManager.isPC(nodeChar) then
-				local bTokenVis = DB.getValue(nodeChar, 'tokenvis') == 1;
-				if not bTokenVis then
+				if DB.getValue(nodeChar, 'tokenvis') ~= 1 then
 					nGMOnly = 1; -- hide if token not visible
 				end
 			end
 
 			rEffect.nDuration = nRollDuration;
-			if not bLabelOnly then
+			if DB.getValue(nodeItemEffect, 'type', '') ~= 'label' then
 				rEffect.sName = sName .. ';' .. sLabel;
 			else
 				rEffect.sName = sLabel;
@@ -405,6 +398,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 			rEffect.sSource = sItemSource;
 			rEffect.nGMOnly = nGMOnly;
 			rEffect.sApply = '';
+			rEffect.sName = EffectManager35E.evalEffect(nodeChar, rEffect.sLabel); -- handle (N)PC Effects
 
 			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly)
 			EffectManager.addEffect('', '', nodeChar, rEffect, false);
