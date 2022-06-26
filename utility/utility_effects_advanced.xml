@@ -19,12 +19,22 @@
 						DB.getValue(node, "isidentified", 1) > 0 and
 						OptionsManager.isOption("ADND_AE_EDIT", "enabled")
 						)
-					)
+					);
 				header_effects.setVisible(bVisible);
 				effects_iedit.setVisible(bVisible);
 				effects_list_iadd.setVisible(bVisible);
 				effects_list.setVisible(bVisible);
             end
+			function onDrop(_, _, draginfo)
+				if draginfo.getType() == 'effect' then
+					local nodeAdvEffect = getDatabaseNode().getChild('effectlist').createChild();
+					local rEffect = EffectManager.decodeEffectFromText(draginfo.getStringData(), draginfo.getSecret());
+					DB.setValue(nodeAdvEffect, 'effect', 'string', rEffect.sName);
+					DB.setValue(nodeAdvEffect, 'durmod', 'number', draginfo.getNumberData());
+					if rEffect.sUnits then DB.setValue(nodeAdvEffect, 'durunit', 'string', rEffect.sUnits); end
+					if rEffect.nGMOnly == 1 then DB.setValue(nodeAdvEffect, 'visibility', 'string', 'hide'); end
+				end
+			end
         </script>
 		<sheetdata>
 			<anchor_column name="columnanchor" />
