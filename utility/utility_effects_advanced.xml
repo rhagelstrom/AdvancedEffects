@@ -291,7 +291,7 @@
 			</cycler_susceptiblitytypes>
 
             <combobox_damage_types name="susceptiblity">
-                <anchored to="susceptiblity_type" position="righthigh" offset="10,0" width="80"  height="20"/>
+                <anchored to="susceptiblity_type" position="righthigh" relation="relative" offset="10,0" width="80"  height="20"/>
 			</combobox_damage_types>
 
 			<advanced_effect_number name="susceptiblity_modifier">
