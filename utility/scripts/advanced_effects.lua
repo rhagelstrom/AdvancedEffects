@@ -3,6 +3,7 @@
 -- attribution and copyright information.
 --
 -- update display string
+-- luacheck: globals update
 function update()
 	local node = getDatabaseNode();
 	-- display dice/mods for duration --celestian

@@ -126,6 +126,7 @@ local function updateSusceptibleEffects()
 	DB.setValue(nodeRecord, 'effect', 'string', sEffectString);
 end
 
+-- luacheck: globals update
 function update()
 	local node = getDatabaseNode();
 	local sType = DB.getValue(node, 'type', '');

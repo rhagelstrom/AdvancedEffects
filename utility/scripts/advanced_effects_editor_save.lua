@@ -2,11 +2,6 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
-function onVisibilityChanged()
-	save_type.setVisible(isVisible());
-	save.setVisible(isVisible());
-	save_modifier.setVisible(isVisible());
-end
 
 local function updateSaveEffects(nodeRecord)
 	local sEffectString;
@@ -24,6 +19,13 @@ local function updateSaveEffects(nodeRecord)
 	if (sSave ~= '') then sEffectString = sTypeChar .. sSave:upper() .. ': ' .. nModifier .. ';'; end
 
 	DB.setValue(nodeRecord, 'effect', 'string', sEffectString);
+end
+
+-- luacheck: globals onVisibilityChanged isVisible
+function onVisibilityChanged()
+	save_type.setVisible(isVisible());
+	save.setVisible(isVisible());
+	save_modifier.setVisible(isVisible());
 end
 
 function onInit()

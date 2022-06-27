@@ -23,6 +23,7 @@ local function updateSusceptibleEffects(nodeRecord)
 	DB.setValue(nodeRecord, 'effect', 'string', sEffectString);
 end
 
+-- luacheck: globals update
 function update() end
 
 function onInit()

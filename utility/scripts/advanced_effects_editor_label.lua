@@ -7,6 +7,7 @@ local function updateLabelOnlyEffects(nodeRecord)
 	DB.setValue(nodeRecord, 'effect', 'string', sLabelOnly);
 end
 
+-- luacheck: globals update
 function update() end
 
 function onInit()
