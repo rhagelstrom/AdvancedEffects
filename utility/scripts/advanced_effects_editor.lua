@@ -108,7 +108,6 @@ local function updateSusceptibleEffects()
 	if not Session.IsHost then return; end
 
 	local nodeRecord = getDatabaseNode();
-	-- Debug.console("advanced_effects_editor.lua", "updateSusceptibleEffects", "nodeRecord",nodeRecord);
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'susceptiblity_type', '');
 	local sSuscept = DB.getValue(nodeRecord, 'susceptiblity', '');
@@ -145,7 +144,6 @@ function update()
 	local bIsAbilityCheck = (DB.getValue(node, 'ability_type', 'modified') == 'check');
 
 	local bSusceptiblity = (sType == 'susceptiblity');
-	local bIsResist = (DB.getValue(node, 'susceptiblity_type', '') == 'resist');
 
 	local bMisc = (sType == 'misc_ae');
 
