@@ -2,9 +2,10 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
-local function updateAbilityEffects(nodeRecord)
+local function updateAbilityEffects()
 	if not Session.IsHost then return; end
 
+	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'ability_type', 'modified');
 	local bIsCheck = (sType == 'check');
@@ -52,8 +53,10 @@ local function updateAbilityEffects(nodeRecord)
 	DB.setValue(nodeRecord, 'effect', 'string', sEffectString);
 end
 
-local function updateSaveEffects(nodeRecord)
+local function updateSaveEffects()
 	if not Session.IsHost then return; end
+
+	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'save_type', 'modifier');
 	local sSave = DB.getValue(nodeRecord, 'save', 'fortitude');
@@ -78,18 +81,20 @@ local function updateSaveEffects(nodeRecord)
 	DB.setValue(nodeRecord, 'effect', 'string', sEffectString);
 end
 
-local function updateMiscEffects(nodeRecord)
+local function updateMiscEffects()
 	if not Session.IsHost then return; end
+
+	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'misc_type', '');
 	local nModifier = DB.getValue(nodeRecord, 'misc_modifier', 0);
-	local bIsNotHeal = (sType ~= 'heal');
+	local bHeal = (sType == 'heal');
 	local sBonusType = DB.getValue(nodeRecord, 'misc_bonus_type', '');
 
 	if (sType == '') then sType = 'ac'; end
 
 	if (nModifier ~= 0) then
-		if bIsNotHeal and sBonusType ~= '' and sBonusType ~= 'none' then
+		if not bHeal and sBonusType ~= '' and sBonusType ~= 'none' then
 			sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. sBonusType .. ';';
 		else
 			sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ';';
@@ -169,7 +174,7 @@ function update()
 
 	susceptiblity_type.setVisible(bSusceptiblity);
 	susceptiblity.setComboBoxVisible(bSusceptiblity);
-	susceptiblity_modifier.setVisible(bSusceptiblity and bIsResist);
+	susceptiblity_modifier.setVisible(bSusceptiblity and DB.getValue(node, 'susceptiblity_type', '') == 'resist');
 	if bSusceptiblity then updateSusceptibleEffects(); end
 
 	misc_type.setVisible(bMisc);
@@ -182,12 +187,10 @@ function update()
 	label_only.setVisible(bLabel);
 end
 
-local function updateAbilityType()
-	local node = getDatabaseNode();
+local function updateAbilityType(node)
+	local bIsAbilityCheck = (node.getValue() == 'check');
 
-	local bIsAbilityCheck = (DB.getValue(node, 'ability_type', '') == 'check');
-
-	ability.setVisible((not bIsAbilityCheck));
+	ability.setVisible(not bIsAbilityCheck);
 	ability_check.setVisible(bIsAbilityCheck);
 
 	if bIsAbilityCheck then
@@ -200,24 +203,21 @@ local function updateAbilityType()
 end
 
 local function updateMiscType(node)
-	local bIsNotHeal = (DB.getValue(node, 'misc_type', 'ac') ~= 'heal');
-
+	misc_bonus_type.setComboBoxVisible(node.getValue() ~= 'heal');
+	misc_attack_type.setComboBoxVisible(node.getValue() == 'atk')
 	misc_bonus_type.setComboBoxVisible(bIsNotHeal);
 
 	updateMiscEffects()
 end
 
-local function updateLabelOnlyEffects(nodeRecord)
+local function updateLabelOnlyEffects(node)
 	if not Session.IsHost then return; end
-	local sLabelOnly = DB.getValue(nodeRecord, 'label_only', '');
 
-	DB.setValue(nodeRecord, 'effect', 'string', sLabelOnly);
+	DB.setValue(node.getParent(), 'effect', 'string', node.getValue() or '');
 end
 
 local function updateSusceptibleType(node)
-	local bIsResist = (DB.getValue(node, 'susceptiblity_type', '') == 'resist');
-
-	susceptiblity_modifier.setVisible(bIsResist);
+	susceptiblity_modifier.setVisible(node.getValue() == 'resist');
 
 	updateSusceptibleEffects();
 end
