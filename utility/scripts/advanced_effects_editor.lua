@@ -3,8 +3,6 @@
 -- attribution and copyright information.
 --
 local function updateAbilityEffects()
-	if not Session.IsHost then return; end
-
 	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'ability_type', 'modified');
@@ -54,8 +52,6 @@ local function updateAbilityEffects()
 end
 
 local function updateSaveEffects()
-	if not Session.IsHost then return; end
-
 	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'save_type', 'modifier');
@@ -82,19 +78,24 @@ local function updateSaveEffects()
 end
 
 local function updateMiscEffects()
-	if not Session.IsHost then return; end
-
 	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'misc_type', '');
 	local nModifier = DB.getValue(nodeRecord, 'misc_modifier', 0);
-	local bHeal = (sType == 'heal');
-	local sBonusType = DB.getValue(nodeRecord, 'misc_bonus_type', '');
+	local sBonusType = DB.getValue(nodeRecord, 'misc_bonus_type', 'none');
+	local sAttackType = DB.getValue(nodeRecord, 'misc_attack_type', 'none');
 
 	if (sType == '') then sType = 'ac'; end
 
 	if (nModifier ~= 0) then
-		if not bHeal and sBonusType ~= '' and sBonusType ~= 'none' then
+		Debug.chat(sAttackType)
+		if sType == 'atk' and sAttackType ~= 'none' then
+			if sBonusType ~= 'none' then
+				sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. sBonusType .. ', ' .. sAttackType .. ';';
+			else
+				sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. ',' .. sAttackType .. ';';
+			end
+		elseif sType ~= 'heal' and sBonusType ~= 'none' then
 			sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. sBonusType .. ';';
 		else
 			sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ';';
@@ -105,26 +106,19 @@ local function updateMiscEffects()
 end
 
 local function updateSusceptibleEffects()
-	if not Session.IsHost then return; end
-
 	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
 	local sType = DB.getValue(nodeRecord, 'susceptiblity_type', '');
 	local sSuscept = DB.getValue(nodeRecord, 'susceptiblity', '');
 	local nModifier = DB.getValue(nodeRecord, 'susceptiblity_modifier', 0);
 
-	if (sType == '') then sType = 'immune'; end
-	if (sSuscept == '') then
-		sSuscept = 'acid';
-		DB.setValue(nodeRecord, 'susceptiblity', 'string', 'acid');
-	end
+	if sType == '' then sType = 'immune'; end
+	if sSuscept == '' then sSuscept = 'acid'; DB.setValue(nodeRecord, 'susceptiblity', 'string', 'acid'); end
 
-	if (sSuscept ~= '') then
-		if sType == 'resist' then
-			sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. sSuscept .. ';';
-		else
-			sEffectString = sEffectString .. sType:upper() .. ': ' .. sSuscept .. ';';
-		end
+	if sType == 'resist' then
+		sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. sSuscept .. ';';
+	else
+		sEffectString = sEffectString .. sType:upper() .. ': ' .. sSuscept .. ';';
 	end
 
 	DB.setValue(nodeRecord, 'effect', 'string', sEffectString);
@@ -153,7 +147,7 @@ function update()
 	save.setVisible(bSave);
 	save_modifier.setVisible(bSave);
 	save_bonus_type.setComboBoxVisible(bSave);
-	if bSave then updateSaveEffects(); end
+	if bSave and Session.IsHost then updateSaveEffects(); end
 
 	ability_type.setVisible(bAbility);
 	ability.setVisible(bAbility and (not bIsAbilityCheck));
@@ -167,18 +161,19 @@ function update()
 			ability_modifier.setAnchor('left', 'ability', 'right', 'relative', '10');
 		end
 
-		updateAbilityEffects();
+		if Session.IsHost then updateAbilityEffects(); end
 	end
 
 	susceptiblity_type.setVisible(bSusceptiblity);
 	susceptiblity.setComboBoxVisible(bSusceptiblity);
 	susceptiblity_modifier.setVisible(bSusceptiblity and DB.getValue(node, 'susceptiblity_type', '') == 'resist');
-	if bSusceptiblity then updateSusceptibleEffects(); end
+	if bSusceptiblity and Session.IsHost then updateSusceptibleEffects(); end
 
 	misc_type.setVisible(bMisc);
 	misc_modifier.setVisible(bMisc);
 	misc_bonus_type.setComboBoxVisible(bMisc);
-	if bMisc then updateMiscEffects(); end
+	misc_attack_type.setComboBoxVisible(bMisc and DB.getValue(node, 'misc_attack_type', '') == 'atk');
+	if bMisc and Session.IsHost then updateMiscEffects(); end
 
 	effect.setVisible(bCustom);
 
@@ -202,15 +197,12 @@ end
 
 local function updateMiscType(node)
 	misc_bonus_type.setComboBoxVisible(node.getValue() ~= 'heal');
-	misc_attack_type.setComboBoxVisible(node.getValue() == 'atk')
-	misc_bonus_type.setComboBoxVisible(bIsNotHeal);
+	misc_attack_type.setComboBoxVisible(node.getValue() == 'atk');
 
 	updateMiscEffects()
 end
 
 local function updateLabelOnlyEffects(node)
-	if not Session.IsHost then return; end
-
 	DB.setValue(node.getParent(), 'effect', 'string', node.getValue() or '');
 end
 
@@ -231,55 +223,61 @@ function onInit()
 		if (sVisibility == '' and sEffectString == '') then DB.setValue(node, 'visibility', 'string', 'hide'); end
 	end
 
-	DB.addHandler(DB.getPath(node, '.type'), 'onUpdate', update);
-	DB.addHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
-	DB.addHandler(DB.getPath(node, '.save'), 'onUpdate', updateSaveEffects);
-	DB.addHandler(DB.getPath(node, '.save_modifier'), 'onUpdate', updateSaveEffects);
-	DB.addHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
+	if Session.IsHost then
+		DB.addHandler(DB.getPath(node, '.type'), 'onUpdate', update);
+	
+		DB.addHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
+		DB.addHandler(DB.getPath(node, '.save'), 'onUpdate', updateSaveEffects);
+		DB.addHandler(DB.getPath(node, '.save_modifier'), 'onUpdate', updateSaveEffects);
+		DB.addHandler(DB.getPath(node, '.save_bonus_type'), 'onUpdate', updateSaveEffects);
 
-	DB.addHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityType);
-	DB.addHandler(DB.getPath(node, '.ability'), 'onUpdate', updateAbilityEffects);
-	DB.addHandler(DB.getPath(node, '.ability_modifier'), 'onUpdate', updateAbilityEffects);
-	DB.addHandler(DB.getPath(node, '.ability_check'), 'onUpdate', updateAbilityEffects);
-	DB.addHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityEffects);
+		DB.addHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityType);
+		DB.addHandler(DB.getPath(node, '.ability'), 'onUpdate', updateAbilityEffects);
+		DB.addHandler(DB.getPath(node, '.ability_modifier'), 'onUpdate', updateAbilityEffects);
+		DB.addHandler(DB.getPath(node, '.ability_check'), 'onUpdate', updateAbilityEffects);
+		DB.addHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityEffects);
 
-	DB.addHandler(DB.getPath(node, '.susceptiblity_type'), 'onUpdate', updateSusceptibleType);
-	DB.addHandler(DB.getPath(node, '.susceptiblity'), 'onUpdate', updateSusceptibleEffects);
-	DB.addHandler(DB.getPath(node, '.susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects);
+		DB.addHandler(DB.getPath(node, '.susceptiblity_type'), 'onUpdate', updateSusceptibleType);
+		DB.addHandler(DB.getPath(node, '.susceptiblity'), 'onUpdate', updateSusceptibleEffects);
+		DB.addHandler(DB.getPath(node, '.susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects);
 
-	DB.addHandler(DB.getPath(node, '.misc_attack_type'), 'onUpdate', updateMiscType);
-	DB.addHandler(DB.getPath(node, '.misc_bonus_type'), 'onUpdate', updateMiscType);
-	DB.addHandler(DB.getPath(node, '.misc_modifier'), 'onUpdate', updateMiscEffects);
-	DB.addHandler(DB.getPath(node, '.misc_type'), 'onUpdate', updateMiscEffects);
+		DB.addHandler(DB.getPath(node, '.misc_type'), 'onUpdate', updateMiscType);
+		DB.addHandler(DB.getPath(node, '.misc_attack_type'), 'onUpdate', updateMiscEffects);
+		DB.addHandler(DB.getPath(node, '.misc_bonus_type'), 'onUpdate', updateMiscEffects);
+		DB.addHandler(DB.getPath(node, '.misc_modifier'), 'onUpdate', updateMiscEffects);
 
-	DB.addHandler(DB.getPath(node, '.label_only'), 'onUpdate', updateLabelOnlyEffects);
+		DB.addHandler(DB.getPath(node, '.label_only'), 'onUpdate', updateLabelOnlyEffects);
+	end
 
 	update();
 end
 
 function onClose()
-	local node = getDatabaseNode();
+	if Session.IsHost then
+		local node = getDatabaseNode();
+	
+		DB.removeHandler(DB.getPath(node, '.type'), 'onUpdate', update);
 
-	DB.removeHandler(DB.getPath(node, '.type'), 'onUpdate', update);
-	DB.removeHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
-	DB.removeHandler(DB.getPath(node, '.save'), 'onUpdate', updateSaveEffects);
-	DB.removeHandler(DB.getPath(node, '.save_modifier'), 'onUpdate', updateSaveEffects);
-	DB.removeHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
+		DB.removeHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
+		DB.removeHandler(DB.getPath(node, '.save'), 'onUpdate', updateSaveEffects);
+		DB.removeHandler(DB.getPath(node, '.save_modifier'), 'onUpdate', updateSaveEffects);
+		DB.removeHandler(DB.getPath(node, '.save_bonus_type'), 'onUpdate', updateSaveEffects);
 
-	DB.removeHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityType);
-	DB.removeHandler(DB.getPath(node, '.ability'), 'onUpdate', updateAbilityEffects);
-	DB.removeHandler(DB.getPath(node, '.ability_modifier'), 'onUpdate', updateAbilityEffects);
-	DB.removeHandler(DB.getPath(node, '.ability_check'), 'onUpdate', updateAbilityEffects);
-	DB.removeHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityEffects);
+		DB.removeHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityType);
+		DB.removeHandler(DB.getPath(node, '.ability'), 'onUpdate', updateAbilityEffects);
+		DB.removeHandler(DB.getPath(node, '.ability_modifier'), 'onUpdate', updateAbilityEffects);
+		DB.removeHandler(DB.getPath(node, '.ability_check'), 'onUpdate', updateAbilityEffects);
+		DB.removeHandler(DB.getPath(node, '.ability_type'), 'onUpdate', updateAbilityEffects);
 
-	DB.removeHandler(DB.getPath(node, '.susceptiblity_type'), 'onUpdate', updateSusceptibleType);
-	DB.removeHandler(DB.getPath(node, '.susceptiblity'), 'onUpdate', updateSusceptibleEffects);
-	DB.removeHandler(DB.getPath(node, '.susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects);
+		DB.removeHandler(DB.getPath(node, '.susceptiblity_type'), 'onUpdate', updateSusceptibleType);
+		DB.removeHandler(DB.getPath(node, '.susceptiblity'), 'onUpdate', updateSusceptibleEffects);
+		DB.removeHandler(DB.getPath(node, '.susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects);
 
-	DB.removeHandler(DB.getPath(node, '.misc_attack_type'), 'onUpdate', updateMiscType);
-	DB.removeHandler(DB.getPath(node, '.misc_bonus_type'), 'onUpdate', updateMiscType);
-	DB.removeHandler(DB.getPath(node, '.misc_modifier'), 'onUpdate', updateMiscEffects);
-	DB.removeHandler(DB.getPath(node, '.misc_type'), 'onUpdate', updateMiscEffects);
+		DB.removeHandler(DB.getPath(node, '.misc_type'), 'onUpdate', updateMiscType);
+		DB.removeHandler(DB.getPath(node, '.misc_attack_type'), 'onUpdate', updateMiscEffects);
+		DB.removeHandler(DB.getPath(node, '.misc_bonus_type'), 'onUpdate', updateMiscEffects);
+		DB.removeHandler(DB.getPath(node, '.misc_modifier'), 'onUpdate', updateMiscEffects);
 
-	DB.removeHandler(DB.getPath(node, '.label_only'), 'onUpdate', updateLabelOnlyEffects);
+		DB.removeHandler(DB.getPath(node, '.label_only'), 'onUpdate', updateLabelOnlyEffects);
+	end
 end

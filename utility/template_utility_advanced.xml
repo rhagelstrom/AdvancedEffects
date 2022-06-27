@@ -96,6 +96,20 @@
 			<listmaxsize>3</listmaxsize>
 			</combobox>
 	</template>
+
+	<template name="combobox_attack_types">
+			<combobox>
+				<listdirection>down</listdirection>
+				<script>
+					function onInit()
+						super.onInit();
+						addItems(DataCommon.rangetypes);
+						add("none");
+					end
+				</script>
+			<listmaxsize>3</listmaxsize>
+			</combobox>
+	</template>
 	
 	<template name="cycler_effecttypes">
 		<button_stringcycler>
