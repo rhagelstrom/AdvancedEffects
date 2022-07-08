@@ -541,7 +541,7 @@ function onInit()
 	CombatRecordManager.addNPC = addNPC_new;
 
 	-- 3.5E replacements
-	if not CombatManagerKel then
+	if not CombatManagerKel then -- luacheck: globals CombatManagerKel
 		EffectManager35E.getEffectsByType = getEffectsByType_new;
 		EffectManager35E.hasEffect = hasEffect_new;
 	end
