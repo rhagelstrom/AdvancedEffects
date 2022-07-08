@@ -7,7 +7,7 @@ function onButtonPress()
 	local w = Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
 	w.main.subwindow.name.setValue(DB.getValue(window.getDatabaseNode(), "...name", ""));
 end
-function onDragStart()
+function onDragStart(_, _, _, dragdata)
 	local nodeAdvEffect = window.getDatabaseNode();
 
 	local rEffect = {};
@@ -18,10 +18,10 @@ function onDragStart()
 		rEffect.nGMOnly = 1
 	end
 
-	draginfo.setType('effect')
-	draginfo.setNumberData(DB.getValue(nodeAdvEffect, 'durmod', 0));
-	draginfo.setStringData(EffectManager.encodeEffectAsText(rEffect));
-	draginfo.setDescription(draginfo.getStringData());
+	dragdata.setType('effect')
+	dragdata.setNumberData(DB.getValue(nodeAdvEffect, 'durmod', 0));
+	dragdata.setStringData(EffectManager.encodeEffectAsText(rEffect));
+	dragdata.setDescription(dragdata.getStringData());
 
-	return ActionEffect.performRoll(draginfo, nil, rEffect);
+	return ActionEffect.performRoll(dragdata, nil, rEffect);
 end
