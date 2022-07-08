@@ -19,11 +19,9 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.13-test.1\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" icon="celestian" />
+	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.13-test.1\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" />
 
 	<base>
-		<icon name="celestian" file="graphics/icons/celestian.png" />
-
 		<script name="AdvancedEffectsItemHandlers" file="scripts/itemhandlers.lua" />
 		<script name="AdvancedEffectsAbilityHandlers" file="scripts/abilityhandlers.lua" />
 		<script name="AdvancedEffects" file="scripts/manager_AE.lua" />
