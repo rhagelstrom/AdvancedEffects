@@ -432,45 +432,31 @@ end
 -- is to facilitate deletion of effects that are no longer applicable).
 -- Lastly it looks through the character's attached effects and adds those.
 local addPC_old
-local function addPC_new(nodeChar, ...)
-	if not nodeChar then return; end
-
-	-- Call original function for better compatibility
-	addPC_old(nodeChar, ...)
+local function addPC_new(tCustom, ...)
+	addPC_old(tCustom, ...) -- Call original function
 
 	-- check each inventory item for effects that need to be applied
-	for _, nodeItem in pairs(DB.getChildren(nodeChar, 'inventorylist')) do
+	for _, nodeItem in pairs(DB.getChildren(tCustom['nodeRecord'], 'inventorylist')) do
 		if DB.getValue(nodeItem, 'carried') == 2 then updateItemEffects(nodeItem); end
 	end
 
 	-- check each special ability for effects that need to be applied
-	for _, nodeAbility in pairs(DB.getChildren(nodeChar, 'specialabilitylist')) do
-		updateItemEffects(nodeAbility);
-	end
-	for _, nodeAbility in pairs(DB.getChildren(nodeChar, 'featlist')) do
-		updateItemEffects(nodeAbility);
-	end
-	for _, nodeAbility in pairs(DB.getChildren(nodeChar, 'proficiencylist')) do
-		updateItemEffects(nodeAbility);
-	end
-	for _, nodeAbility in pairs(DB.getChildren(nodeChar, 'traitlist')) do
-		updateItemEffects(nodeAbility);
+	local tFields = {'specialabilitylist', 'featlist', 'proficiencylist', 'traitlist'}
+	for _, fieldName in pairs(tFields) do
+		for _, nodeAbility in pairs(DB.getChildren(tCustom['nodeRecord'], fieldName)) do
+			updateItemEffects(nodeAbility);
+		end
 	end
 
 	-- check for and apply character effects
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
-
-	updateCharEffects(nodeChar, nodeCT);
+	updateCharEffects(tCustom['nodeRecord'], tCustom['nodeCT']);
 end
 
 local addNPC_old
-local function addNPC_new(sClass, nodeNPC, sName, ...)
-	-- Call original function
-	local nodeCT = addNPC_old(sClass, nodeNPC, sName, ...);
+local function addNPC_new(tCustom, ...)
+	addNPC_old(tCustom, ...); -- Call original function
 
-	updateCharEffects(nodeNPC, nodeCT);
-
-	return nodeCT;
+	updateCharEffects(tCustom['nodeRecord'], tCustom['nodeCT']);
 end
 
 --	replace 3.5E EffectManager35E manager_effect_35E.lua hasEffect() with this
@@ -548,11 +534,11 @@ function onInit()
 	decodeActors_old = ActionsManager.decodeActors
 	ActionsManager.decodeActors = decodeActors_new
 
-	addPC_old = CombatManager.addPC;
-	CombatManager.addPC = addPC_new;
+	addPC_old = CombatRecordManager.addPC;
+	CombatRecordManager.addPC = addPC_new;
 
-	addNPC_old = CombatManager.addNPC;
-	CombatManager.addNPC = addNPC_new;
+	addNPC_old = CombatRecordManager.addNPC;
+	CombatRecordManager.addNPC = addNPC_new;
 
 	-- 3.5E replacements
 	if not CombatManagerKel then
