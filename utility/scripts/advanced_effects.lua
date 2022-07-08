@@ -2,8 +2,9 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
+-- luacheck: globals update effect_description name
+
 -- update display string
--- luacheck: globals update
 function update()
 	local node = getDatabaseNode();
 	-- display dice/mods for duration --celestian
