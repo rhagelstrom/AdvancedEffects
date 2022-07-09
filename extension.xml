@@ -4,19 +4,16 @@
 	<properties>
 		<name>Feature: Advanced Effects</name>
 		<version>1.13</version>
-		<loadorder>34</loadorder>
-		<description>
-			<text>Add effects to pcs, npcs and items.</text>
-			<website></website>
-			<author>Celestian</author>
-			<ported_by>rmilmine and bmos</ported_by>
-		</description>
+		<author>Celestian</author>
+		<ported_by>rmilmine and bmos</ported_by>
+		<description>Add effects to pcs, npcs and items</description>
 		<ruleset>
 			<name>3.5E</name>
 		</ruleset>
 		<ruleset>
 			<name>PFRPG</name>
 		</ruleset>
+		<loadorder>34</loadorder>
 	</properties>
 
 	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.13-test.3\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" />
