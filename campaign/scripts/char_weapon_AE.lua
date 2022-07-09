@@ -10,7 +10,8 @@ function onDamageChanged()
 
 	local aDamage = {};
 	local aDamageNodes = UtilityManager.getSortedTable(DB.getChildren(nodeWeapon, "damagelist"));
-	for _,v in ipairs(aDamageNodes) do		local aDice = DB.getValue(v, "dice", {});
+	for _,v in ipairs(aDamageNodes) do
+		local aDice = DB.getValue(v, "dice", {});
 		local nMod = DB.getValue(v, "bonus", 0);
 
 		local sAbility = DB.getValue(v, "stat", "");
