@@ -9,7 +9,7 @@ function onDamageChanged()
 	local nodeWeapon = getDatabaseNode();
 	local nodeChar = nodeWeapon.getChild("...")
 	local rActor = ActorManager.resolveActor(nodeChar);
-	
+
 	local aDamage = {};
 	local aDamageNodes = UtilityManager.getSortedTable(DB.getChildren(nodeWeapon, "damagelist"));
 	for _,v in ipairs(aDamageNodes) do
@@ -24,7 +24,7 @@ function onDamageChanged()
 			if DB.getValue(nodeWeapon, 'type') == 1 then sAbility = 'dexterity'; end
 		end
 		-- END ADDITION FOR ADVANCED EFFECTS
-	
+
 		if sAbility ~= "" then
 			local nMult = DB.getValue(v, "statmult", 1);
 			local nMax = DB.getValue(v, "statmax", 0);
@@ -36,7 +36,7 @@ function onDamageChanged()
 				nAbilityBonus = math.floor(nMult * nAbilityBonus);
 			end
 			nMod = nMod + nAbilityBonus;
-		endy
+		end
 
 		if #aDice > 0 or nMod ~= 0 then
 			local sDamage = StringManager.convertDiceToString(DB.getValue(v, "dice", {}), nMod);
