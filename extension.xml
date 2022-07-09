@@ -16,7 +16,7 @@
 		<loadorder>34</loadorder>
 	</properties>
 
-	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.13-test.3\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" />
+	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.13-test.4\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" />
 
 	<base>
 		<script name="AdvancedEffectsItemHandlers" file="scripts/itemhandlers.lua" />
