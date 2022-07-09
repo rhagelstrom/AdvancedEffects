@@ -355,7 +355,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 				if (sEffSource == sItemSource) then
 					bFound = true;
 					if (not bEquipped) then
-						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly, sUser)
+						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
 						nodeEffect.delete();
 						break
 					end -- not equipped
