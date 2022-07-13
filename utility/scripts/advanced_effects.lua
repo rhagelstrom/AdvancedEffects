@@ -2,8 +2,9 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
+-- luacheck: globals update effect_description name
+
 -- update display string
--- luacheck: globals update
 function update()
 	local node = getDatabaseNode();
 	-- display dice/mods for duration --celestian
@@ -49,11 +50,6 @@ end
 function onInit()
 	local node = getDatabaseNode();
 
-	-- set name of effect to name of item so when effect
-	-- is applied to someone it shows where it came from properly
-	local sName = DB.getValue(DB.getChild(node, '...'), 'name', '');
-	name.setValue(sName);
-
 	-- watch these variables and update display string if they change
 	DB.addHandler(DB.getPath(node, '.effect'), 'onUpdate', update);
 	DB.addHandler(DB.getPath(node, '.durdice'), 'onUpdate', update);
@@ -62,10 +58,16 @@ function onInit()
 	DB.addHandler(DB.getPath(node, '.visibility'), 'onUpdate', update);
 	DB.addHandler(DB.getPath(node, '.actiononly'), 'onUpdate', update);
 
+	-- set name of effect to name of item so that, when effect
+	-- is applied to someone, it shows where it came from properly
+	name.setValue(DB.getValue(DB.getChild(node, '...'), 'name', ''));
+
 	update();
 end
 
 function onClose()
+	local node = getDatabaseNode();
+
 	DB.removeHandler(DB.getPath(node, '.effect'), 'onUpdate', update);
 	DB.removeHandler(DB.getPath(node, '.durdice'), 'onUpdate', update);
 	DB.removeHandler(DB.getPath(node, '.durmod'), 'onUpdate', update);

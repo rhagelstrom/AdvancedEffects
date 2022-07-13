@@ -2,6 +2,8 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
+-- luacheck: globals save_bonus_type ability_check ability_bonus_type susceptiblity_type susceptiblity susceptiblity_modifier
+-- luacheck: globals misc_bonus_type misc_attack_type label_only
 local function updateAbilityEffects()
 	local nodeRecord = getDatabaseNode();
 	local sEffectString = '';
@@ -225,7 +227,7 @@ function onInit()
 
 	if Session.IsHost then
 		DB.addHandler(DB.getPath(node, '.type'), 'onUpdate', update);
-	
+
 		DB.addHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);
 		DB.addHandler(DB.getPath(node, '.save'), 'onUpdate', updateSaveEffects);
 		DB.addHandler(DB.getPath(node, '.save_modifier'), 'onUpdate', updateSaveEffects);
@@ -255,7 +257,7 @@ end
 function onClose()
 	if Session.IsHost then
 		local node = getDatabaseNode();
-	
+
 		DB.removeHandler(DB.getPath(node, '.type'), 'onUpdate', update);
 
 		DB.removeHandler(DB.getPath(node, '.save_type'), 'onUpdate', updateSaveEffects);

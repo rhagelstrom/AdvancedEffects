@@ -3,7 +3,7 @@
 
 	<properties>
 		<name>Feature: Advanced Effects</name>
-		<version>1.12</version>
+		<version>1.13</version>
 		<author>Celestian</author>
 		<ported_by>rmilmine and bmos</ported_by>
 		<description>Add effects to pcs, npcs and items</description>
@@ -16,11 +16,9 @@
 		<loadorder>34</loadorder>
 	</properties>
 
-	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.12\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" icon="celestian" />
+	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects - PFRPG and 3.5E v1.13-test.5\roriginally by Celestian, 2017-2021\rported to PFRPG/3.5E by rmilmine with improvements by bmos and SoxMax." font="emotefont" />
 
 	<base>
-		<icon name="celestian" file="graphics/icons/celestian.png" />
-
 		<script name="AdvancedEffectsItemHandlers" file="scripts/itemhandlers.lua" />
 		<script name="AdvancedEffectsAbilityHandlers" file="scripts/abilityhandlers.lua" />
 		<script name="AdvancedEffects" file="scripts/manager_AE.lua" />

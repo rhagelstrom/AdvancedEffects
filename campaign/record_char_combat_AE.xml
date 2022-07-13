@@ -22,21 +22,7 @@
 					<left offset="20" />
 					<right parent="advanced_effects_frame" anchor="right" relation="relative" offset="-10" />
 				</anchored>
-				<script>
-					function onDrop(x, y, draginfo, ...)
-						if super and super.onDrop then
-							super.onDrop(x, y, draginfo, ...)
-						end
-						if draginfo.getType() == 'effect' then
-							local nodeAdvEffect = window.getDatabaseNode().getChild('effectlist').createChild();
-							local rEffect = EffectManager.decodeEffectFromText(draginfo.getStringData(), draginfo.getSecret());
-							DB.setValue(nodeAdvEffect, 'effect', 'string', rEffect.sName);
-							DB.setValue(nodeAdvEffect, 'durmod', 'number', draginfo.getNumberData());
-							if rEffect.sUnits then DB.setValue(nodeAdvEffect, 'durunit', 'string', rEffect.sUnits); end
-							if rEffect.nGMOnly == 1 then DB.setValue(nodeAdvEffect, 'visibility', 'string', 'hide'); end
-						end
-					end
-				</script>
+				<script file="campaign/scripts/effects_list_AE.lua" />
 			</list_editor_advanced_effects>
 
 			<scrollbar_list>
