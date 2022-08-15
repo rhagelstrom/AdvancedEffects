@@ -90,7 +90,6 @@ local function updateMiscEffects()
 	if (sType == '') then sType = 'ac'; end
 
 	if (nModifier ~= 0) then
-		Debug.chat(sAttackType)
 		if sType == 'atk' and sAttackType ~= 'none' then
 			if sBonusType ~= 'none' then
 				sEffectString = sEffectString .. sType:upper() .. ': ' .. nModifier .. ' ' .. sBonusType .. ', ' .. sAttackType .. ';';
