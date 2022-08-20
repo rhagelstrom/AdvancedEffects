@@ -2,40 +2,35 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
--- luacheck: globals getWeaponDamageRollStructures_new
-local getWeaponDamageRollStructures_old
-function getWeaponDamageRollStructures_new(nodeWeapon, ...)
-	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...);
 
-	-- add nodeWeapon to rActor so that when effects are checked we can
-	-- compare them against action only effects
-	local _, sRecord = DB.getValue(nodeWeapon, 'shortcut', '', '');
-	rActor.nodeWeapon = sRecord;
+local function insertNodes(rActor, nodeWeapon)
+	-- add nodeWeapon and nodeItem to rActor so that when effects are
+	-- checked we can compare them against action only effects
+	local _, nodeItem = DB.getValue(nodeWeapon, 'shortcut', '', '');
+	rActor.nodeItem = nodeItem;
+	rActor.nodeWeapon = nodeWeapon.getPath();
 
 	-- bmos adding AmmunitionManager integration
 	if AmmunitionManager then
 		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
 		if nodeAmmo then rActor.nodeAmmo = nodeAmmo.getPath() end
 	end
+end
+
+local getWeaponDamageRollStructures_old
+local function getWeaponDamageRollStructures_new(nodeWeapon, ...)
+	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...);
+
+	insertNodes(rActor, nodeWeapon)
 
 	return rActor, rDamage;
 end
 
--- luacheck: globals getWeaponAttackRollStructures_new
 local getWeaponAttackRollStructures_old
-function getWeaponAttackRollStructures_new(nodeWeapon, nAttack, ...)
+local function getWeaponAttackRollStructures_new(nodeWeapon, nAttack, ...)
 	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack, ...);
 
-	-- add nodeWeapon to rActor so that when effects are checked we can
-	-- compare them against action only effects
-	local _, sRecord = DB.getValue(nodeWeapon, 'shortcut', '', '');
-	rActor.nodeWeapon = sRecord;
-
-	-- bmos adding AmmunitionManager integration
-	if AmmunitionManager then
-		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
-		if nodeAmmo then rActor.nodeAmmo = nodeAmmo.getPath() end
-	end
+	insertNodes(rActor, nodeWeapon)
 
 	return rActor, rAttack;
 end

@@ -67,10 +67,10 @@ function isValidCheckEffect(rActor, nodeEffect)
 
 		if sItemPath and sItemPath ~= '' then
 			-- if there is a nodeWeapon do some sanity checking
-			if rActor.nodeWeapon then
+			if rActor.nodeItem then
 				-- here is where we get the node path of the item, not the
 				-- effectslist entry
-				if bActionOnly and (sItemPath == rActor.nodeWeapon) then bActionItemUsed = true; end
+				if bActionOnly and (sItemPath == rActor.nodeItem) then bActionItemUsed = true; end
 			end
 
 			-- if there is a nodeAmmo do some sanity checking
@@ -315,8 +315,8 @@ local encodeActionForDrag_old
 local function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
 	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
-	if rSource and rSource.nodeWeapon then
-		local nodeWeapon = rSource.nodeWeapon
+	if rSource and rSource.nodeItem then
+		local nodeWeapon = rSource.nodeItem
 		if nodeWeapon ~= '' then draginfo.setMetaData(weaponPathKey, nodeWeapon) end
 	end
 	if AmmunitionManager and rSource and rSource.nodeAmmo then
@@ -331,7 +331,7 @@ local function decodeActors_new(draginfo, ...)
 	local rSource, aTargets = decodeActors_old(draginfo, ...)
 
 	local sNodeWeapon = draginfo.getMetaData(weaponPathKey)
-	if (sNodeWeapon and sNodeWeapon ~= '') then rSource.nodeWeapon = sNodeWeapon end
+	if (sNodeWeapon and sNodeWeapon ~= '') then rSource.nodeItem = sNodeWeapon end
 
 	local sNodeAmmo = draginfo.getMetaData(ammoPathKey)
 	if AmmunitionManager and (sNodeAmmo and sNodeAmmo ~= '') then rSource.nodeAmmo = sNodeAmmo end
