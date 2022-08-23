@@ -10,16 +10,13 @@
     <windowclass name="advanced_effects_subwindow">
 		<margins control="0,0,2,2" />
         <script>
+			local function isVisible(nodeRecord)
+				local bID = ItemManager.getIDState(nodeRecord);
+				local bPlayerEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
+				return not nodeRecord.isReadOnly() and (Session.IsHost or (nodeRecord.getPath():match("^charsheet") and bID and bPlayerEdit));
+			end
             function onInit()
-                local node = getDatabaseNode();
-
-				local bVisible = not node.isReadOnly() and (
-					Session.IsHost or (
-						string.match(node.getPath(),"^charsheet") and
-						DB.getValue(node, "isidentified", 1) > 0 and
-						OptionsManager.isOption("ADND_AE_EDIT", "enabled")
-						)
-					);
+				local bVisible = isVisible(getDatabaseNode());
 				header_effects.setVisible(bVisible);
 				effects_list_iedit.setVisible(bVisible);
 				effects_list_iadd.setVisible(bVisible);
