@@ -6,7 +6,32 @@
 -->
 
 <root>
-    <!-- advanced effects subwindow -->
+	<!-- advanced effects subwindow with frame-->
+	<windowclass name="advanced_effects_subwindowf">
+		<sheetdata>
+			<frame_char name="ae_frame">
+				<anchored>
+					<top />
+					<left />
+					<right />
+					<bottom />
+				</anchored>
+			</frame_char>
+			<subwindow name="ae_subwindow">
+				<anchored>
+					<top parent="ae_frame" offset="10" />
+					<left parent="ae_frame" offset="10" />
+					<right parent="ae_frame" offset="-5" />
+					<bottom parent="ae_frame" offset="-10" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+			</subwindow>
+		</sheetdata>
+	</windowclass>
+
+	<!-- advanced effects subwindow -->
     <windowclass name="advanced_effects_subwindow">
 		<margins control="0,0,2,2" />
         <script>
