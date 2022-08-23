@@ -21,7 +21,7 @@
 						)
 					);
 				header_effects.setVisible(bVisible);
-				effects_iedit.setVisible(bVisible);
+				effects_list_iedit.setVisible(bVisible);
 				effects_list_iadd.setVisible(bVisible);
 				effects_list.setVisible(bVisible);
             end
@@ -43,12 +43,12 @@
 				<static textres="header_effects" />
 				<center />
 			</header_column>
-			<button_iedit name="effects_iedit">
+			<button_iedit name="effects_list_iedit">
 				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
  				<target>effects_list</target>
 			</button_iedit>
 			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<anchored to="effects_list_iedit" position="lefthigh" offset="5,0" />
 				<target>effects_list</target>
 			</button_iadd>
             

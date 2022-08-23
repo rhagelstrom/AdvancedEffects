@@ -18,7 +18,7 @@ function onListChanged()
 end
 
 function update()
-	local bEdit = (window.effects_iedit.getValue() == 1);
+	local bEdit = (window.effects_list_iedit.getValue() == 1);
 	for _,w in ipairs(getWindows()) do
 		w.idelete.setVisibility(bEdit);
 	end

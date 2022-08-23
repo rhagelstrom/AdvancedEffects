@@ -30,12 +30,13 @@
 				<target>effects_list</target>
 			</scrollbar_list>
 
-			<button_iedit name="effects_iedit">
+			<button_iedit name="effects_list_iedit">
 				<anchored to="advanced_effects_frame" position="insidetopright" offset="15,10" />
 				<target>effects_list</target>
 			</button_iedit>
+
 			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="left" offset="5,0" />
+				<anchored to="effects_list_iedit" position="left" offset="5,0" />
 				<target>effects_list</target>
 			</button_iadd>
 		</sheetdata>
