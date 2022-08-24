@@ -152,7 +152,6 @@
 		</sizelimits>
 		<nodelete />
 		<playercontrol />
-		<minimize>minimized_char</minimize>
 		<tooltip control="name" />
 		<sheetdata>
 			<windowtitlebar_char name="title">
