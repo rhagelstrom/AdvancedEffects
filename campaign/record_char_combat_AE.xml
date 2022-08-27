@@ -9,9 +9,9 @@
 		<sheetdata>
 			<subwindow name="char_combat_ae">
 				<anchored>
-					<top parent="attackframe" anchor="bottom" relation="relative" offset="0" />
-					<left parent="attackframe" offset="0" />
-					<right parent="initiativeframe" offset="0" />
+					<top parent="attackframe" anchor="bottom" relation="relative" offset="5" />
+					<left parent="attackframe" />
+					<right parent="initiativeframe" />
 					<bottom anchor="bottom" relation="relative" offset="-5" />
 				</anchored>
 				<class>advanced_effects_subwindowf</class>

@@ -9,7 +9,7 @@
 		<sheetdata>
 			<subwindow name="advanced_effects_contents" insertbefore="divider4">
 				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
 					<left offset="5" />
 					<right offset="5" />
 				</anchored>
