@@ -80,50 +80,19 @@ local function removeEffectOnAbilityEffectDelete(node)
 end
 
 function onInit()
+	local tNodes = {'specialabilitylist', 'featlist', 'proficiencylist', 'traitlist'}
 	if Session.IsHost then
-		-- watch the character/pc class ability lists
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist', 'onChildAdded', addAbilityEffect);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.specialabilitylist.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
-		DB.addHandler('charsheet.*.specialabilitylist', 'onChildDeleted', updateFromDeletedAbility);
-		-- watch the character/pc feats lists
-		DB.addHandler('charsheet.*.featlist.*.effectlist', 'onChildAdded', addAbilityEffect);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.featlist.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
-		DB.addHandler('charsheet.*.featlist', 'onChildDeleted', updateFromDeletedAbility);
-		-- watch the character/pc proficiencies lists
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist', 'onChildAdded', addAbilityEffect);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.proficiencylist.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
-		DB.addHandler('charsheet.*.proficiencylist', 'onChildDeleted', updateFromDeletedAbility);
-		-- watch the character/pc racial traits lists
-		DB.addHandler('charsheet.*.traitlist.*.effectlist', 'onChildAdded', addAbilityEffect);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
-		DB.addHandler('charsheet.*.traitlist.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
-		DB.addHandler('charsheet.*.traitlist', 'onChildDeleted', updateFromDeletedAbility);
+		for _, sName in ipairs(tNodes) do
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildAdded', addAbilityEffect);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
+			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
+			DB.addHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility);
+		end
 	end
 end

@@ -84,17 +84,20 @@ end
 
 function onInit()
 	if Session.IsHost then
-		-- watch the character/pc inventory list
-		DB.addHandler('charsheet.*.inventorylist.*.carried', 'onUpdate', inventoryUpdateItemEffects);
-		DB.addHandler('charsheet.*.inventorylist.*.isidentified', 'onUpdate', updateItemEffectsForID);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.effect', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.durdice', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.durmod', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.name', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.durunit', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.visibility', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist.*.actiononly', 'onUpdate', updateItemEffectsForEdit);
-		DB.addHandler('charsheet.*.inventorylist.*.effectlist', 'onChildDeleted', removeEffectOnItemEffectDelete);
-		DB.addHandler('charsheet.*.inventorylist', 'onChildDeleted', updateFromDeletedInventory);
+		-- watch the character/pc inventory list(s)
+		for _, sItemListNodeName in pairs(ItemManager.getInventoryPaths('charsheet')) do
+			local sItemList = 'charsheet.*.' .. sItemListNodeName;
+			DB.addHandler(sItemList .. '.*.carried', 'onUpdate', inventoryUpdateItemEffects);
+			DB.addHandler(sItemList .. '.*.isidentified', 'onUpdate', updateItemEffectsForID);
+			DB.addHandler(sItemList .. '.*.effectlist.*.effect', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist.*.durdice', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist.*.durmod', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist.*.name', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist.*.durunit', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist.*.visibility', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist.*.actiononly', 'onUpdate', updateItemEffectsForEdit);
+			DB.addHandler(sItemList .. '.*.effectlist', 'onChildDeleted', removeEffectOnItemEffectDelete);
+			DB.addHandler(sItemList .. '', 'onChildDeleted', updateFromDeletedInventory);
+		end
 	end
 end
