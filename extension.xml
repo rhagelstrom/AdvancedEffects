@@ -29,10 +29,10 @@
 		<includefile source="utility/template_utility_advanced.xml" />
 		<includefile source="utility/utility_effects_advanced.xml" />
 
-		<includefile source="campaign/record_char_actions_AE.xml" />
+		<includefile source="campaign/record_char_actions.xml" />
 		<includefile source="campaign/record_item.xml" />
 		<includefile source="campaign/record_char_abilities.xml" />
-		<includefile source="campaign/record_npc_AE.xml" />
-		<includefile source="campaign/record_char_combat_AE.xml" />
+		<includefile source="campaign/record_npc.xml" />
+		<includefile source="campaign/record_char_combat.xml" />
     </base>
 </root>
