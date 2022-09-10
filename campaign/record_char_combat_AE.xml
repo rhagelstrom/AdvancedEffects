@@ -9,7 +9,7 @@
 		<sheetdata>
 			<subwindow name="char_combat_ae">
 				<anchored>
-					<top parent="attackframe" anchor="bottom" relation="relative" offset="5" />
+					<top parent="attackframe" anchor="bottom" relation="relative" offset="0" />
 					<left parent="attackframe" />
 					<right parent="initiativeframe" />
 					<bottom anchor="bottom" relation="relative" offset="-5" />
