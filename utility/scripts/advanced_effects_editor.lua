@@ -215,14 +215,14 @@ local function updateSusceptibleType(node)
 end
 
 function onInit()
-	local nodeEffect = getDatabaseNode()
+	local nodeAdvEffect = getDatabaseNode()
 
 	-- if npc and no effect yet then we set the
 	-- visibility default to hidden
-	if nodeEffect.getPath():match('^npc%.id%-%d+') then
-		local sVisibility = DB.getValue(nodeEffect, 'visibility', '')
-		local sEffectString = DB.getValue(nodeEffect, 'effect', '')
-		if sVisibility == '' and sEffectString == '' then DB.setValue(nodeEffect, 'visibility', 'string', 'hide') end
+	if nodeAdvEffect.getPath():match('^npc%.id%-%d+') then
+		local sVisibility = DB.getValue(nodeAdvEffect, 'visibility', '')
+		local sEffectString = DB.getValue(nodeAdvEffect, 'effect', '')
+		if sVisibility == '' and sEffectString == '' then DB.setValue(nodeAdvEffect, 'visibility', 'string', 'hide') end
 	end
 
 	update()
@@ -231,29 +231,29 @@ function onInit()
 		return
 	end
 
-	DB.addHandler(DB.getPath(nodeEffect, 'type'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'type'), 'onUpdate', update)
 
-	DB.addHandler(DB.getPath(nodeEffect, 'save_type'), 'onUpdate', updateSaveEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'save'), 'onUpdate', updateSaveEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'save_modifier'), 'onUpdate', updateSaveEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'save_bonus_type'), 'onUpdate', updateSaveEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'save_type'), 'onUpdate', updateSaveEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'save'), 'onUpdate', updateSaveEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'save_modifier'), 'onUpdate', updateSaveEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'save_bonus_type'), 'onUpdate', updateSaveEffects)
 
-	DB.addHandler(DB.getPath(nodeEffect, 'ability_type'), 'onUpdate', updateAbilityType)
-	DB.addHandler(DB.getPath(nodeEffect, 'ability'), 'onUpdate', updateAbilityEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'ability_modifier'), 'onUpdate', updateAbilityEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'ability_check'), 'onUpdate', updateAbilityEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'ability_type'), 'onUpdate', updateAbilityEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'ability_type'), 'onUpdate', updateAbilityType)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'ability'), 'onUpdate', updateAbilityEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'ability_modifier'), 'onUpdate', updateAbilityEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'ability_check'), 'onUpdate', updateAbilityEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'ability_type'), 'onUpdate', updateAbilityEffects)
 
-	DB.addHandler(DB.getPath(nodeEffect, 'susceptiblity_type'), 'onUpdate', updateSusceptibleType)
-	DB.addHandler(DB.getPath(nodeEffect, 'susceptiblity'), 'onUpdate', updateSusceptibleEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'susceptiblity_type'), 'onUpdate', updateSusceptibleType)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'susceptiblity'), 'onUpdate', updateSusceptibleEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects)
 
-	DB.addHandler(DB.getPath(nodeEffect, 'misc_type'), 'onUpdate', updateMiscType)
-	DB.addHandler(DB.getPath(nodeEffect, 'misc_attack_type'), 'onUpdate', updateMiscEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'misc_bonus_type'), 'onUpdate', updateMiscEffects)
-	DB.addHandler(DB.getPath(nodeEffect, 'misc_modifier'), 'onUpdate', updateMiscEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'misc_type'), 'onUpdate', updateMiscType)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'misc_attack_type'), 'onUpdate', updateMiscEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'misc_bonus_type'), 'onUpdate', updateMiscEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'misc_modifier'), 'onUpdate', updateMiscEffects)
 
-	DB.addHandler(DB.getPath(nodeEffect, 'label_only'), 'onUpdate', updateLabelOnlyEffects)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'label_only'), 'onUpdate', updateLabelOnlyEffects)
 end
 
 function onClose()
@@ -261,29 +261,29 @@ function onClose()
 		return
 	end
 
-	local nodeEffect = getDatabaseNode()
+	local nodeAdvEffect = getDatabaseNode()
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'type'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'type'), 'onUpdate', update)
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'save_type'), 'onUpdate', updateSaveEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'save'), 'onUpdate', updateSaveEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'save_modifier'), 'onUpdate', updateSaveEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'save_bonus_type'), 'onUpdate', updateSaveEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'save_type'), 'onUpdate', updateSaveEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'save'), 'onUpdate', updateSaveEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'save_modifier'), 'onUpdate', updateSaveEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'save_bonus_type'), 'onUpdate', updateSaveEffects)
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'ability_type'), 'onUpdate', updateAbilityType)
-	DB.removeHandler(DB.getPath(nodeEffect, 'ability'), 'onUpdate', updateAbilityEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'ability_modifier'), 'onUpdate', updateAbilityEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'ability_check'), 'onUpdate', updateAbilityEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'ability_type'), 'onUpdate', updateAbilityEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'ability_type'), 'onUpdate', updateAbilityType)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'ability'), 'onUpdate', updateAbilityEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'ability_modifier'), 'onUpdate', updateAbilityEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'ability_check'), 'onUpdate', updateAbilityEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'ability_type'), 'onUpdate', updateAbilityEffects)
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'susceptiblity_type'), 'onUpdate', updateSusceptibleType)
-	DB.removeHandler(DB.getPath(nodeEffect, 'susceptiblity'), 'onUpdate', updateSusceptibleEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'susceptiblity_type'), 'onUpdate', updateSusceptibleType)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'susceptiblity'), 'onUpdate', updateSusceptibleEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'susceptiblity_modifier'), 'onUpdate', updateSusceptibleEffects)
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'misc_type'), 'onUpdate', updateMiscType)
-	DB.removeHandler(DB.getPath(nodeEffect, 'misc_attack_type'), 'onUpdate', updateMiscEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'misc_bonus_type'), 'onUpdate', updateMiscEffects)
-	DB.removeHandler(DB.getPath(nodeEffect, 'misc_modifier'), 'onUpdate', updateMiscEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'misc_type'), 'onUpdate', updateMiscType)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'misc_attack_type'), 'onUpdate', updateMiscEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'misc_bonus_type'), 'onUpdate', updateMiscEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'misc_modifier'), 'onUpdate', updateMiscEffects)
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'label_only'), 'onUpdate', updateLabelOnlyEffects)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'label_only'), 'onUpdate', updateLabelOnlyEffects)
 end

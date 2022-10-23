@@ -48,31 +48,31 @@ function update()
 end
 
 function onInit()
-	local nodeEffect = getDatabaseNode()
+	local nodeAdvEffect = getDatabaseNode()
 
 	-- watch these variables and update display string if they change
-	DB.addHandler(DB.getPath(nodeEffect, 'effect'), 'onUpdate', update)
-	DB.addHandler(DB.getPath(nodeEffect, 'durdice'), 'onUpdate', update)
-	DB.addHandler(DB.getPath(nodeEffect, 'durmod'), 'onUpdate', update)
-	DB.addHandler(DB.getPath(nodeEffect, 'durunit'), 'onUpdate', update)
-	DB.addHandler(DB.getPath(nodeEffect, 'visibility'), 'onUpdate', update)
-	DB.addHandler(DB.getPath(nodeEffect, 'actiononly'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'effect'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'durdice'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'durmod'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'durunit'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'visibility'), 'onUpdate', update)
+	DB.addHandler(DB.getPath(nodeAdvEffect, 'actiononly'), 'onUpdate', update)
 
 	-- set name of effect to name of item so that, when effect
 	-- is applied to someone, it shows where it came from properly
-	local nodeEffectSource = DB.getChild(nodeEffect, '...')
-	name.setValue(DB.getValue(nodeEffectSource, 'name', ''))
+	local nodeAdvEffectSource = DB.getChild(nodeAdvEffect, '...')
+	name.setValue(DB.getValue(nodeAdvEffectSource, 'name', ''))
 
 	update()
 end
 
 function onClose()
-	local nodeEffect = getDatabaseNode()
+	local nodeAdvEffect = getDatabaseNode()
 
-	DB.removeHandler(DB.getPath(nodeEffect, 'effect'), 'onUpdate', update)
-	DB.removeHandler(DB.getPath(nodeEffect, 'durdice'), 'onUpdate', update)
-	DB.removeHandler(DB.getPath(nodeEffect, 'durmod'), 'onUpdate', update)
-	DB.removeHandler(DB.getPath(nodeEffect, 'durunit'), 'onUpdate', update)
-	DB.removeHandler(DB.getPath(nodeEffect, 'visibility'), 'onUpdate', update)
-	DB.removeHandler(DB.getPath(nodeEffect, 'actiononly'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'effect'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'durdice'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'durmod'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'durunit'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'visibility'), 'onUpdate', update)
+	DB.removeHandler(DB.getPath(nodeAdvEffect, 'actiononly'), 'onUpdate', update)
 end
