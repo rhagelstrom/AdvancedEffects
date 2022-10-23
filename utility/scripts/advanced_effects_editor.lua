@@ -214,21 +214,24 @@ local function updateSusceptibleType(node)
 	updateSusceptibleEffects()
 end
 
+-- if npc and no effect yet then we set the
+-- visibility default to hidden
+local function hideNpcEffects(nodeAdvEffect)
+	if nodeAdvEffect.getPath():match('npc%.id%-%d+') then return; end -- not for reference npcs
+
+	local sVisibility = DB.getValue(nodeAdvEffect, 'visibility', '')
+	local sEffectString = DB.getValue(nodeAdvEffect, 'effect', '')
+	if sVisibility == '' and sEffectString == '' then DB.setValue(nodeAdvEffect, 'visibility', 'string', 'hide') end
+end
+
 function onInit()
 	local nodeAdvEffect = getDatabaseNode()
 
-	-- if npc and no effect yet then we set the
-	-- visibility default to hidden
-	if nodeAdvEffect.getPath():match('^npc%.id%-%d+') then
-		local sVisibility = DB.getValue(nodeAdvEffect, 'visibility', '')
-		local sEffectString = DB.getValue(nodeAdvEffect, 'effect', '')
-		if sVisibility == '' and sEffectString == '' then DB.setValue(nodeAdvEffect, 'visibility', 'string', 'hide') end
-	end
-
+	hideNpcEffects(nodeAdvEffect)
 	update()
 
 	if not Session.IsHost then
-		return
+		return -- abort if code is running on client
 	end
 
 	DB.addHandler(DB.getPath(nodeAdvEffect, 'type'), 'onUpdate', update)
@@ -258,7 +261,7 @@ end
 
 function onClose()
 	if not Session.IsHost then
-		return
+		return -- abort if code is running on client
 	end
 
 	local nodeAdvEffect = getDatabaseNode()
