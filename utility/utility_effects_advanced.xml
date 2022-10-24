@@ -123,7 +123,7 @@
                 <script>
                     function onClickDown(button, x, y)
                         local w = Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
-						local node = window.getDatabaseNode().getChild("..."");
+						local node = window.getDatabaseNode().getChild("...");
                         w.main.subwindow.name.setValue(DB.getValue(node, "name", ""));
                         return true;
                     end
