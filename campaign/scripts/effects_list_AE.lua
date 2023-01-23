@@ -6,7 +6,7 @@
 function onDrop(x, y, draginfo, ...)
 	if super and super.onDrop then super.onDrop(x, y, draginfo, ...) end
 	if draginfo.getType() == 'effect' then
-		local nodeAdvEffect = window.getDatabaseNode().getChild('effectlist').createChild()
+		local nodeAdvEffect = DB.createChild(DB.getChild(window.getDatabaseNode(),'effectlist'))
 		local rEffect = EffectManager.decodeEffectFromText(draginfo.getStringData(), draginfo.getSecret())
 		DB.setValue(nodeAdvEffect, 'effect', 'string', rEffect.sName)
 		DB.setValue(nodeAdvEffect, 'durmod', 'number', draginfo.getNumberData())

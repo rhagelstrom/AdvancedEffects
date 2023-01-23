@@ -49,7 +49,7 @@
             end
 			function onDrop(_, _, draginfo)
 				if draginfo.getType() == 'effect' then
-					local nodeAdvEffect = DB.getChild(getDatabaseNode(), 'effectlist').createChild();
+					local nodeAdvEffect = DB.createChild(DB.getChild(getDatabaseNode(), 'effectlist'));
 					local rEffect = EffectManager.decodeEffectFromText(draginfo.getStringData(), draginfo.getSecret());
 					DB.setValue(nodeAdvEffect, 'effect', 'string', rEffect.sName);
 					DB.setValue(nodeAdvEffect, 'durmod', 'number', draginfo.getNumberData());
