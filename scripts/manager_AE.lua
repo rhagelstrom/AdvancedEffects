@@ -22,7 +22,7 @@ end
 
 -- build message to send that effect removed
 local function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
-	local sUser = nodeChar.getOwner()
+	local sUser = DB.getOwner(nodeChar)
 	-- Build output message
 	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeChar), sUser)
 	msg.text = "Advanced Effect ['" .. sLabel .. "'] "
@@ -35,7 +35,7 @@ end
 
 -- build message to send that effect added
 local function sendEffectAddedMessage(nodeCT, rNewEffect, _, nGMOnly)
-	local sUser = nodeCT.getOwner()
+	local sUser = DB.getOwner(nodeCT)
 	-- Build output message
 	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT), sUser)
 	msg.text = "Advanced Effect ['" .. rNewEffect.sName .. "'] "
@@ -58,9 +58,9 @@ function isValidCheckEffect(rActor, nodeEffect)
 		-- setting then we set it.
 		local node = DB.findNode(sSource)
 		if node then
-			local nodeItem = node.getChild('...')
+			local nodeItem = DB.getChild(node, '...')
 			if nodeItem then
-				sItemPath = nodeItem.getPath()
+				sItemPath = DB.getPath(nodeItem)
 				bActionOnly = (DB.getValue(node, 'actiononly', 0) ~= 0)
 			end
 		end
@@ -289,7 +289,7 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	rEffect.sLabel = sLabel
 	rEffect.sUnits = DB.getValue(nodeCharEffect, 'durunit', '')
 	rEffect.nInit = 0
-	rEffect.sSource = nodeEntry.getPath()
+	rEffect.sSource = DB.getPath(nodeEntry)
 	rEffect.nGMOnly = nGMOnly
 	rEffect.sApply = ''
 	rEffect.sName = EffectManager35E.evalEffect(nodeEntry, rEffect.sLabel) -- handle (N)PC Effects
@@ -345,7 +345,7 @@ end
 
 -- update single effect for item
 local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIdentified)
-	local sItemSource = nodeItemEffect.getPath()
+	local sItemSource = DB.getPath(nodeItemEffect)
 	local sLabel = DB.getValue(nodeItemEffect, 'effect', '')
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
@@ -360,7 +360,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 					bFound = true
 					if not bEquipped then
 						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
-						nodeEffect.delete()
+						DB.deleteNode(nodeEffect)
 						break
 					end -- not equipped
 				end -- effect source == item source
@@ -412,11 +412,11 @@ end
 
 -- luacheck: globals updateItemEffects
 function updateItemEffects(nodeItem)
-	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeItem.getChild('...')))
+	local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, '...')))
 	if not nodeChar then return end
 
-	local bEquipped = not nodeItem.getPath():match('inventorylist') or DB.getValue(nodeItem, 'carried', 1) == 2
-	local bID = not nodeItem.getPath():match('inventorylist') or DB.getValue(nodeItem, 'isidentified', 1) == 1
+	local bEquipped = not DB.getPath(nodeItem):match('inventorylist') or DB.getValue(nodeItem, 'carried', 1) == 2
+	local bID = not DB.getPath(nodeItem):match('inventorylist') or DB.getValue(nodeItem, 'isidentified', 1) == 1
 	-- local bOptionID = OptionsManager.isOption("MIID", "on");
 	-- if not bOptionID then
 	-- bID = true;

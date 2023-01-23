@@ -38,7 +38,7 @@
 			local function isVisible(nodeRecord)
 				local bID = ItemManager.getIDState(nodeRecord);
 				local bPlayerEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
-				return not nodeRecord.isReadOnly() and (Session.IsHost or (nodeRecord.getPath():match("^charsheet") and bID and bPlayerEdit));
+				return not nodeRecord.isReadOnly() and (Session.IsHost or (DB.getPath(nodeRecord):match("^charsheet") and bID and bPlayerEdit));
 			end
             function onInit()
 				local bVisible = isVisible(getDatabaseNode());
@@ -49,7 +49,7 @@
             end
 			function onDrop(_, _, draginfo)
 				if draginfo.getType() == 'effect' then
-					local nodeAdvEffect = getDatabaseNode().getChild('effectlist').createChild();
+					local nodeAdvEffect = DB.getChild(getDatabaseNode(), 'effectlist').createChild();
 					local rEffect = EffectManager.decodeEffectFromText(draginfo.getStringData(), draginfo.getSecret());
 					DB.setValue(nodeAdvEffect, 'effect', 'string', rEffect.sName);
 					DB.setValue(nodeAdvEffect, 'durmod', 'number', draginfo.getNumberData());

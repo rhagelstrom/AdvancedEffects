@@ -5,7 +5,7 @@
 -- luacheck: globals onDamageChanged
 function onDamageChanged()
 	local nodeWeapon = getDatabaseNode()
-	local nodeChar = nodeWeapon.getChild('...')
+	local nodeChar = DB.getChild(nodeWeapon, '...')
 	local rActor = ActorManager.resolveActor(nodeChar)
 
 	local aDamage = {}

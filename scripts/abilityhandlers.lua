@@ -13,8 +13,8 @@ local function replaceAbilityEffects(nodeAbility)
 			-- see if the node exists and if it's in an effectlist
 			local nodeAbilitySource = DB.findNode(sEffSource)
 			if nodeAbilitySource and string.match(sEffSource, 'effectlist') then
-				if nodeAbilitySource.getChild('...') == nodeAbility then
-					nodeEffect.delete() -- remove existing effect
+				if DB.getChild(nodeAbilitySource, '...') == nodeAbility then
+					DB.deleteNode(nodeEffect) -- remove existing effect
 					bFound = true
 					AdvancedEffects.updateItemEffects(nodeAbility)
 				end
@@ -25,13 +25,13 @@ local function replaceAbilityEffects(nodeAbility)
 end
 
 local function addAbilityEffect(node)
-	local nodeAbility = node.getParent()
+	local nodeAbility = DB.getParent(node)
 	if nodeAbility then AdvancedEffects.updateItemEffects(nodeAbility) end
 end
 
 --	This function changes the associated effects when ability effect lists are changed.
 local function updateAbilityEffectsForEdit(node)
-	local nodeAbility = node.getChild('....')
+	local nodeAbility = DB.getChild(node, '....')
 	if nodeAbility and not replaceAbilityEffects(nodeAbility) then AdvancedEffects.updateItemEffects(nodeAbility) end
 end
 
@@ -61,7 +61,7 @@ local function checkEffectsAfterDelete(nodeChar)
 			else
 				Comm.deliverChatMessage(msg)
 			end
-			nodeEffect.delete()
+			DB.deleteNode(nodeEffect)
 		end
 	end
 end
@@ -69,7 +69,7 @@ end
 ---	This function checks to see if an effect is missing its associated ability.
 --	If an associated ability isn't found, it removes the effect as the ability has been removed
 local function updateFromDeletedAbility(node)
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(node.getParent()))
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getParent(node)))
 	if nodeCT then checkEffectsAfterDelete(nodeCT) end
 end
 

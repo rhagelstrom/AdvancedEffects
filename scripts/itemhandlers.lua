@@ -12,8 +12,8 @@ local function replaceItemEffects(nodeItem)
 			-- see if the node exists and if it's in an inventory node
 			local nodeItemSource = DB.findNode(sEffSource)
 			if nodeItemSource and string.match(sEffSource, 'inventorylist') then
-				if nodeItemSource.getChild('...') == nodeItem then
-					nodeEffect.delete() -- remove existing effect
+				if DB.getChild(nodeItemSource, '...') == nodeItem then
+					DB.deleteNode(nodeEffect) -- remove existing effect
 					AdvancedEffects.updateItemEffects(nodeItem)
 				end
 			end
@@ -22,19 +22,19 @@ local function replaceItemEffects(nodeItem)
 end
 
 local function inventoryUpdateItemEffects(node)
-	local nodeItem = (node.getParent())
+	local nodeItem = DB.getParent(node)
 	if nodeItem then AdvancedEffects.updateItemEffects(nodeItem) end
 end
 
 --	This function changes the visibility of effects when items are identified.
 local function updateItemEffectsForID(node)
-	local nodeItem = (node.getParent())
+	local nodeItem = DB.getParent(node)
 	if nodeItem then replaceItemEffects(nodeItem) end
 end
 
 --	This function changes the associated effects when item effect lists are changed while item is equipped.
 local function updateItemEffectsForEdit(node)
-	local nodeItem = (node.getChild('....'))
+	local nodeItem = DB.getChild(node, '....')
 	if nodeItem then replaceItemEffects(nodeItem) end
 end
 
@@ -64,7 +64,7 @@ local function checkEffectsAfterDelete(nodeChar)
 			else
 				Comm.deliverChatMessage(msg)
 			end
-			nodeEffect.delete()
+			DB.deleteNode(nodeEffect)
 		end
 	end
 end
@@ -72,7 +72,7 @@ end
 ---	This function checks to see if an effect is missing its associated item.
 --	If an associated item isn't found, it removes the effect as the item has been removed
 local function updateFromDeletedInventory(node)
-	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(node.getParent()))
+	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getParent(node)))
 	if nodeCT then checkEffectsAfterDelete(nodeCT) end
 end
 

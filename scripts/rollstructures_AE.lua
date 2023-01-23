@@ -8,12 +8,12 @@ local function insertNodes(rActor, nodeWeapon)
 	-- checked we can compare them against action only effects
 	local _, nodeItem = DB.getValue(nodeWeapon, 'shortcut', '', '')
 	rActor.nodeItem = nodeItem
-	rActor.nodeWeapon = nodeWeapon.getPath()
+	rActor.nodeWeapon = DB.getPath(nodeWeapon)
 
 	-- bmos adding AmmunitionManager integration
 	if AmmunitionManager then
 		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
-		if nodeAmmo then rActor.nodeAmmo = nodeAmmo.getPath() end
+		if nodeAmmo then rActor.nodeAmmo = DB.getPath(nodeAmmo) end
 	end
 end
 

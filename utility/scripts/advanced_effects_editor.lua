@@ -185,7 +185,7 @@ function update()
 end
 
 local function updateAbilityType(node)
-	local bIsAbilityCheck = (node.getValue() == 'check')
+	local bIsAbilityCheck = DB.getValue(node) == 'check'
 
 	ability.setVisible(not bIsAbilityCheck)
 	ability_check.setVisible(bIsAbilityCheck)
@@ -200,16 +200,17 @@ local function updateAbilityType(node)
 end
 
 local function updateMiscType(node)
-	misc_bonus_type.setComboBoxVisible(node.getValue() ~= 'heal')
-	misc_attack_type.setComboBoxVisible(node.getValue() == 'atk')
+	local sVal = DB.getValue(node)
+	misc_bonus_type.setComboBoxVisible(sVal ~= 'heal')
+	misc_attack_type.setComboBoxVisible(sVal == 'atk')
 
 	updateMiscEffects()
 end
 
-local function updateLabelOnlyEffects(node) DB.setValue(node.getParent(), 'effect', 'string', node.getValue() or '') end
+local function updateLabelOnlyEffects(node) DB.setValue(DB.getParent(node), 'effect', 'string', DB.getValue(node) or '') end
 
 local function updateSusceptibleType(node)
-	susceptiblity_modifier.setVisible(node.getValue() == 'resist')
+	susceptiblity_modifier.setVisible(DB.getValue(node) == 'resist')
 
 	updateSusceptibleEffects()
 end
@@ -217,7 +218,7 @@ end
 -- if npc and no effect yet then we set the
 -- visibility default to hidden
 local function hideNpcEffects(nodeAdvEffect)
-	if nodeAdvEffect.getPath():match('npc%.id%-%d+') then return; end -- not for reference npcs
+	if DB.getPath(nodeAdvEffect):match('npc%.id%-%d+') then return; end -- not for reference npcs
 
 	local sVisibility = DB.getValue(nodeAdvEffect, 'visibility', '')
 	local sEffectString = DB.getValue(nodeAdvEffect, 'effect', '')
