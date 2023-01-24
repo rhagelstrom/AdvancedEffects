@@ -8,7 +8,7 @@ local function replaceAbilityEffects(nodeAbility)
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeAbility, '...')))
 	if nodeCT then
 		local bFound
-		for _, nodeEffect in pairs(DB.getChildren(nodeCT, 'effects')) do
+		for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
 			local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
 			-- see if the node exists and if it's in an effectlist
 			local nodeAbilitySource = DB.findNode(sEffSource)
@@ -39,7 +39,7 @@ end
 --	If an associated ability isn't found, it removes the effect as the ability has been removed
 local function checkEffectsAfterDelete(nodeChar)
 	local sUser = User.getUsername()
-	for _, nodeEffect in pairs(DB.getChildren(nodeChar, 'effects')) do
+	for _, nodeEffect in ipairs(DB.getChildList(nodeChar, 'effects')) do
 		local sLabel = DB.getValue(nodeEffect, 'label', '')
 		local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
 		-- see if the node exists and if it's in an effectlist

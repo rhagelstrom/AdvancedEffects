@@ -7,7 +7,7 @@
 local function replaceItemEffects(nodeItem)
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, '...')))
 	if nodeCT and DB.getValue(nodeItem, 'carried') == 2 then
-		for _, nodeEffect in pairs(DB.getChildren(nodeCT, 'effects')) do
+		for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
 			local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
 			-- see if the node exists and if it's in an inventory node
 			local nodeItemSource = DB.findNode(sEffSource)
@@ -42,7 +42,7 @@ end
 --	If an associated item isn't found, it removes the effect as the item has been removed
 local function checkEffectsAfterDelete(nodeChar)
 	local sUser = User.getUsername()
-	for _, nodeEffect in pairs(DB.getChildren(nodeChar, 'effects')) do
+	for _, nodeEffect in ipairs(DB.getChildList(nodeChar, 'effects')) do
 		local sLabel = DB.getValue(nodeEffect, 'label', '')
 		local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
 		-- see if the node exists and if it's in an inventory node

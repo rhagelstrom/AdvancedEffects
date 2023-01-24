@@ -109,7 +109,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 	end
 
 	-- Iterate through effects
-	for _, v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), 'effects')) do
+	for _, v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), 'effects')) do
 		local nActive = DB.getValue(v, 'isactive', 0)
 		-- Check effect is from used weapon.
 		if isValidCheckEffect(rActor, v) then
@@ -302,7 +302,7 @@ end
 -- nodeChar: node of PC/NPC in PC/NPCs record list
 -- nodeCT: node in combat tracker for PC/NPC
 local function updateCharEffects(nodeChar, nodeCT)
-	for _, nodeCharEffect in pairs(DB.getChildren(nodeChar, 'effectlist')) do
+	for _, nodeCharEffect in ipairs(DB.getChildList(nodeChar, 'effectlist')) do
 		updateCharEffect(nodeCharEffect, nodeCT)
 	end -- for item's effects list
 end
@@ -351,7 +351,7 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
 	if sLabel and sLabel ~= '' then -- if we have effect string
 		local bFound = false
-		for _, nodeEffect in pairs(DB.getChildren(nodeChar, 'effects')) do
+		for _, nodeEffect in ipairs(DB.getChildList(nodeChar, 'effects')) do
 			local nActive = DB.getValue(nodeEffect, 'isactive', 0)
 			local nGMOnly = DB.getValue(nodeEffect, 'isgmonly', 0)
 			if nActive ~= 0 then
@@ -422,7 +422,7 @@ function updateItemEffects(nodeItem)
 	-- bID = true;
 	-- end
 
-	for _, nodeItemEffect in pairs(DB.getChildren(nodeItem, 'effectlist')) do
+	for _, nodeItemEffect in ipairs(DB.getChildList(nodeItem, 'effectlist')) do
 		updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, bEquipped, bID)
 	end
 
@@ -440,14 +440,14 @@ local function addPC_new(tCustom, ...)
 	addPC_old(tCustom, ...) -- Call original function
 
 	-- check each inventory item for effects that need to be applied
-	for _, nodeItem in pairs(DB.getChildren(tCustom['nodeRecord'], 'inventorylist')) do
+	for _, nodeItem in ipairs(DB.getChildList(tCustom['nodeRecord'], 'inventorylist')) do
 		if DB.getValue(nodeItem, 'carried') == 2 then updateItemEffects(nodeItem) end
 	end
 
 	-- check each special ability for effects that need to be applied
 	local tFields = { 'specialabilitylist', 'featlist', 'proficiencylist', 'traitlist' }
 	for _, fieldName in pairs(tFields) do
-		for _, nodeAbility in pairs(DB.getChildren(tCustom['nodeRecord'], fieldName)) do
+		for _, nodeAbility in ipairs(DB.getChildList(tCustom['nodeRecord'], fieldName)) do
 			updateItemEffects(nodeAbility)
 		end
 	end
@@ -470,7 +470,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 
 	-- Iterate through each effect
 	local aMatch = {}
-	for _, v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), 'effects')) do
+	for _, v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), 'effects')) do
 		local nActive = DB.getValue(v, 'isactive', 0)
 
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
