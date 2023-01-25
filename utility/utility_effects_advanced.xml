@@ -155,9 +155,9 @@
 		<playercontrol />
 		<tooltip control="name" />
 		<sheetdata>
-			<windowtitlebar_char name="title">
+			<windowtitlebar name="title">
 				<resource>power_title_effect</resource>
-			</windowtitlebar_char>
+			</windowtitlebar>
 			<anchor_title_charsheethelper name="contentanchor" />
 			
 			<genericcontrol name="contentframe">
