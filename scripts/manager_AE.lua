@@ -319,13 +319,12 @@ local encodeActionForDrag_old
 local function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
 	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
-	if rSource and rSource.nodeItem then
-		local nodeWeapon = rSource.nodeItem
-		if nodeWeapon ~= '' then draginfo.setMetaData(weaponPathKey, nodeWeapon) end
+	if not rSource then return end
+	if rSource.nodeItem and rSource.nodeItem ~= '' then
+		draginfo.setMetaData(weaponPathKey, rSource.nodeItem)
 	end
-	if AmmunitionManager and rSource and rSource.nodeAmmo then
-		local nodeAmmo = rSource.nodeAmmo
-		if nodeAmmo ~= '' then draginfo.setMetaData(ammoPathKey, nodeAmmo) end
+	if AmmunitionManager and rSource.nodeAmmo and rSource.nodeAmmo ~= '' then
+		draginfo.setMetaData(ammoPathKey, rSource.nodeAmmo)
 	end
 end
 
@@ -347,8 +346,6 @@ end
 local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIdentified)
 	local sItemSource = DB.getPath(nodeItemEffect)
 	local sLabel = DB.getValue(nodeItemEffect, 'effect', '')
-	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);
-	-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
 	if sLabel and sLabel ~= '' then -- if we have effect string
 		local bFound = false
 		for _, nodeEffect in ipairs(DB.getChildList(nodeChar, 'effects')) do
