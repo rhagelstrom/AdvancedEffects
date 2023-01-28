@@ -6,16 +6,15 @@
 --	Then it calls updateItemEffects to re-parse the current/correct effects.
 local function replaceItemEffects(nodeItem)
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, '...')))
-	if nodeCT and DB.getValue(nodeItem, 'carried') == 2 then
-		for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
-			local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
-			-- see if the node exists and if it's in an inventory node
-			local nodeItemSource = DB.findNode(sEffSource)
-			if nodeItemSource and string.match(sEffSource, 'inventorylist') then
-				if DB.getChild(nodeItemSource, '...') == nodeItem then
-					DB.deleteNode(nodeEffect) -- remove existing effect
-					AdvancedEffects.updateItemEffects(nodeItem)
-				end
+	if not nodeCT or DB.getValue(nodeItem, 'carried') ~= 2 then return end
+	for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
+		local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
+		-- see if the node exists and if it's in an inventory node
+		local nodeItemSource = DB.findNode(sEffSource)
+		if nodeItemSource and string.match(sEffSource, 'inventorylist') then
+			if DB.getChild(nodeItemSource, '...') == nodeItem then
+				DB.deleteNode(nodeEffect) -- remove existing effect
+				AdvancedEffects.updateItemEffects(nodeItem)
 			end
 		end
 	end
@@ -83,21 +82,20 @@ local function removeEffectOnItemEffectDelete(node)
 end
 
 function onInit()
-	if Session.IsHost then
-		-- watch the character/pc inventory list(s)
-		for _, sItemListNodeName in pairs(ItemManager.getInventoryPaths('charsheet')) do
-			local sItemList = 'charsheet.*.' .. sItemListNodeName
-			DB.addHandler(sItemList .. '.*.carried', 'onUpdate', inventoryUpdateItemEffects)
-			DB.addHandler(sItemList .. '.*.isidentified', 'onUpdate', updateItemEffectsForID)
-			DB.addHandler(sItemList .. '.*.effectlist.*.effect', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist.*.durdice', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist.*.durmod', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist.*.name', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist.*.durunit', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist.*.visibility', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist.*.actiononly', 'onUpdate', updateItemEffectsForEdit)
-			DB.addHandler(sItemList .. '.*.effectlist', 'onChildDeleted', removeEffectOnItemEffectDelete)
-			DB.addHandler(sItemList .. '', 'onChildDeleted', updateFromDeletedInventory)
-		end
+	if not Session.IsHost then return end
+	-- watch the character/pc inventory list(s)
+	for _, sItemListNodeName in pairs(ItemManager.getInventoryPaths('charsheet')) do
+		local sItemList = 'charsheet.*.' .. sItemListNodeName
+		DB.addHandler(sItemList .. '.*.carried', 'onUpdate', inventoryUpdateItemEffects)
+		DB.addHandler(sItemList .. '.*.isidentified', 'onUpdate', updateItemEffectsForID)
+		DB.addHandler(sItemList .. '.*.effectlist.*.effect', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist.*.durdice', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist.*.durmod', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist.*.name', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist.*.durunit', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist.*.visibility', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist.*.actiononly', 'onUpdate', updateItemEffectsForEdit)
+		DB.addHandler(sItemList .. '.*.effectlist', 'onChildDeleted', removeEffectOnItemEffectDelete)
+		DB.addHandler(sItemList .. '', 'onChildDeleted', updateFromDeletedInventory)
 	end
 end

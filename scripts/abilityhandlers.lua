@@ -6,22 +6,21 @@
 --	Then it calls updateAbilityEffects to re-parse the current/correct effects.
 local function replaceAbilityEffects(nodeAbility)
 	local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeAbility, '...')))
-	if nodeCT then
-		local bFound
-		for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
-			local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
-			-- see if the node exists and if it's in an effectlist
-			local nodeAbilitySource = DB.findNode(sEffSource)
-			if nodeAbilitySource and string.match(sEffSource, 'effectlist') then
-				if DB.getChild(nodeAbilitySource, '...') == nodeAbility then
-					DB.deleteNode(nodeEffect) -- remove existing effect
-					bFound = true
-					AdvancedEffects.updateItemEffects(nodeAbility)
-				end
+	if not nodeCT then return end
+	local bFound
+	for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
+		local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
+		-- see if the node exists and if it's in an effectlist
+		local nodeAbilitySource = DB.findNode(sEffSource)
+		if nodeAbilitySource and string.match(sEffSource, 'effectlist') then
+			if DB.getChild(nodeAbilitySource, '...') == nodeAbility then
+				DB.deleteNode(nodeEffect) -- remove existing effect
+				bFound = true
+				AdvancedEffects.updateItemEffects(nodeAbility)
 			end
 		end
-		return bFound
 	end
+	return bFound
 end
 
 local function addAbilityEffect(node)
@@ -80,19 +79,18 @@ local function removeEffectOnAbilityEffectDelete(node)
 end
 
 function onInit()
+	if not Session.IsHost then return end
 	local tNodes = { 'specialabilitylist', 'featlist', 'proficiencylist', 'traitlist' }
-	if Session.IsHost then
-		for _, sName in ipairs(tNodes) do
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildAdded', addAbilityEffect)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit)
-			DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete)
-			DB.addHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility)
-		end
+	for _, sName in ipairs(tNodes) do
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildAdded', addAbilityEffect)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit)
+		DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete)
+		DB.addHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility)
 	end
 end

@@ -49,44 +49,42 @@ end
 ---	This function returns false if the effect is tied to an item and the item is not being used.
 --	luacheck: globals isValidCheckEffect
 function isValidCheckEffect(rActor, nodeEffect)
-	if DB.getValue(nodeEffect, 'isactive', 0) ~= 0 then
-		local bActionItemUsed, bActionOnly = false, false
-		local sItemPath = ''
+	if DB.getValue(nodeEffect, 'isactive', 0) == 0 then return end
+	local bActionItemUsed, bActionOnly = false, false
+	local sItemPath = ''
 
-		local sSource = DB.getValue(nodeEffect, 'source_name', '')
-		-- if source is a valid node and we can find "actiononly"
-		-- setting then we set it.
-		local node = DB.findNode(sSource)
-		if node then
-			local nodeItem = DB.getChild(node, '...')
-			if nodeItem then
-				sItemPath = DB.getPath(nodeItem)
-				bActionOnly = (DB.getValue(node, 'actiononly', 0) ~= 0)
-			end
-		end
-
-		if sItemPath and sItemPath ~= '' then
-			-- if there is a nodeWeapon do some sanity checking
-			if rActor.nodeItem then
-				-- here is where we get the node path of the item, not the
-				-- effectslist entry
-				if bActionOnly and (sItemPath == rActor.nodeItem) then bActionItemUsed = true end
-			end
-
-			-- if there is a nodeAmmo do some sanity checking
-			if AmmunitionManager and rActor.nodeAmmo then
-				-- here is where we get the node path of the item, not the
-				-- effectslist entry
-				if bActionOnly and (sItemPath == rActor.nodeAmmo) then bActionItemUsed = true end
-			end
-		end
-
-		if bActionOnly and not bActionItemUsed then
-			return false
-		else
-			return true
+	local sSource = DB.getValue(nodeEffect, 'source_name', '')
+	-- if source is a valid node and we can find "actiononly"
+	-- setting then we set it.
+	local node = DB.findNode(sSource)
+	if node then
+		local nodeItem = DB.getChild(node, '...')
+		if nodeItem then
+			sItemPath = DB.getPath(nodeItem)
+			bActionOnly = (DB.getValue(node, 'actiononly', 0) ~= 0)
 		end
 	end
+
+	if sItemPath and sItemPath ~= '' then
+		-- if there is a nodeWeapon do some sanity checking
+		if rActor.nodeItem then
+			-- here is where we get the node path of the item, not the
+			-- effectslist entry
+			if bActionOnly and (sItemPath == rActor.nodeItem) then bActionItemUsed = true end
+		end
+
+		-- if there is a nodeAmmo do some sanity checking
+		if AmmunitionManager and rActor.nodeAmmo then
+			-- here is where we get the node path of the item, not the
+			-- effectslist entry
+			if bActionOnly and (sItemPath == rActor.nodeAmmo) then bActionItemUsed = true end
+		end
+	end
+
+	if bActionOnly and not bActionItemUsed then
+		return false
+	end
+	return true
 end
 
 local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly) -- luacheck: ignore (cyclomatic complexity)
@@ -346,65 +344,63 @@ end
 local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIdentified)
 	local sItemSource = DB.getPath(nodeItemEffect)
 	local sLabel = DB.getValue(nodeItemEffect, 'effect', '')
-	if sLabel and sLabel ~= '' then -- if we have effect string
-		local bFound = false
-		for _, nodeEffect in ipairs(DB.getChildList(nodeChar, 'effects')) do
-			local nActive = DB.getValue(nodeEffect, 'isactive', 0)
-			local nGMOnly = DB.getValue(nodeEffect, 'isgmonly', 0)
-			if nActive ~= 0 then
-				local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
-				if sEffSource == sItemSource then
-					bFound = true
-					if not bEquipped then
-						sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
-						DB.deleteNode(nodeEffect)
-						break
-					end -- not equipped
-				end -- effect source == item source
-			end -- was active
-		end -- nodeEffect for
-		if not bFound and bEquipped then
-			local rEffect = {}
-			local nRollDuration
-			local dDurationDice = DB.getValue(nodeItemEffect, 'durdice')
-			local nModDice = DB.getValue(nodeItemEffect, 'durmod', 0)
+	if not sLabel or sLabel == '' then return end -- abort if we don't have effect string
+	local bFound = false
+	for _, nodeEffect in ipairs(DB.getChildList(nodeChar, 'effects')) do
+		local nActive = DB.getValue(nodeEffect, 'isactive', 0)
+		local nGMOnly = DB.getValue(nodeEffect, 'isgmonly', 0)
+		if nActive ~= 0 then
+			local sEffSource = DB.getValue(nodeEffect, 'source_name', '')
+			if sEffSource == sItemSource then
+				bFound = true
+				if not bEquipped then
+					sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nGMOnly)
+					DB.deleteNode(nodeEffect)
+					break
+				end -- not equipped
+			end -- effect source == item source
+		end -- was active
+	end -- nodeEffect for
+	if bFound or not bEquipped then return end
+	local rEffect = {}
+	local nRollDuration
+	local dDurationDice = DB.getValue(nodeItemEffect, 'durdice')
+	local nModDice = DB.getValue(nodeItemEffect, 'durmod', 0)
 
-			if dDurationDice and dDurationDice ~= '' then
-				nRollDuration = DiceManager.evalDice(dDurationDice, nModDice)
-			else
-				nRollDuration = nModDice
-			end
-			local nGMOnly = 0
-			if DB.getValue(nodeItemEffect, 'visibility') == 'hide' then
-				nGMOnly = 1
-			elseif not bIdentified then
-				nGMOnly = 1
-			end
+	if dDurationDice and dDurationDice ~= '' then
+		nRollDuration = DiceManager.evalDice(dDurationDice, nModDice)
+	else
+		nRollDuration = nModDice
+	end
+	local nGMOnly = 0
+	if DB.getValue(nodeItemEffect, 'visibility') == 'hide' then
+		nGMOnly = 1
+	elseif not bIdentified then
+		nGMOnly = 1
+	end
 
-			if not ActorManager.isPC(nodeChar) then
-				if DB.getValue(nodeChar, 'tokenvis') ~= 1 then
-					nGMOnly = 1 -- hide if token not visible
-				end
-			end
-
-			rEffect.nDuration = nRollDuration
-			if DB.getValue(nodeItemEffect, 'type', '') ~= 'label' then
-				rEffect.sName = sName .. ';' .. sLabel
-			else
-				rEffect.sName = sLabel
-			end
-			rEffect.sLabel = sLabel
-			rEffect.sUnits = DB.getValue(nodeItemEffect, 'durunit', '')
-			rEffect.nInit = 0
-			rEffect.sSource = sItemSource
-			rEffect.nGMOnly = nGMOnly
-			rEffect.sApply = ''
-			rEffect.sName = EffectManager35E.evalEffect(nodeChar, rEffect.sLabel) -- handle (N)PC Effects
-
-			sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly)
-			EffectManager.addEffect('', '', nodeChar, rEffect, false)
+	if not ActorManager.isPC(nodeChar) then
+		if DB.getValue(nodeChar, 'tokenvis') ~= 1 then
+			nGMOnly = 1 -- hide if token not visible
 		end
 	end
+
+	rEffect.nDuration = nRollDuration
+	if DB.getValue(nodeItemEffect, 'type', '') ~= 'label' then
+		rEffect.sName = sName .. ';' .. sLabel
+	else
+		rEffect.sName = sLabel
+	end
+	rEffect.sLabel = sLabel
+	rEffect.sUnits = DB.getValue(nodeItemEffect, 'durunit', '')
+	rEffect.nInit = 0
+	rEffect.sSource = sItemSource
+	rEffect.nGMOnly = nGMOnly
+	rEffect.sApply = ''
+	rEffect.sName = EffectManager35E.evalEffect(nodeChar, rEffect.sLabel) -- handle (N)PC Effects
+
+	sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly)
+	EffectManager.addEffect('', '', nodeChar, rEffect, false)
 end
 
 -- luacheck: globals updateItemEffects
