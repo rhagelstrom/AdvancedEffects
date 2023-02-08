@@ -218,7 +218,7 @@ end
 -- if npc and no effect yet then we set the
 -- visibility default to hidden
 local function hideNpcEffects(nodeAdvEffect)
-	if DB.getPath(nodeAdvEffect):match('npc%.id%-%d+') then return; end -- not for reference npcs
+	if DB.getPath(nodeAdvEffect):match('npc%.id%-%d+') then return end -- not for reference npcs
 
 	local sVisibility = DB.getValue(nodeAdvEffect, 'visibility', '')
 	local sEffectString = DB.getValue(nodeAdvEffect, 'effect', '')

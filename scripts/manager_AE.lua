@@ -81,9 +81,7 @@ function isValidCheckEffect(rActor, nodeEffect)
 		end
 	end
 
-	if bActionOnly and not bActionItemUsed then
-		return false
-	end
+	if bActionOnly and not bActionItemUsed then return false end
 	return true
 end
 
@@ -318,12 +316,8 @@ local function encodeActionForDrag_new(draginfo, rSource, sType, rRolls, ...)
 	encodeActionForDrag_old(draginfo, rSource, sType, rRolls, ...)
 
 	if not rSource then return end
-	if rSource.nodeItem and rSource.nodeItem ~= '' then
-		draginfo.setMetaData(weaponPathKey, rSource.nodeItem)
-	end
-	if AmmunitionManager and rSource.nodeAmmo and rSource.nodeAmmo ~= '' then
-		draginfo.setMetaData(ammoPathKey, rSource.nodeAmmo)
-	end
+	if rSource.nodeItem and rSource.nodeItem ~= '' then draginfo.setMetaData(weaponPathKey, rSource.nodeItem) end
+	if AmmunitionManager and rSource.nodeAmmo and rSource.nodeAmmo ~= '' then draginfo.setMetaData(ammoPathKey, rSource.nodeAmmo) end
 end
 
 --	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
