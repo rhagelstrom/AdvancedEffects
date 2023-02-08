@@ -107,9 +107,14 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			end
 		end
 	end
-
+	local aEffects = {};
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType);
+	else
+		aEffects = DB.getChildren(ActorManager.getCTNode(rActor), "effects");
+	end
 	-- Iterate through effects
-	for _, v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), 'effects')) do
+	for _, v in pairs(aEffects) do
 		local nActive = DB.getValue(v, 'isactive', 0)
 		-- Check effect is from used weapon.
 		if isValidCheckEffect(rActor, v) then
@@ -463,6 +468,10 @@ local function addNPC_new(tCustom, ...)
 	updateCharEffects(tCustom['nodeRecord'], tCustom['nodeCT'])
 end
 
+function hasEffectCondition_new(rActor, sEffect)
+    return EffectManager35E.hasEffect(rActor, sEffect, nil, false, true);
+end
+
 --	replace 3.5E EffectManager35E manager_effect_35E.lua hasEffect() with this
 local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
 	if not sEffect or not rActor then return false end
@@ -470,7 +479,13 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 
 	-- Iterate through each effect
 	local aMatch = {}
-	for _, v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), 'effects')) do
+	local aEffects = {};
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffect);
+	else
+	     aEffects = DB.getChildren(ActorManager.getCTNode(rActor), "effects");
+	end
+	for _, v in pairs(aEffects) do
 		local nActive = DB.getValue(v, 'isactive', 0)
 
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
@@ -547,6 +562,7 @@ function onInit()
 	if not CombatManagerKel then -- luacheck: globals CombatManagerKel
 		EffectManager35E.getEffectsByType = getEffectsByType_new
 		EffectManager35E.hasEffect = hasEffect_new
+		EffectManager35E.hasEffectCondition = hasEffectCondition_new
 	end
 
 	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
