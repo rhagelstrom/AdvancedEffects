@@ -1,7 +1,14 @@
 --
+-- Please see the LICENSE.md file included with this distribution for
+-- attribution and copyright information.
+--
+
+--
 -- Effects on Items, apply to character in CT
 --
--- send message
+
+-- luacheck: globals CombatManagerKel hasEffectCondition_new notifyApplyDamage
+
 local function sendRawMessage(sUser, nGMOnly, msg)
 	local sIdentity = nil
 	if sUser and sUser ~= '' then sIdentity = User.getCurrentIdentity(sUser) or nil end
@@ -595,7 +602,7 @@ function onInit()
 	CombatRecordManager.addNPC = addNPC_new
 
 	-- 3.5E replacements
-	if not CombatManagerKel then -- luacheck: globals CombatManagerKel
+	if not CombatManagerKel then
 		EffectManager35E.getEffectsByType = getEffectsByType_new
 		EffectManager35E.hasEffect = hasEffect_new
 		EffectManager35E.hasEffectCondition = hasEffectCondition_new
