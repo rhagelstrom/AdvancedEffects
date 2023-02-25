@@ -11,16 +11,14 @@ local function insertNodes(rActor, nodeWeapon)
 	rActor.nodeWeapon = DB.getPath(nodeWeapon)
 
 	-- bmos adding AmmunitionManager integration
-	if AmmunitionManager then
-		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
-		if nodeAmmo then rActor.nodeAmmo = DB.getPath(nodeAmmo) end
-	end
+	if not AmmunitionManager then return end
+	local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
+	if nodeAmmo then rActor.nodeAmmo = DB.getPath(nodeAmmo) end
 end
 
 local getWeaponDamageRollStructures_old
 local function getWeaponDamageRollStructures_new(nodeWeapon, ...)
 	local rActor, rDamage = getWeaponDamageRollStructures_old(nodeWeapon, ...)
-
 	insertNodes(rActor, nodeWeapon)
 
 	return rActor, rDamage
@@ -29,7 +27,6 @@ end
 local getWeaponAttackRollStructures_old
 local function getWeaponAttackRollStructures_new(nodeWeapon, nAttack, ...)
 	local rActor, rAttack = getWeaponAttackRollStructures_old(nodeWeapon, nAttack, ...)
-
 	insertNodes(rActor, nodeWeapon)
 
 	return rActor, rAttack

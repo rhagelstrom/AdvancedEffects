@@ -207,7 +207,7 @@ local function updateMiscType(node)
 	updateMiscEffects()
 end
 
-local function updateLabelOnlyEffects(node) DB.setValue(DB.getParent(node), 'effect', 'string', DB.getValue(node) or '') end
+local function updateLabelOnlyEffects(node) DB.setValue(node, '..effect', 'string', DB.getValue(node) or '') end
 
 local function updateSusceptibleType(node)
 	susceptiblity_modifier.setVisible(DB.getValue(node) == 'resist')
