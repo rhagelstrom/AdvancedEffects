@@ -7,7 +7,7 @@
 -- Effects on Items, apply to character in CT
 --
 
--- luacheck: globals CombatManagerKel hasEffectCondition_new notifyApplyDamage
+-- luacheck: globals CombatManagerKel hasEffectCondition_new notifyApplyDamage TurboManager
 
 local function sendRawMessage(sUser, nGMOnly, msg)
 	local sIdentity = nil
@@ -114,7 +114,7 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			end
 		end
 	end
-	local aEffects = {}
+	local aEffects
 	if TurboManager then
 		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType)
 	else
@@ -484,7 +484,7 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 
 	-- Iterate through each effect
 	local aMatch = {}
-	local aEffects = {}
+	local aEffects
 	if TurboManager then
 		aEffects = TurboManager.getMatchedEffects(rActor, sEffect)
 	else
