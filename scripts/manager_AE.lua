@@ -1,7 +1,14 @@
 --
+-- Please see the LICENSE.md file included with this distribution for
+-- attribution and copyright information.
+--
+
+--
 -- Effects on Items, apply to character in CT
 --
--- send message
+
+-- luacheck: globals CombatManagerKel hasEffectCondition_new notifyApplyDamage TurboManager
+
 local function sendRawMessage(sUser, nGMOnly, msg)
 	local sIdentity = nil
 	if sUser and sUser ~= '' then sIdentity = User.getCurrentIdentity(sUser) or nil end
@@ -103,9 +110,14 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 			end
 		end
 	end
-
+	local aEffects
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType)
+	else
+		aEffects = DB.getChildList(ActorManager.getCTNode(rActor), 'effects')
+	end
 	-- Iterate through effects
-	for _, v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), 'effects')) do
+	for _, v in ipairs(aEffects) do
 		local nActive = DB.getValue(v, 'isactive', 0)
 		-- Check effect is from used weapon.
 		if isValidCheckEffect(rActor, v) then
@@ -450,6 +462,8 @@ local function addNPC_new(tCustom, ...)
 	updateCharEffects(tCustom['nodeRecord'], tCustom['nodeCT'])
 end
 
+function hasEffectCondition_new(rActor, sEffect) return EffectManager35E.hasEffect(rActor, sEffect, nil, false, true) end
+
 --	replace 3.5E EffectManager35E manager_effect_35E.lua hasEffect() with this
 local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
 	if not sEffect or not rActor then return false end
@@ -457,7 +471,13 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 
 	-- Iterate through each effect
 	local aMatch = {}
-	for _, v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), 'effects')) do
+	local aEffects
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffect)
+	else
+		aEffects = DB.getChildList(ActorManager.getCTNode(rActor), 'effects')
+	end
+	for _, v in ipairs(aEffects) do
 		local nActive = DB.getValue(v, 'isactive', 0)
 
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
@@ -515,6 +535,44 @@ local function hasEffect_new(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEff
 	return false
 end
 
+function handleApplyDamage(msgOOB)
+	local rSource = ActorManager.resolveActor(msgOOB.sSourceNode)
+	local rTarget = ActorManager.resolveActor(msgOOB.sTargetNode)
+	if rTarget then rTarget.nOrder = msgOOB.nTargetOrder end
+
+	rSource.nodeItem = msgOOB.nodeItem
+	rSource.nodeAmmo = msgOOB.nodeAmmo
+	rSource.nodeWeapon = msgOOB.nodeWeapon
+
+	local nTotal = tonumber(msgOOB.nTotal) or 0
+	ActionDamage.applyDamage(rSource, rTarget, (tonumber(msgOOB.nSecret) == 1), msgOOB.sRollType, msgOOB.sDamage, nTotal)
+end
+
+function notifyApplyDamage(rSource, rTarget, bSecret, sRollType, sDesc, nTotal)
+	if not rTarget then return end
+
+	local msgOOB = {}
+	msgOOB.type = ActionDamage.OOB_MSGTYPE_APPLYDMG
+
+	if bSecret then
+		msgOOB.nSecret = 1
+	else
+		msgOOB.nSecret = 0
+	end
+	msgOOB.sRollType = sRollType
+	msgOOB.nTotal = nTotal
+	msgOOB.sDamage = sDesc
+	msgOOB.nodeItem = rSource.nodeItem
+	msgOOB.nodeAmmo = rSource.nodeAmmo
+	msgOOB.nodeWeapon = rSource.nodeWeapon
+
+	msgOOB.sSourceNode = ActorManager.getCreatureNodeName(rSource)
+	msgOOB.sTargetNode = ActorManager.getCreatureNodeName(rTarget)
+	msgOOB.nTargetOrder = rTarget.nOrder
+
+	Comm.deliverOOBMessage(msgOOB, '')
+end
+
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
 	-- CoreRPG replacements
@@ -531,9 +589,13 @@ function onInit()
 	CombatRecordManager.addNPC = addNPC_new
 
 	-- 3.5E replacements
-	if not CombatManagerKel then -- luacheck: globals CombatManagerKel
+	if not CombatManagerKel then
 		EffectManager35E.getEffectsByType = getEffectsByType_new
 		EffectManager35E.hasEffect = hasEffect_new
+		EffectManager35E.hasEffectCondition = hasEffectCondition_new
+		ActionDamage.notifyApplyDamage = notifyApplyDamage
+		ActionDamage.handleApplyDamage = handleApplyDamage
+		OOBManager.registerOOBMsgHandler(ActionDamage.OOB_MSGTYPE_APPLYDMG, handleApplyDamage)
 	end
 
 	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
