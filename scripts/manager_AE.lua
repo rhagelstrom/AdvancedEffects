@@ -540,9 +540,11 @@ function handleApplyDamage(msgOOB)
 	local rTarget = ActorManager.resolveActor(msgOOB.sTargetNode)
 	if rTarget then rTarget.nOrder = msgOOB.nTargetOrder end
 
-	rSource.nodeItem = msgOOB.nodeItem
-	rSource.nodeAmmo = msgOOB.nodeAmmo
-	rSource.nodeWeapon = msgOOB.nodeWeapon
+	if rSource then
+		rSource.nodeItem = msgOOB.nodeItem
+		rSource.nodeAmmo = msgOOB.nodeAmmo
+		rSource.nodeWeapon = msgOOB.nodeWeapon
+	end
 
 	local nTotal = tonumber(msgOOB.nTotal) or 0
 	ActionDamage.applyDamage(rSource, rTarget, (tonumber(msgOOB.nSecret) == 1), msgOOB.sRollType, msgOOB.sDamage, nTotal)
@@ -562,9 +564,12 @@ function notifyApplyDamage(rSource, rTarget, bSecret, sRollType, sDesc, nTotal)
 	msgOOB.sRollType = sRollType
 	msgOOB.nTotal = nTotal
 	msgOOB.sDamage = sDesc
-	msgOOB.nodeItem = rSource.nodeItem
-	msgOOB.nodeAmmo = rSource.nodeAmmo
-	msgOOB.nodeWeapon = rSource.nodeWeapon
+
+	if rSource then
+		msgOOB.nodeItem = rSource.nodeItem
+		msgOOB.nodeAmmo = rSource.nodeAmmo
+		msgOOB.nodeWeapon = rSource.nodeWeapon
+	end
 
 	msgOOB.sSourceNode = ActorManager.getCreatureNodeName(rSource)
 	msgOOB.sTargetNode = ActorManager.getCreatureNodeName(rTarget)
