@@ -299,8 +299,8 @@ local function updateCharEffect(nodeCharEffect, nodeEntry)
 	rEffect.nInit = 0
 	rEffect.sSource = DB.getPath(nodeEntry)
 	rEffect.nGMOnly = nGMOnly
-	rEffect.sApply = DB.getValue(nodeCharEffect, 'apply', '');
-	rEffect.sChangeState = DB.getValue(nodeCharEffect, 'changestate', '');
+	rEffect.sApply = DB.getValue(nodeCharEffect, 'apply', '')
+	rEffect.sChangeState = DB.getValue(nodeCharEffect, 'changestate', '')
 	rEffect.sName = EffectManager35E.evalEffect(nodeEntry, rEffect.sLabel) -- handle (N)PC Effects
 
 	sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, User.getUsername())
@@ -403,8 +403,8 @@ local function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIde
 	rEffect.nInit = 0
 	rEffect.sSource = sItemSource
 	rEffect.nGMOnly = nGMOnly
-	rEffect.sApply = DB.getValue(nodeItemEffect, 'apply', '');
-	rEffect.sChangeState = DB.getValue(nodeItemEffect, 'changestate', '');
+	rEffect.sApply = DB.getValue(nodeItemEffect, 'apply', '')
+	rEffect.sChangeState = DB.getValue(nodeItemEffect, 'changestate', '')
 	rEffect.sName = EffectManager35E.evalEffect(nodeChar, rEffect.sLabel) -- handle (N)PC Effects
 
 	sendEffectAddedMessage(nodeChar, rEffect, sLabel, nGMOnly)
