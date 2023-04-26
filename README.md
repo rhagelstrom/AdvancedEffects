@@ -6,7 +6,7 @@ Original extension by [Celestian](https://www.fantasygrounds.com/forums/member.p
 Attach effects to PCs, NPCs, class/race abilities, and items.
 
 # Compatibility
-This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) v4.3.6 (2023-03-16).
+This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) v4.3.8 (2023-04-25).
 
 # How does it work?
 For items, effects (such as "IFT: ALIGN (evil); AC: 2") will be placed on the owner of the item when they equip the item (and are in the combat tracker) and will be removed when the item is unequipped.
