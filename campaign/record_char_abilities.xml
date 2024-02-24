@@ -41,53 +41,43 @@
 
 	<!-- Add Effect Features Section to Proficiency Details -->
 	<windowclass name="referenceproficiency" merge="join">
+		<sizelimits>
+			<minimum height="450" />
+		</sizelimits>
 		<sheetdata>
-			<ft_record name="text">
-				<anchored to="contentframe">
-					<bottom anchor="center" offset="30"/>
+			<sub_content_framed_groupbox name="content">
+				<anchored>
+					<bottom anchor="bottom" relation="relative" offset="-180"/>
 				</anchored>
-			</ft_record>
-			<subwindow name="advanced_effects_contents">
-				<anchored to="contentframe">
-					<top parent="text" anchor="bottom" offset="5" />
-					<left />
-					<bottom />
-					<right />
+			</sub_content_framed_groupbox>
+			<sub_content_framed_groupbox name="advanced_effects">
+				<anchored>
+					<top parent="content" anchor="bottom" offset="30"/>
+					<bottom anchor="bottom" relation="relative" offset="-30"/>
 				</anchored>
 				<class>advanced_effects_subwindow</class>
-				<activate />
-				<invisible />
-			</subwindow>
-			<scrollbar>
-				<anchored to="advanced_effects_contents" />
-				<target>advanced_effects_contents</target>
-			</scrollbar>
+			</sub_content_framed_groupbox>
 		</sheetdata>
 	</windowclass>
 
 	<!-- Add Effect Features Section to Racial Trait Details -->
 	<windowclass name="referenceracialtrait" merge="join">
+		<sizelimits>
+			<minimum height="450" />
+		</sizelimits>
 		<sheetdata>
-			<ft_record name="text">
-				<anchored to="contentframe">
-					<bottom anchor="center" offset="30"/>
+			<sub_content_framed_groupbox name="content">
+				<anchored>
+					<bottom anchor="bottom" relation="relative" offset="-180"/>
 				</anchored>
-			</ft_record>
-			<subwindow name="advanced_effects_contents">
-				<anchored to="contentframe">
-					<top parent="text" anchor="bottom" offset="5" />
-					<left />
-					<bottom />
-					<right />
+			</sub_content_framed_groupbox>
+			<sub_content_framed_groupbox name="advanced_effects">
+				<anchored>
+					<top parent="content" anchor="bottom" offset="30"/>
+					<bottom anchor="bottom" relation="relative" offset="-30"/>
 				</anchored>
 				<class>advanced_effects_subwindow</class>
-				<activate />
-				<invisible />
-			</subwindow>
-			<scrollbar>
-				<anchored to="advanced_effects_contents" />
-				<target>advanced_effects_contents</target>
-			</scrollbar>
+			</sub_content_framed_groupbox>
 		</sheetdata>
 	</windowclass>
 </root>
