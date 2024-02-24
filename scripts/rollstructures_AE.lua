@@ -6,14 +6,18 @@
 local function insertNodes(rActor, nodeWeapon)
 	-- add nodeWeapon and nodeItem to rActor so that when effects are
 	-- checked we can compare them against action only effects
-	local _, nodeItem = DB.getValue(nodeWeapon, 'shortcut', '', '')
+	local _, nodeItem = DB.getValue(nodeWeapon, "shortcut", "", "")
 	rActor.nodeItem = nodeItem
 	rActor.nodeWeapon = DB.getPath(nodeWeapon)
 
 	-- bmos adding AmmunitionManager integration
-	if not AmmunitionManager then return end
+	if not AmmunitionManager then
+		return
+	end
 	local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon)
-	if nodeAmmo then rActor.nodeAmmo = DB.getPath(nodeAmmo) end
+	if nodeAmmo then
+		rActor.nodeAmmo = DB.getPath(nodeAmmo)
+	end
 end
 
 local getWeaponDamageRollStructures_old
