@@ -6,30 +6,28 @@
 
 <root>
 	<!-- Add Effect Features Section to Feature Details -->
-	<windowclass name="ref_feat_stats" merge="join">
+	<windowclass name="referencefeat_main" merge="join">
 		<sheetdata>
 			<subwindow name="advanced_effects_contents">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
-					<left offset="5" />
-					<right offset="5" />
+					<left offset="0" />
+					<right offset="-2" />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
 				<activate />
-				<fastinit />
-				<invisible />
 			</subwindow>
 		</sheetdata>
 	</windowclass>
 
 	<!-- Add Effect Features Section to Class Ability Details -->
-	<windowclass name="ref_classability_stats" merge="join">
+	<windowclass name="referenceclassability_main" merge="join">
 		<sheetdata>
 			<subwindow name="advanced_effects_contents">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
-					<left offset="5" />
-					<right offset="5" />
+					<left offset="0" />
+					<right offset="-2" />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
 				<activate />
