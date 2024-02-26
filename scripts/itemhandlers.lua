@@ -1,6 +1,12 @@
 --
+-- Please see the LICENSE.md file included with this distribution for
+-- attribution and copyright information.
+--
+
+--
 -- Effects on Items, apply to character in CT
 --
+
 ---	This function removes existing effects and re-parses them.
 --	First it finds any effects that have this item as the source and removes those effects.
 --	Then it calls updateItemEffects to re-parse the current/correct effects.

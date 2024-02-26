@@ -8,7 +8,6 @@
 --
 
 -- luacheck: globals CombatManagerKel hasEffectCondition_new notifyApplyDamage TurboManager
-
 local function sendRawMessage(sUser, nGMOnly, msg)
 	local sIdentity = nil
 	if sUser and sUser ~= "" then

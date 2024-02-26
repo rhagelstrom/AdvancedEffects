@@ -2,6 +2,7 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
+
 -- luacheck: globals onDrop
 function onDrop(x, y, draginfo, ...)
 	if super and super.onDrop then

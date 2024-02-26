@@ -1,6 +1,12 @@
 --
+-- Please see the LICENSE.md file included with this distribution for
+-- attribution and copyright information.
+--
+
+--
 -- Effects on Abilities, apply to character in CT
 --
+
 ---	This function removes existing effects and re-parses them.
 --	First it finds any effects that have this ability as the source and removes those effects.
 --	Then it calls updateAbilityEffects to re-parse the current/correct effects.
