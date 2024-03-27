@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<!-- 
-  Please see the license.html file included with this distribution for 
+<!--
+  Please see the license.html file included with this distribution for
   attribution and copyright information.
 -->
 
@@ -36,7 +36,7 @@
 				<script>
 					function onValueChanged()
 						local bEditMode = (getValue() == 1);
-						
+
 						window.effects_list_iadd.setVisible(bEditMode);
 						window.effects_list.update();
 					end
@@ -53,7 +53,7 @@
 				<script>
 					function addEntry(bFocus)
 						local n = getWindowCount();
-						
+
 						local w = createWindow();
 						return w;
 					end

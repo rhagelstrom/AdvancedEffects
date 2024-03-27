@@ -37,12 +37,12 @@
                 <invisible />
             </subwindow>
         </sheetdata>
-    </windowclass>
+    </windowclass> -->
 
 
-    <windowclass name="reference_feat" merge="join">
+    <!-- <windowclass name="reference_feat" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertbefore="content">
+            <subwindow name="advanced_effects_contents" insertafter="header">
                 <anchored to="contentanchor">
                     <left offset="15" />
                     <right offset="-15" />
@@ -55,38 +55,6 @@
             </subwindow>
         </sheetdata>
     </windowclass> -->
-
-    <windowclass name="item_main_weapon" merge="join">
-        <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="properties_label">
-                <anchored>
-                    <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-                    <left offset="5" />
-                    <right offset="5" />
-                </anchored>
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-                <invisible />
-            </subwindow>
-        </sheetdata>
-    </windowclass>
-
-    <windowclass name="item_main_armor" merge="join">
-        <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="properties_label">
-                <anchored>
-                    <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-                    <left offset="5" />
-                    <right offset="5" />
-                </anchored>
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-                <invisible />
-            </subwindow>
-        </sheetdata>
-    </windowclass>
 
     <windowclass name="item_main" merge="join">
         <sheetdata>
@@ -117,12 +85,6 @@
                 <fastinit />
             </subwindow>
         </sheetdata>
-        <!-- <tab merge="add">
-			<name>notes</name>
-			<resource>tab_advanced_effects</resource>
-			<class>advanced_effects_subwindow</class>
-			<embed />
-		</tab> -->
     </windowclass>
 
     <windowclass name="reference_subrace_main" merge="join">
@@ -170,8 +132,7 @@
 
     <windowclass name="npc_combat" merge="join">
         <sheetdata>
-
-            <subwindow name="advanced_effects_contents" insertbefore="header_traits">
+            <subwindow name="advanced_effects_contents" insertbefore="traits_header">
                 <anchored>
                     <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
                     <left offset="5" />
@@ -181,14 +142,7 @@
                 <activate />
                 <fastinit />
             </subwindow>
-
         </sheetdata>
-        <!-- <tab merge="add">
-			<name>notes</name>
-			<resource>tab_advanced_effects</resource>
-			<class>advanced_effects_subwindow</class>
-			<embed />
-		</tab> -->
     </windowclass>
 
     <windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
