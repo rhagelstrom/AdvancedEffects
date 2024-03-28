@@ -1,0 +1,135 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Release Build
+
+permissions: write-all
+
+env:
+  EXTENSION:  '.ext'
+  PDF: '.pdf'
+  MARKDOWN: '.md'
+  README: 'README'
+  FILE_TYPE_EXLUSIONS: '*.git* *.css* *.resources* *.vscode* *.yml /*node_modules/* ./graphics/documentation/* .editorconfig body.md *.psd *.xcf *.mod forge-thumbnail.png *.pdf LICENSE *.DS_Store*'
+  RESOURCES: '.resources/'
+  GITHUB: '.github/'
+  THEME: '.css/torillic.css'
+  GRAPHICS: 'graphics/'
+  BADGES: '\[!\[.+\]\(.+\)\]\(.+\)\s?\n?'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo Assets
+      uses: actions/checkout@v4
+
+    - name: Strip Badges
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: ${{ env.BADGES }}
+        exclude: ${{ env.FILE_TYPE_EXLUSIONS }}
+        replace: ' '
+
+    - name: Get current Date
+      run: echo "DATE=$(date +'%m/%d/%y')" >> $GITHUB_ENV
+
+    - name: Replace Date
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: '~date~'
+        exclude: ${{ env.FILE_TYPE_EXLUSIONS }}
+        replace: ${{ env.DATE }}
+
+    - name: Replace Version
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: '~dev_version~'
+        exclude: ${{ env.FILE_TYPE_EXLUSIONS }}
+        replace: ${{github.ref_name}}
+
+    - name: Replace Backslashes
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: '\\'
+        include: 'README.md'
+        replace: '  '
+
+    - name: Zip Assets Into ${{ github.event.repository.name }}${{ env.EXTENSION }} File
+      uses: thedoctor0/zip-release@0.7.6
+      with:
+        filename: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+        exclusions: ${{ env.FILE_TYPE_EXLUSIONS }}
+
+    - name: Add ${{ github.event.repository.name }}${{ env.EXTENSION }} to Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+        path: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+
+  upload:
+    if: ${{ ! contains(github.ref_name,'-rc') }} # Don't update the Forge on test builds. Tags with -rc
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout FG-Forge-Updater repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'rhagelstrom/FG-Forge-Updater'
+
+      - name: Set up python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: 'pip'
+
+      - name: Install uv and create venv
+        run: |
+          pip install -U pip uv
+          uv venv
+
+      - name: Enable macOS/Linux venv
+        if: runner.os != 'Windows'
+        run: |
+          source .venv/bin/activate
+          echo $PATH >> $GITHUB_PATH
+
+      - name: Enable Windows venv
+        if: runner.os == 'Windows'
+        run: |
+          .venv\Scripts\activate
+          echo $env:path >> $ENV:GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv pip install -e .
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+
+      - name: Upload ${{ github.event.repository.name }}${{ env.EXTENSION }} to FG Forge
+        env:
+          FG_USER_NAME: ${{ vars.FG_USER_NAME }}
+          FG_USER_PASS: ${{ secrets.FG_USER_PASS }}
+          FG_ITEM_ID: ${{ vars.FG_ITEM_ID }}
+          FG_UL_FILE: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+          FG_README_UPDATE: "TRUE"
+          FG_UPLOAD_BUILD: "TRUE"
+          FG_GRAPH_SALES: "FALSE"
+        run: |
+          python src/main.py
+
+      # - name: Add cumulative users graph to release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     body: "![Cumulative Users Graph](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/cumulative_users.png)"
+      #     artifacts: cumulative_users.png
+      #     allowUpdates: true

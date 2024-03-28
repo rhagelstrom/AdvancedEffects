@@ -1,0 +1,21 @@
+on:
+  push:
+    paths:
+      - 'README.md'
+
+name: Lint README.md
+jobs:
+
+  lint-readme:
+    name: Lint README.md file
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Lint README.md file
+      uses: avto-dev/markdown-lint@v1.5.0
+      with:
+        config: '.github/configs/markdown_lint_rules.json'
+        args: 'README.md'
+
