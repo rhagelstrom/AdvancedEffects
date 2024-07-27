@@ -82,7 +82,7 @@ function onInit()
     });
 
     if PowerUp then
-        PowerUp.registerExtension('Iconograffiti', '~dev_version~');
+        PowerUp.registerExtension('Advanced Effects', '~dev_version~');
     end
 
 end

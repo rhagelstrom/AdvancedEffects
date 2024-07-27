@@ -5,6 +5,9 @@
 -- luacheck: globals onInit onClose update
 -- luacheck: globals node effect_description
 function onInit()
+    if super and super.onInit then
+        super.onInit();
+    end
     local node = getDatabaseNode();
     local nodeItem = DB.getChild(node, '...');
     -- set name of effect to name of item so when effect
@@ -20,10 +23,13 @@ function onInit()
     DB.addHandler(DB.getPath(node, 'durunit'), 'onUpdate', update);
     DB.addHandler(DB.getPath(node, 'visibility'), 'onUpdate', update);
     DB.addHandler(DB.getPath(node, 'actiononly'), 'onUpdate', update);
+    DB.addHandler(DB.getPath(nodeItem, 'locked'), 'onUpdate', update);
     update();
 end
 
 function onClose()
+    local node = getDatabaseNode();
+    local nodeItem = DB.getChild(node, '...');
     -- DB.removeHandler(DB.getPath(node),"onChildUpdate", update);
     DB.removeHandler(DB.getPath(node, 'effect'), 'onUpdate', update);
     DB.removeHandler(DB.getPath(node, 'durdice'), 'onUpdate', update);
@@ -31,11 +37,19 @@ function onClose()
     DB.removeHandler(DB.getPath(node, 'durunit'), 'onUpdate', update);
     DB.removeHandler(DB.getPath(node, 'visibility'), 'onUpdate', update);
     DB.removeHandler(DB.getPath(node, 'actiononly'), 'onUpdate', update);
+    DB.removeHandler(DB.getPath(nodeItem, 'locked'), 'onUpdate', update);
 end
 
 -- update display string
 function update()
+
+    if super and super.update then
+        super.update();
+    end
     local node = getDatabaseNode();
+    local nodeItem = DB.getChild(node, '...');
+    local bReadOnly = DB.getValue(nodeItem, 'locked', 0);
+
     -- display dice/mods for duration --celestian
     local sDuration = '';
     local dDurationDice = DB.getValue(node, 'durdice');
@@ -77,6 +91,7 @@ function update()
     end
     local sEffect = DB.getValue(node, 'effect', '');
     local sVis = DB.getValue(node, 'visibility', '');
+    local sVisible = sVis;
     if (sVis ~= '') then
         sVis = ' visibility [' .. sVis .. ']';
     end
@@ -85,4 +100,21 @@ function update()
     end
     local sFinal = '[' .. sEffect .. ']' .. sDuration .. sVis .. sActionOnly;
     effect_description.setValue(sFinal);
+
+    if not Session.IsHost then
+        if sVisible == 'hide' then
+            effect_description.setVisible(false);
+            effectdetail.setVisible(false);
+        elseif sVisible == 'show' then
+            effect_description.setVisible(true);
+            effectdetail.update();
+        elseif sVisible == '' and bReadOnly == 1 then
+            effect_description.setVisible(false);
+            effectdetail.setVisible(false);
+        else
+            effect_description.setVisible(true);
+            effectdetail.update();
+        end
+    end
+
 end
