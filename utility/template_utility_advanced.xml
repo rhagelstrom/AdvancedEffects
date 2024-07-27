@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<!-- 
-  Please see the license.html file included with this distribution for 
+<!--
+  Please see the license.html file included with this distribution for
   attribution and copyright information.
 -->
 
@@ -23,13 +23,13 @@
 				function onInit()
 					registerMenuItem(Interface.getString("list_menu_createitem"), "insert", 5);
 				end
-				
+
 				function onMenuSelection(selection)
 					if selection == 5 then
 						self.addEntry(true);
 					end
 				end
-				
+
 				function onListChanged()
 					update();
 				end
@@ -40,7 +40,7 @@
 						w.idelete.setVisibility(bEdit);
 					end
 				end
-				
+
 				function addEntry(bFocus)
 					return createWindow();
 				end

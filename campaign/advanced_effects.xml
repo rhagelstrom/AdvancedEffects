@@ -42,11 +42,11 @@
 
     <!-- <windowclass name="reference_feat" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="header">
-                <anchored to="contentanchor">
+            <subwindow name="advanced_effects_contents" insertafter="record_content_text">
+                <anchored>
+                    <top parent= "contentanchor" anchor="bottom" relation="relative" offset="0" />
                     <left offset="15" />
                     <right offset="-15" />
-                    <top relation="relative" offset="15" />
                 </anchored>
                 <class>advanced_effects_subwindow</class>
                 <activate />
@@ -103,33 +103,6 @@
         </sheetdata>
     </windowclass>
 
-    <windowclass name="advanced_effects_subwindow">
-        <sheetdata>
-            <anchor_column name="columnanchor" />
-            <!-- advanced effects -->
-            <!-- effects  -->
-            <header_column name="advancedeffects_header">
-                <static textres="char_abilities_label_advancedeffects"/>
-                <center />
-            </header_column>
-            <button_iedit name="effectslist_iedit">
-                <anchored to="advancedeffects_header" position="righthigh" offset="-20,0" />
-                <target>effectslist</target>
-            </button_iedit>
-            <button_iadd name="effectslist_iadd">
-                <anchored to="effectslist_iedit" position="lefthigh" offset="5,0" />
-                <target>effectslist</target>
-            </button_iadd>
-
-            <list_column name="effectslist">
-                <datasource>.effectlist</datasource>
-                <class>advanced_effects_entry</class>
-            </list_column>
-            <!-- end advanced effects entry -->
-        </sheetdata>
-    </windowclass>
-
-
     <windowclass name="npc_combat" merge="join">
         <sheetdata>
             <subwindow name="advanced_effects_contents" insertbefore="traits_header">
@@ -147,53 +120,16 @@
 
     <windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
         <sheetdata>
-            <!-- effects -->
-            <label_charframetop name="advancedeffectstitle">
-                <anchored to="languagestitle" height="20">
-                    <top anchor="bottom" relation="relative" offset="7" />
-                    <left />
-                    <right />
-                </anchored>
-                <static textres="char_abilities_label_advancedeffects" />
-                <icons>char_abilities</icons>
-                <target>header_effects</target>
-            </label_charframetop>
-
-
-            <button_iedit name="effects_iedit">
-                <anchored to="advancedeffectstitle" position="insidetopright" offset="-5,0" />
-                <script>
-					function onValueChanged()
-						local bEditMode = (getValue() == 1);
-
-						window.effects_list_iadd.setVisible(bEditMode);
-						window.effects_list.update();
-					end
-                </script>
-            </button_iedit>
-            <button_iadd name="effects_list_iadd">
-                <anchored to="effects_iedit" position="lefthigh" offset="5,0" />
-                <target>effects_list</target>
-            </button_iadd>
-
-            <list_editor_advanced_effects name="effects_list">
+            <subwindow name="advanced_effects_contents" insertafter="traits">
                 <anchored>
-                    <top parent="advancedeffectstitle" anchor="bottom" relation="relative" offset="0" />
-                    <left />
-                    <right />
+                    <top parent="languagestitle" anchor="bottom" relation="relative" offset="o" />
+                    <left offset="5"/>
+                    <right offset="5"/>
                 </anchored>
-                <datasource>.effectlist</datasource>
-                <class>advanced_effects_entry</class>
-                <script>
-					function addEntry(bFocus)
-						local n = getWindowCount();
-
-						local w = createWindow();
-						return w;
-					end
-                </script>
-            </list_editor_advanced_effects>
-            <!-- end advanced effects entry -->
+            <class>advanced_effects_subwindow</class>
+            <activate />
+            <fastinit />
+        </subwindow>
         </sheetdata>
     </windowclass>
 
