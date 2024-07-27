@@ -9,21 +9,7 @@
 	<!-- advanced effects subwindow -->
 	<windowclass name="advanced_effects_subwindow">
 		<margins control="0,0,2,2" />
-		<script>
-            function onInit()
-                if Session.IsHost then
-                    header_effects.setVisible(true);
-                    effects_iedit.setVisible(true);
-                    effects_list_iadd.setVisible(true);
-                    effects_list.setVisible(true);
-                else
-                    header_effects.setVisible(false);
-                    effects_iedit.setVisible(false);
-                    effects_list_iadd.setVisible(false);
-                    effects_list.setVisible(false);
-                end
-            end
-		</script>
+		<script file="utility/scripts/advanced_effects_main.lua" />
 		<sheetdata>
 			<anchor_column name="columnanchor" />
 			<!-- effects -->
@@ -32,12 +18,10 @@
 				<center />
 			</header_column>
 			<button_iedit name="effects_iedit">
-				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
+				<anchored to="header_effects" position="insidetopright" offset="8,0" />
 				<script>
 					function onValueChanged()
 						local bEditMode = (getValue() == 1);
-
-						window.effects_list_iadd.setVisible(bEditMode);
 						window.effects_list.update();
 					end
 				</script>
@@ -53,10 +37,10 @@
 				<script>
 					function addEntry(bFocus)
 						local n = getWindowCount();
-
 						local w = createWindow();
 						return w;
 					end
+
 				</script>
 			</list_editor_advanced_effects>
 			<!-- end advanced effects entry -->
@@ -82,37 +66,68 @@
 				</anchored>
 				<invisible />
 			</genericcontrol>
-
-			<!-- editor button -->
-			<button_details name="effectdetail">
-				<script>
-					function onButtonPress()
-						Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
-					end
-				</script>
-				<anchored to="rightanchor">
-					<top />
-					<right anchor="left" relation="relative" offset="-25" />
-				</anchored>
-			</button_details>
-
 			<!-- delete button if in edit mode -->
 			<button_idelete name="idelete">
 				<anchored to="rightanchor">
 					<top offset="-2" />
-					<right anchor="left" relation="relative" offset="-25" />
+					<right anchor="left" relation="relative" offset="-18" />
 				</anchored>
 			</button_idelete>
+			<genericcontrol name="spacer">
+				<anchored to="rightanchor" height="20" width="20">
+					<top offset="-2" />
+					<right anchor="left" relation="relative" offset="-18" />
+				</anchored>
+			</genericcontrol>
+			<!-- editor button -->
+			<button_details name="effectdetail">
+				<script>
+					function onInit()
+						if super and super.onInit() then
+							super.onInit()
+						end
+						local node = window.getDatabaseNode();
+						local nodeItem = DB.getChild(node, '...');
+						DB.addHandler(DB.getPath(nodeItem, 'locked'), 'onUpdate', self.update);
+						self.update();
+					end
 
+					function onClose()
+						if super and super.onClose() then
+							super.onClose();
+						end
+						local node = getDatabaseNode();
+						local nodeItem = DB.getChild(node, '...');
+						DB.removeHandler(DB.getPath(nodeItem, 'locked'), 'onUpdate', update);
+					end
+
+					function onButtonPress()
+						if self.isVisible() then
+							Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
+						end
+					end
+
+					function update()
+						if super and super.update() then
+							super.update();
+						end
+						local node = window.getDatabaseNode();
+						local nodeItem = DB.getChild(node, '...');
+						local bReadOnly = DB.getValue(nodeItem, 'locked', 0);
+						if bReadOnly == 0 then
+							self.setVisible(true);
+						else
+							self.setVisible(false);
+						end
+					end
+				</script>
+				<anchored to="rightanchor">
+					<top />
+					<right anchor="left" relation="relative" offset="-5" />
+				</anchored>
+			</button_details>
 			<hs name="name"/>
 			<basicstring name="effect_description">
-				<script>
-                    function onClickDown(button, x, y)
-                        local w = Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
-                        w.main.subwindow.name.setValue(DB.getValue(window.getDatabaseNode(), "...name", ""));
-                        return true;
-                    end
-				</script>
 				<multilinespacing>20</multilinespacing>
 				<anchored to="leftanchor">
 					<top />
@@ -339,6 +354,18 @@
 
 			<!-- show/hide effect -->
 			<button_stringcycler name="visibility">
+				<script>
+					function onInit()
+						if super and super.onInit() then
+							super.onInit()
+						end
+						if Session.IsHost then
+							self.setVisible(true);
+						else
+							self.setVisible(false);
+						end
+					end
+				</script>
 				<anchored to="durunit" position="righthigh" offset="10,0" width="40" height="20" />
 				<parameters>
 					<defaultlabelres>dash</defaultlabelres>
@@ -348,6 +375,19 @@
 				<tooltip textres="item_label_effect_visible_tooltip" />
 			</button_stringcycler>
 			<label_fieldtop>
+				<script>
+					function onInit()
+						if super and super.onInit() then
+							super.onInit()
+						end
+
+						if Session.IsHost then
+							self.setVisible(true);
+						else
+							self.setVisible(false);
+						end
+					end
+				</script>
 				<anchored to="visibility" />
 				<static textres="item_label_effect_visible" />
 				<tooltip textres="item_label_effect_visible_tooltip" />
@@ -355,10 +395,28 @@
 
 			<!-- weapon/attack effect only? -->
 			<button_checkbox name="actiononly">
+				<script>
+					function onInit()
+						if super and super.onInit() then
+							super.onInit()
+						end
+						local node = window.getDatabaseNode();
+						local nodeItem = DB.getChild(node, '...');
+						local sType = DB.getValue(nodeItem, 'type', ''):lower();
+						local sSubType = DB.getValue(nodeItem, 'subtype', ''):lower();
+						if sType == 'weapon' or sSubType == 'ammunition' then
+							self.setVisible(true);
+							window.actiononlylabel.setVisible(true);
+						else
+							self.setVisible(false);
+							window.actiononlylabel.setVisible(false);
+						end
+					end
+				</script>
 				<anchored to="visibility" position="righthigh" offset="10,0" width="10" height="20" />
 				<tooltip textres="item_label_effect_attackonly_tooltip" />
 			</button_checkbox>
-			<label>
+			<label name="actiononlylabel">
 				<font>sheetlabelmini</font>
 				<anchored to="actiononly" position="righthigh" offset="2,0"/>
 				<static textres="item_label_effect_attackonly" />
