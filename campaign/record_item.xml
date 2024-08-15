@@ -7,9 +7,9 @@
 <root>
 	<windowclass name="item_main" merge="join">
 		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertbefore="divider4">
+			<subwindow name="advanced_effects_contents" insertafter="divider5">
 				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
+					<top parent="description" anchor="bottom" relation="relative" offset="5" />
 					<left offset="5" />
 					<right offset="5" />
 				</anchored>
