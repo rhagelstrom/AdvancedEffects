@@ -1,3 +1,5 @@
+-- luacheck: globals onInit update
+
 function onInit()
     if super and super.onInit() then
         super.onInit();

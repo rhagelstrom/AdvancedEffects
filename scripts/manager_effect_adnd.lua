@@ -303,10 +303,6 @@ function updateCharEffect(nodeCharEffect, nodeEntry)
     elseif sVisibility == 'hide' then
         nDMOnly = 1;
     end
-    local bisPC = ActorManager.isPC(nodeEntry);
-    if (not bisPC) then
-        nDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
-    end
 
     local rEffect = {};
     rEffect.nDuration = nRollDuration;

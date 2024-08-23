@@ -2,7 +2,7 @@
 -- handles advanced effects
 --
 --
--- luacheck: globals onInit onClose update
+-- luacheck: globals onInit onClose update effectdetail
 -- luacheck: globals node effect_description
 function onInit()
     if super and super.onInit then

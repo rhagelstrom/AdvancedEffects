@@ -4,6 +4,7 @@
 --
 -- luacheck: globals onInit onClose update
 -- luacheck: globals updateAbilityEffects updateSaveEffects updateSusceptibleEffects updateMiscEffects
+
 function onInit()
     local node = getDatabaseNode();
     -- DB.getValue(node,"save_type","modifier");
