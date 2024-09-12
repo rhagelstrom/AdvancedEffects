@@ -6,9 +6,16 @@
 -->
 
 <root>
+	<template name="sub_advanced_effects">
+		<sub_content_framed_groupbox_bottom name="sub_advance_effects">
+			<class>advanced_effects_subwindow</class>
+		</sub_content_framed_groupbox_bottom>
+	</template>
+
 	<!-- advanced effects subwindow -->
 	<windowclass name="advanced_effects_subwindow">
-		<margins control="0,0,2,2" />
+		<!-- <margins control="0,0,2,2" /> -->
+		<margins control="0,0,0,5" />
 		<script file="utility/scripts/advanced_effects_main.lua" />
 		<sheetdata>
 			<anchor_column name="columnanchor" />

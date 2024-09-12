@@ -8,10 +8,10 @@
 -- luacheck: globals onNPCPostAdd getUserFromNode sendEffectRemovedMessage sendEffectAddedMessage sendRawMessage isValidCheckEffect
 -- luacheck: globals decodeActors getEffectsByType hasEffectCondition hasEffect checkConditionalHelper manager_action_damage_performRoll
 -- luacheck: globals manager_action_attack_performRoll manager_power_performAction helperBuildAddStructure addClassFeature
--- luacheck: globals addFeat addRaceTrait addAbilityEffects
+-- luacheck: globals addFeat addSpeciesTrait addAbilityEffects
 local addClassFeature_old;
 local addFeat_old;
-local addRaceTrait_old;
+local addSpeciesTrait_old;
 local decodeActors_old;
 local helperBuildAddStructure_old;
 local onNPCPostAdd_old;
@@ -65,8 +65,8 @@ function onInit()
     CharClassManager.addClassFeature = addClassFeature;
     addFeat_old = CharFeatManager.addFeat;
     CharFeatManager.addFeat = addFeat;
-    addRaceTrait_old = CharRaceManager.addRaceTrait;
-    CharRaceManager.addRaceTrait = addRaceTrait;
+    addSpeciesTrait_old = CharSpeciesManager.addSpeciesTrait;
+    CharSpeciesManager.addSpeciesTrait = addSpeciesTrait;
     helperBuildAddStructure_old = CharManager.helperBuildAddStructure;
     CharManager.helperBuildAddStructure = helperBuildAddStructure;
     PowerManager.performAction = manager_power_performAction;
@@ -899,9 +899,9 @@ function addFeat(nodeChar, sClass, sRecord, bWizard)
     end
 end
 
--- replace 5E CharRaceManager manager_char.lua addRaceTrait() with this
-function addRaceTrait(nodeChar, sClass, sRecord, bWizard)
-    addRaceTrait_old(nodeChar, sClass, sRecord, bWizard);
+-- replace 5E CharSpeciesManager manager_char.lua addSpeciesTrait() with this
+function addSpeciesTrait(nodeChar, sClass, sRecord, bWizard)
+    addSpeciesTrait_old(nodeChar, sClass, sRecord, bWizard);
     if rAdd then
         addAbilityEffects(nodeChar);
     end

@@ -9,114 +9,51 @@
         <script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
     </windowclass>
 
-    <windowclass name="ref_ability" merge="join">
-        <sheetdata>
-            <subwindow name="advanced_effects_contents" insertbefore="content">
-                <anchored to="contentanchor">
-                    <left offset="10" />
-                    <right offset="-10" />
-                    <top relation="relative" offset="10" postoffset="10" />
-                </anchored>
-                <frame name="groupbox" offset="10,10,10,10" />
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-                <invisible />
-            </subwindow>
-        </sheetdata>
-    </windowclass>
-
     <windowclass name="reference_feat" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertbefore="content">
-                <anchored to="contentanchor">
-                    <left offset="10" />
-                    <right offset="-10" />
-                    <top relation="relative" offset="10" postoffset="10" />
-                </anchored>
-                <frame name="groupbox" offset="10,10,10,10" />
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-                <invisible />
-            </subwindow>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="sub_version"/>
         </sheetdata>
     </windowclass>
 
-    <windowclass name="item_main" merge="join">
+    <windowclass name="reference_classfeature" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="weight_label">
-                <anchored>
-                    <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-                    <left offset="5" />
-                    <right offset="5" />
-                </anchored>
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-                <invisible />
-            </subwindow>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="content"/>
         </sheetdata>
     </windowclass>
 
-    <windowclass name="reference_race_main" merge="join">
+    <windowclass name="reference_class" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="traits">
-                <anchored>
-                    <top parent="traits" anchor="bottom" relation="relative" offset="0" />
-                    <left offset="5" />
-                    <right offset="5" />
-                </anchored>
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-            </subwindow>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="sub_version"/>
         </sheetdata>
     </windowclass>
 
-    <windowclass name="reference_subrace_main" merge="join">
+    <windowclass name="item" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="traits">
-                <anchored>
-                    <top parent="traits" anchor="bottom" relation="relative" offset="0" />
-                    <left offset="5" />
-                    <right offset="5" />
-                </anchored>
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-            </subwindow>
-
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="sub_version"/>
         </sheetdata>
     </windowclass>
 
-    <windowclass name="npc_combat" merge="join">
+    <windowclass name="reference_race" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertbefore="traits_header">
-                <anchored>
-                    <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-                    <left offset="5" />
-                    <right offset="5" />
-                </anchored>
-                <class>advanced_effects_subwindow</class>
-                <activate />
-                <fastinit />
-            </subwindow>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="sub_version"/>
         </sheetdata>
     </windowclass>
 
-    <windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
+    <windowclass name="reference_subrace" merge="join">
         <sheetdata>
-            <subwindow name="advanced_effects_contents" insertafter="traits">
-                <anchored>
-                    <top parent="languagestitle" anchor="bottom" relation="relative" offset="o" />
-                    <left offset="5"/>
-                    <right offset="5"/>
-                </anchored>
-            <class>advanced_effects_subwindow</class>
-            <activate />
-            <fastinit />
-        </subwindow>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="sub_version"/>
+        </sheetdata>
+    </windowclass>
+
+    <windowclass name="npc" merge="join">
+        <sheetdata>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="sub_version"/>
+        </sheetdata>
+    </windowclass>
+
+    <windowclass name="charsheet_abilities" merge="join" insertafter="languages">
+        <sheetdata>
+            <sub_advanced_effects name="sub_advanced_effects"  insertbefore="content"/>
         </sheetdata>
     </windowclass>
 
