@@ -13,7 +13,7 @@
 		<ruleset>
 			<name>PFRPG</name>
 		</ruleset>
-		<loadorder>34</loadorder>
+		<loadorder>51</loadorder>
 	</properties>
 
 	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?57817-Advanced-Effects-for-5E-and-Pathfinder\rAdvanced Effects for Pathfinder v1.21\rCreated by Celestian for 2E and 5E\rported to PFRPG/3.5E by rmilmine with further improvements by bmos and SoxMax." font="emotefont" icon="module_loaded" />
