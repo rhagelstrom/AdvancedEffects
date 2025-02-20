@@ -9,9 +9,8 @@ function onDamageChanged()
 	local nodeChar = DB.getChild(nodeWeapon, "...")
 	local rActor = ActorManager.resolveActor(nodeChar)
 
-	local aDamage = {}
-	local aDamageNodes = UtilityManager.getSortedTable(DB.getChildren(nodeWeapon, "damagelist"))
-	for _, v in ipairs(aDamageNodes) do
+	local tDamage = {}
+	for _, v in ipairs(UtilityManager.getNodeSortedChildren(nodeWeapon, "damagelist")) do
 		local aDice = DB.getValue(v, "dice", {})
 		local nMod = DB.getValue(v, "bonus", 0)
 
@@ -45,9 +44,9 @@ function onDamageChanged()
 			if sType ~= "" then
 				sDamage = sDamage .. " " .. sType
 			end
-			table.insert(aDamage, sDamage)
+			table.insert(tDamage, sDamage)
 		end
 	end
 
-	damageview.setValue(table.concat(aDamage, "\n+ "))
+	button_damage.setTooltipText(string.format("%s: %s", Interface.getString("action_damage_tag"), table.concat(tDamage, " + ")));
 end
