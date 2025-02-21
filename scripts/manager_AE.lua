@@ -298,7 +298,7 @@ function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
 
 	local aEffects
 	if TurboManager then
-		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType)
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffect)
 	else
 		aEffects = DB.getChildList(ActorManager.getCTNode(rActor), 'effects')
 	end
