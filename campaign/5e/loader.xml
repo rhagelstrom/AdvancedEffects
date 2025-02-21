@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root>
+		<includefile source='campaign/5e/record_char_abilities.xml' />
+		<includefile source='campaign/5e/record_char_weapon.xml' />
+		<includefile source='campaign/5e/record_feat.xml' />
+		<includefile source='campaign/5e/record_feature.xml' />
+		<includefile source='campaign/5e/record_item.xml' />
+		<includefile source='campaign/5e/record_npc.xml' />
+		<includefile source='campaign/5e/record_racial_trait.xml' />
+		<includefile source='campaign/5e/record_vehicle.xml' />
+</root>
