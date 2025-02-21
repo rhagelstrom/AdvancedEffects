@@ -3,7 +3,7 @@
 <root version="3.0" >
 	<properties>
 		<name>Feature: Advanced Effects</name>
-		<version>1.23</version>
+		<version>1.23-hotfix.1</version>
 		<author>Celestian</author>
 		<ported_by>rmilmine and bmos</ported_by>
 		<description>Add effects to pcs, npcs and items</description>
