@@ -6,7 +6,7 @@
 local function insertNodes(rActor, nodeWeapon)
 	-- add nodeWeapon and nodeItem to rActor so that when effects are
 	-- checked we can compare them against action only effects
-	local _, nodeItem = DB.getValue(nodeWeapon, "shortcut", "", "")
+	local _, nodeItem = DB.getValue(nodeWeapon, 'shortcut', '', '')
 	rActor.nodeItem = nodeItem
 	rActor.nodeWeapon = DB.getPath(nodeWeapon)
 

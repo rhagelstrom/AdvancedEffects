@@ -3,7 +3,7 @@
 <root version="3.0" >
 	<properties>
 		<name>Feature: Advanced Effects</name>
-		<version>1.22</version>
+		<version>1.23</version>
 		<author>Celestian</author>
 		<ported_by>rmilmine and bmos</ported_by>
 		<description>Add effects to pcs, npcs and items</description>
@@ -30,7 +30,7 @@
 		<includefile source="utility/utility_effects_advanced.xml" />
 
 		<includefile source="campaign/record_char_abilities.xml" />
-		<!-- <includefile source="campaign/record_char_actions.xml" /> -->
+		<includefile source="campaign/record_char_actions.xml" />
 		<includefile source="campaign/record_char_combat.xml" />
 		<includefile source="campaign/record_char.xml" />
 		<includefile source="campaign/record_item.xml" />

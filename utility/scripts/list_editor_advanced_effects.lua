@@ -4,7 +4,7 @@
 --
 -- luacheck: globals registerMenuItem onMenuSelection onListChanged update getWindows addEntry createWindow
 function onInit()
-	registerMenuItem(Interface.getString("list_menu_createitem"), "insert", 5)
+	registerMenuItem(Interface.getString('list_menu_createitem'), 'insert', 5)
 end
 
 function onMenuSelection(selection)
