@@ -30,7 +30,7 @@
 		<includefile source="utility/utility_effects_advanced.xml" />
 
 		<includefile source="campaign/record_char_abilities.xml" />
-		<includefile source="campaign/record_char_actions.xml" />
+		<!-- <includefile source="campaign/record_char_actions.xml" /> -->
 		<includefile source="campaign/record_char_combat.xml" />
 		<includefile source="campaign/record_char.xml" />
 		<includefile source="campaign/record_item.xml" />
