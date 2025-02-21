@@ -292,7 +292,6 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 end
 
 function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
-	Debug.chat('checkConditionalHelper_new', rActor, sEffect, rTarget, aIgnore)
 	if not rActor then
 		return false;
 	end
