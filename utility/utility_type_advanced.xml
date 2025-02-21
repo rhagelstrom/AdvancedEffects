@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+
+<!--
+  Please see the LICENSE.md file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root>
+    <windowclass name='advanced_effect_editor_content' merge='join'>
+        <script file='utility/scripts/advanced_effects_editor_type.lua' />
+        <sheetdata>
+            <!-- effect type cycler here -->
+    	    <label_column name='type_label' insertbefore='header_label' >
+				<static textres='power_label_type' />
+                <tooltip textres='power_label_type_tooltip' />
+			</label_column>
+
+            <cycler_effecttypes name='type' insertbefore='header_label'>
+				<anchored>
+					<top parent='columnanchor' anchor='bottom' relation='relative' offset='7' />
+					<left offset='97' />
+					<right offset='-110' />
+				</anchored>
+            </cycler_effecttypes>
+
+            <!-- effect is a label only -->
+			<string_column_full name='label_only' />
+
+               <!-- SAVE types -->
+			<cycler_savetypes name='save_type'>
+				<anchored>
+					<top parent='columnanchor' anchor='bottom' relation='relative' offset='7' />
+					<left offset='5' />
+					<right offset='-250' />
+				</anchored>
+                <tooltip textres='item_save_type_tooltip' />
+			</cycler_savetypes>
+
+			<cycler_saves name='save'>
+                <anchored to='save_type' position='righthigh' offset='10,0' width='70'  height='20'/>
+                <tooltip textres='item_label_save_type_tooltip' />
+			</cycler_saves>
+
+ 			<advanced_effect_number name='save_modifier'>
+				<anchored to='save' position='righthigh' offset='10,0' width='20'  height='20'/>
+                <tooltip textres='item_label_save_value_tooltip' />
+			</advanced_effect_number>
+
+			<combobox_bonus_types name='save_bonus_type'>
+				<anchored to='save_modifier' position='righthigh' offset='10,0' width='100'  height='20'/>
+			</combobox_bonus_types>
+
+            <!-- ability version -->
+			<cycler_abilitytypes name='ability_type'>
+				<anchored>
+					<top parent='columnanchor' anchor='bottom' relation='relative' offset='7' />
+					<left offset='5' />
+					<right offset='-230' />
+				</anchored>
+                <tooltip textres='item_ability_type_tooltip' />
+			</cycler_abilitytypes>
+
+			<cycler_ability_short name='ability'>
+                <anchored to='ability_type' position='righthigh' offset='10,0' width='80'  height='20'/>
+			</cycler_ability_short>
+
+			<cycler_ability_long name='ability_check'>
+                <anchored to='ability_type' position='righthigh' offset='10,0' width='80'  height='20'/>
+			</cycler_ability_long>
+
+			<advanced_effect_number name='ability_modifier'>
+				<anchored to='ability' position='righthigh' offset='10,0' width='20'  height='20'/>
+			</advanced_effect_number>
+
+			<combobox_bonus_types name='ability_bonus_type'>
+				<anchored to='ability_modifier' position='righthigh' offset='10,0' width='100'  height='20'/>
+			</combobox_bonus_types>
+
+            <!-- Susceptiblity version -->
+			<cycler_susceptiblitytypes name='susceptiblity_type'>
+				<anchored>
+					<top parent='columnanchor' anchor='bottom' relation='relative' offset='7' />
+					<left offset='5' />
+					<right offset='-230' />
+				</anchored>
+                <tooltip textres='item_ability_type_tooltip' />
+			</cycler_susceptiblitytypes>
+
+            <combobox_damage_types name='susceptiblity'>
+                <anchored to='susceptiblity_type' position='righthigh' relation='relative' offset='10,0' width='80'  height='20'/>
+			</combobox_damage_types>
+
+			<advanced_effect_number name='susceptiblity_modifier'>
+				<anchored to='susceptiblity' position='righthigh' offset='10,0' width='20'  height='20'/>
+			</advanced_effect_number>
+
+            <!-- misc version -->
+			<cycler_misctypes name='misc_type'>
+				<anchored>
+					<top parent='columnanchor' anchor='bottom' relation='relative' offset='7' />
+					<left offset='5' />
+					<right offset='-230' />
+				</anchored>
+                <tooltip textres='effect_label_misc_type_tooltip' />
+			</cycler_misctypes>
+
+			<advanced_effect_number name='misc_modifier'>
+				<anchored to='misc_type' position='righthigh' offset='10,0' width='20'  height='20'/>
+                <tooltip textres='effect_label_misc_value_tooltip' />
+			</advanced_effect_number>
+
+			<combobox_bonus_types name='misc_bonus_type'>
+				<anchored to='misc_modifier' position='righthigh' offset='10,0' width='100'  height='20'/>
+			</combobox_bonus_types>
+
+			<combobox_attack_types name='misc_attack_type'>
+				<anchored to='misc_bonus_type' position='righthigh' offset='10,0' width='70'  height='20'/>
+			</combobox_attack_types>
+        </sheetdata>
+    </windowclass>
+</root>

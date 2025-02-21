@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<root version='3.3'>
+    	<includefile source='campaign/pfrpg/record_abilities.xml'/>
+		<includefile source='campaign/pfrpg/record_char_combat.xml' />
+		<includefile source='campaign/pfrpg/record_char_weapon.xml' />
+		<includefile source='campaign/pfrpg/record_char.xml' />
+		<includefile source='campaign/pfrpg/record_feat.xml' />
+		<includefile source='campaign/pfrpg/record_item.xml' />
+		<includefile source='campaign/pfrpg/record_npc.xml' />
+		<includefile source='campaign/pfrpg/record_proficiency.xml' />
+		<includefile source='campaign/pfrpg/record_racial_trait.xml' />
+</root>

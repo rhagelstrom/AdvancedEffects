@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root>
+    <!-- Add to Racial Traits -->
+    <windowclass name='referenceracialtrait' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects' />
+        </sheetdata>
+    </windowclass>
+</root>

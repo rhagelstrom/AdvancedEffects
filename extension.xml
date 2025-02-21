@@ -1,5 +1,10 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<root version="3.0">
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root version='3.0'>
 
     <properties>
         <name>Feature: Advanced Effects</name>
@@ -10,20 +15,28 @@
             <website></website>
             <author>Celestian</author>
         </description>
-        <ruleset>
-            <name>5E</name>
-        </ruleset>
+        <ruleset><name>5E</name></ruleset>
+		<ruleset><name>3.5E</name></ruleset>
+		<ruleset><name>PFRPG</name></ruleset>
     </properties>
 
-    <announcement text="Advanced Effects - 5E ~dev_version~\rby Celestian, 2017-2024\rMaintained by rhagelstrom" font="emotefont" icon="celestian" />
+    <announcement text='Advanced Effects ~dev_version~\rby Celestian, bmos, rmilmine, rhagelstrom, SoxMax, MeAndUnique 2017-2025\rMaintained by rhagelstrom' font='emotefont' icon='AdvancedEffects' />
     <base>
-        <icon name="celestian" file="graphics/icons/celestian.png" />
+        <icon name='AdvancedEffects' file='graphics/icons/advancedeffects.webp' />
+        <includefile source='strings/strings.xml' />
 
-        <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
+        <includefile source='scripts/d20/loader.xml'/>
+        <includefile source='scripts/5e/loader.xml'  ruleset='5E' />
+        <includefile source='scripts/pfrpg/loader.xml' ruleset='3.5E|PFRPG' />
 
-        <includefile source="strings/strings.xml" />
-        <includefile source="utility/template_utility_advanced.xml" />
-        <includefile source="utility/utility_effects_advanced.xml" />
-        <includefile source="campaign/advanced_effects.xml" />
+        <includefile source='campaign/loader.xml'/>
+
+        <includefile source='utility/template_utility_advanced.xml'/>
+        <includefile source='utility/utility_effects_advanced.xml'/>
+
+        <!-- Load type cycler for PFRPG only -->
+        <includefile source='utility/template_utility_type_advanced.xml' ruleset='3.5E|PFRPG' />
+        <includefile source='utility/utility_type_advanced.xml' ruleset='3.5E|PFRPG' />
+
     </base>
 </root>
