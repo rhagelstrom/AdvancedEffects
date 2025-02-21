@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<root version='3.3'>
+	<script name='EffectManagerPFRPGAE' file='scripts/5e/manager_effect_pfrpg_ae.lua' />
+</root>

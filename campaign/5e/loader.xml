@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<root version='3.3'>
+		<includefile source='campaign/5e/advanced_effects.xml' />
+		<!-- <includefile source='campaign/pfrpg/record_char_abilities.xml'/>
+		<includefile source='campaign/pfrpg/record_char_combat.xml' />
+		<includefile source='campaign/pfrpg/record_char.xml' />
+		<includefile source='campaign/pfrpg/record_item.xml' />
+		<includefile source='campaign/pfrpg/record_npc.xml' /> -->
+</root>

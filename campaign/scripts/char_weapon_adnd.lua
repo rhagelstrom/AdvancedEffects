@@ -14,31 +14,20 @@ end
 function onAttackAction(draginfo)
     local nodeWeapon = getDatabaseNode();
     local nodeChar = DB.getChild(nodeWeapon, '...')
-
-    -- Build basic attack action record
     local rAction = CharWeaponManager.buildAttackAction(nodeChar, nodeWeapon);
-
-    -- Decrement ammo
-    CharWeaponManager.decrementAmmo(nodeChar, nodeWeapon);
-
-    -- Perform action
     local rActor = ActorManager.resolveActor(nodeChar);
 
-    -- add itemPath to rActor so that when effects are checked we can
-    -- make compare against action only effects
-    rActor.itemPath = advancedEffectsPiece(nodeWeapon);
-    -- end Advanced Effects Piece ---
+    if rAction.range == 'R' then
+        CharWeaponManager.decrementAmmo(nodeChar, nodeWeapon);
+    end
 
-    -- bmos adding AmmunitionManager integration
+    rActor.itemPath = advancedEffectsPiece(nodeWeapon);
     if AmmunitionManager then
         local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor);
         if nodeAmmo then
             rActor.ammoPath = DB.getPath(nodeAmmo);
         end
     end
-    -- end bmos adding ammoPath
-
-    -- bmos adding AmmoManager loading weapon support and checking for ammo
     if not AmmunitionManager then
         ActionAttack.performRoll(draginfo, rActor, rAction);
         return true;
@@ -69,32 +58,22 @@ function onAttackAction(draginfo)
             Comm.deliverChatMessage(messagedata);
         end
     end
-    -- end bmos adding loading weapon and ammo check support
 end
 
 function onDamageAction(draginfo)
     local nodeWeapon = getDatabaseNode();
     local nodeChar = DB.getChild(nodeWeapon, '...')
-
-    -- Build basic damage action record
     local rAction = CharWeaponManager.buildDamageAction(nodeChar, nodeWeapon);
-
-    -- Perform damage action
     local rActor = ActorManager.resolveActor(nodeChar);
 
-    -- add itemPath to rActor so that when effects are checked we can
-    -- make compare against action only effects
     rActor.itemPath = advancedEffectsPiece(nodeWeapon);
-    -- end Advanced Effects Piece ---
 
-    -- bmos adding AmmunitionManager integration
     if AmmunitionManager then
         local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor);
         if nodeAmmo then
             rActor.ammoPath = DB.getPath(nodeAmmo);
         end
     end
-    -- end bmos adding ammoPath
 
     ActionDamage.performRoll(draginfo, rActor, rAction);
     return true;

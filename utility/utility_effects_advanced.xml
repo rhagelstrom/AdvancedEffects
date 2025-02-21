@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version='1.0' encoding='iso-8859-1'?>
 
 <!--
   Please see the LICENSE.md file included with this distribution for
@@ -6,10 +6,10 @@
 -->
 
 <root>
-	<!-- advanced effects subwindow with frame-->
-	<windowclass name="advanced_effects_subwindowf">
+	<!-- advanced effects subwindow with frame pf-->
+	<windowclass name='advanced_effects_subwindowf'>
 		<sheetdata>
-			<frame_char name="ae_frame">
+			<frame_char name='ae_frame'>
 				<anchored>
 					<top />
 					<left />
@@ -17,12 +17,12 @@
 					<bottom />
 				</anchored>
 			</frame_char>
-			<subwindow name="ae_subwindow">
+			<subwindow name='ae_subwindow'>
 				<anchored>
-					<top parent="ae_frame" offset="10" />
-					<left parent="ae_frame" offset="10" />
-					<right parent="ae_frame" offset="-5" />
-					<bottom parent="ae_frame" offset="-10" />
+					<top parent='ae_frame' offset='10' />
+					<left parent='ae_frame' offset='10' />
+					<right parent='ae_frame' offset='-5' />
+					<bottom parent='ae_frame' offset='-10' />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
 				<activate />
@@ -31,359 +31,187 @@
 		</sheetdata>
 	</windowclass>
 
+	<!-- advanced effects subwindow with frame 5E-->
+	<template name='sub_advanced_effects'>
+		<sub_content_framed_groupbox_bottom name='sub_advance_effects'>
+			<class>advanced_effects_subwindow</class>
+		</sub_content_framed_groupbox_bottom>
+	</template>
+
 	<!-- advanced effects subwindow -->
-    <windowclass name="advanced_effects_subwindow">
-		<margins control="0,0,2,2" />
-        <script>
-			local function isVisible(nodeRecord)
-				local bID = ItemManager.getIDState(nodeRecord);
-				local bPlayerEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
-				return not nodeRecord.isReadOnly() and (Session.IsHost or (DB.getPath(nodeRecord):match("^charsheet") and bID and bPlayerEdit));
-			end
-            function onInit()
-				local bVisible = isVisible(getDatabaseNode());
-				header_effects.setVisible(bVisible);
-				effects_list_iedit.setVisible(bVisible);
-				effects_list_iadd.setVisible(bVisible);
-				effects_list.setVisible(bVisible);
-            end
-			function onDrop(_, _, draginfo)
-				if draginfo.getType() == 'effect' then
-					local nodeAdvEffect = DB.createChild(DB.getChild(getDatabaseNode(), 'effectlist'));
-					local rEffect = EffectManager.decodeEffectFromText(draginfo.getStringData(), draginfo.getSecret());
-					DB.setValue(nodeAdvEffect, 'effect', 'string', rEffect.sName);
-					DB.setValue(nodeAdvEffect, 'durmod', 'number', draginfo.getNumberData());
-					if rEffect.sUnits then DB.setValue(nodeAdvEffect, 'durunit', 'string', rEffect.sUnits); end
-					if rEffect.nGMOnly == 1 then DB.setValue(nodeAdvEffect, 'visibility', 'string', 'hide'); end
-				end
-			end
-        </script>
+    <windowclass name='advanced_effects_subwindow'>
+		<!-- <margins control='0,0,2,2' /> -->
+		<margins control='0,0,0,5' />
+		<script file='utility/scripts/advanced_effects_subwindow.lua' />
 		<sheetdata>
-			<anchor_column name="columnanchor" />
-			<!-- effects -->
-			<header_column name="header_effects">
-				<static textres="header_effects" />
+			<anchor_content_top />
+			<anchor_column name='columnanchor' />
+            <!-- effects -->
+			<header_column name='header_effects'>
+				<static textres='header_effects' />
 				<center />
 			</header_column>
-			<button_iedit name="effects_list_iedit">
-				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
- 				<target>effects_list</target>
-			</button_iedit>
-			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_list_iedit" position="lefthigh" offset="5,0" />
+			<button_iadd name='effects_list_iadd'>
+				<anchored to='header_effects' position='insidetopright'  />
 				<target>effects_list</target>
 			</button_iadd>
-
-			<list_editor_advanced_effects name="effects_list">
-			</list_editor_advanced_effects>
-			<!-- end advanced effects entry -->
+			<list_editor_advanced_effects name='effects_list' />
 		</sheetdata>
-	</windowclass>
+    </windowclass>
 
-	<!-- advanced effect settings -->
-	<windowclass name="advanced_effects_entry">
-		<margins control="0,2,0,2" />
-		<script file="utility/scripts/advanced_effects.lua" />
+    <!-- advanced effect settings -->
+	<windowclass name='advanced_effects_entry'>
+		<margins control='0,2,0,2' />
+		<script file='utility/scripts/advanced_effects.lua' />
 		<sheetdata>
-			<genericcontrol name="rightanchor">
-				<anchored width="0" height="0">
-					<top offset="5" />
-					<right />
-				</anchored>
-				<invisible />
-			</genericcontrol>
-			<genericcontrol name="leftanchor">
-				<anchored width="0" height="0">
-					<top offset="5" />
-					<left />
-				</anchored>
-				<invisible />
-			</genericcontrol>
-
-            <!-- editor button -->
-            <buttoncontrol name="effectdetail">
-				<anchored to="rightanchor" width="20" height="20">
-					<top />
-					<right anchor="left" relation="relative" />
-				</anchored>
-				<state icon="button_details" pressed="button_details_down" />
-				<script file="utility/scripts/effectdetail.lua" />
-			</buttoncontrol>
+			<anchor_listitem_left_sm name='leftanchor' />
+			<anchor_listitem_right_sm name='rightanchor' />
 
             <!-- delete button if in edit mode -->
-			<button_idelete name="idelete">
-				<anchored width="20" height="20">
-					<top parent="effectdetail" anchor="top"/>
-					<right parent="effectdetail" anchor="left" relation="relative"/>
-				</anchored>
-			</button_idelete>
-			<!-- editor button -->
-			<button_details name="effectdetail">
+			<button_listitem_idelete name='idelete' merge='join' >
 				<script>
 					function onInit()
 						if super and super.onInit() then
-							super.onInit()
+							super.onInit();
 						end
-						local node = window.getDatabaseNode();
-						local nodeItem = DB.getChild(node, '...');
-						DB.addHandler(DB.getPath(nodeItem, 'locked'), 'onUpdate', self.update);
-						self.update();
+						self.onEditModeChanged();
 					end
 
-            <hs name="name"/>
-            <basicstring name="effect_description">
-                <script>
-                    function onClickDown(button, x, y)
-                        local w = Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
-						local node = DB.getChild(window.getDatabaseNode(), "...");
-                        w.main.subwindow.name.setValue(DB.getValue(node, "name", ""));
-                        return true;
-                    end
-                </script>
-                <multilinespacing>20</multilinespacing>
-				<anchored to="leftanchor">
+					function setLockMode(bReadOnly)
+					    setVisible(not bReadOnly);
+    					if not Session.IsHost then
+    						local sVis = StringManager.capitalize(DB.getValue(window.getDatabaseNode(), 'visibility', ''));
+							if sVis == Interface.getString('item_label_effects_hide') then
+								setVisible(false);
+							end
+						end
+					end
+
+					function getLockMode()
+						return not isVisible();
+					end
+
+					function onEditModeChanged()
+						if editmode then
+							setVisible(WindowManager.getEditMode(window, editmode[1]));
+						end
+					end
+				</script>
+			</button_listitem_idelete>
+
+           <!-- editor button -->
+            <button_details name='effectdetail'>
+				<anchored to='rightanchor'>
 					<top />
-					<left anchor="right" relation="relative" offset="5" />
-					<right parent="rightanchor" anchor="left" relation="relative" offset="-20" />
+					<right anchor='left' relation='relative' />
 				</anchored>
-				<readonly />
-				<tooltip textres="item_label_effects_string_tooltip" />
-			</basicstring>
+				<script file='utility/scripts/effectdetail.lua' />
+			</button_details>
 
-		</sheetdata>
+            <hs name='name'/>
+            <basicstring name='effect_description'>
+                <multilinespacing>20</multilinespacing>
+				<anchored to='leftanchor'>
+					<top />
+					<left anchor='right' relation='relative' offset='5' />
+                    <right parent='rightanchor' anchor='left' relation='relative' offset='-20' />
+				</anchored>
+                <readonly />
+                <tooltip textres='item_label_effects_string_tooltip' />
+            </basicstring>
+
+        </sheetdata>
 	</windowclass>
 
-	<!-- advanced effect edit window -->
-	<windowclass name="advanced_effect_editor">
-		<frame>charsheethelper</frame>
-		<placement>
-			<size width="350" height="280" />
-		</placement>
+	<windowclass name='advanced_effect_editor' copy='charsheethelper_base'>
 		<sizelimits>
-			<minimum width="350" height="250" />
-			<dynamic />
+			<minimum width='350' height='250' />
 		</sizelimits>
-		<nodelete />
-		<playercontrol />
-		<tooltip control="name" />
 		<sheetdata>
-			<windowtitlebar name="title">
-				<resource>power_title_effect</resource>
-			</windowtitlebar>
-			<anchor_title_charsheethelper name="contentanchor" />
-
-			<genericcontrol name="contentframe">
-				<anchored to="contentanchor">
-					<top anchor="bottom" offset="0" />
-					<left />
-					<right />
-					<bottom parent="" offset="-30" />
-				</anchored>
-			</genericcontrol>
-
-			<subwindow_record name="main">
-				<class>advanced_effect_editor_main</class>
-				<activate />
-				<fastinit />
-			</subwindow_record>
-
-			<scrollbar_record>
-				<target>main</target>
-			</scrollbar_record>
-
-			<resize_charsheethelper />
-			<close_charsheethelper />
+			<windowtitlebar_charsheethelper name='title'>
+				<prefix>power_title_effect</prefix>
+			</windowtitlebar_charsheethelper>
+			<sub_content_framed_groupbox name='content'>
+				<class>advanced_effect_editor_content</class>
+			</sub_content_framed_groupbox>
 		</sheetdata>
 	</windowclass>
 
-	<windowclass name="advanced_effect_editor_main">
-		<script file="utility/scripts/advanced_effects_editor.lua" />
+	<!-- Editor Window -->
+	<windowclass name='advanced_effect_editor_content'>
+        <script file='utility/scripts/advanced_effects_editor.lua' />
 		<sheetdata>
-			<anchor_column name="columnanchor" />
+			<anchor_column name='columnanchor' />
 
-			<label_column name="name_label">
-				<static textres="power_label_name" />
+			<label_column name='name_label'>
+				<static textres='power_label_name' />
 			</label_column>
-			<stringcontrol name="name">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
-					<left offset="97" />
-					<right offset="-5" />
-				</anchored>
-				<multilinespacing>20</multilinespacing>
-				<font>sheettext</font>
-				<readonly />
-			</stringcontrol>
+			<stringc_column name='name' />
 
-            <!-- effect type cycler here -->
-			<label_column name="type_label">
-				<static textres="power_label_type" />
-				<tooltip textres="power_label_type_tooltip" />
-			</label_column>
-
-            <cycler_effecttypes name="type">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
-					<left offset="97" />
-					<right offset="-110" />
-				</anchored>
-            </cycler_effecttypes>
-
-			<header_column name="header_label">
-				<static textres="power_header_effect" />
+			<header_column name='header_label'>
+				<static textres='power_header_effect' />
 				<center />
 			</header_column>
 
-
             <!-- effect / label -->
-			<string_column_full name="effect">
+			<string_column_full name='effect'>
 				<delaykeyupdate />
 			</string_column_full>
 
-            <!-- effect is a label only -->
-			<string_column_full name="label_only" />
-
-            <!-- SAVE types -->
-			<cycler_savetypes name="save_type">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
-					<left offset="5" />
-					<right offset="-250" />
-				</anchored>
-				<tooltip textres="item_save_type_tooltip" />
-			</cycler_savetypes>
-
-			<cycler_saves name="save">
-                <anchored to="save_type" position="righthigh" offset="10,0" width="70"  height="20"/>
-                <tooltip textres="item_label_save_type_tooltip" />
-			</cycler_saves>
-
- 			<advanced_effect_number name="save_modifier">
-				<anchored to="save" position="righthigh" offset="10,0" width="20"  height="20"/>
-                <tooltip textres="item_label_save_value_tooltip" />
-			</advanced_effect_number>
-
-			<combobox_bonus_types name="save_bonus_type">
-				<anchored to="save_modifier" position="righthigh" offset="10,0" width="100"  height="20"/>
-			</combobox_bonus_types>
-
-            <!-- ability version -->
-			<cycler_abilitytypes name="ability_type">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
-					<left offset="5" />
-					<right offset="-230" />
-				</anchored>
-				<tooltip textres="item_ability_type_tooltip" />
-			</cycler_abilitytypes>
-
-			<cycler_ability_short name="ability">
-				<anchored to="ability_type" position="righthigh" offset="10,0" width="80" height="20"/>
-			</cycler_ability_short>
-
-			<cycler_ability_long name="ability_check">
-                <anchored to="ability_type" position="righthigh" offset="10,0" width="80"  height="20"/>
-			</cycler_ability_long>
-
-			<advanced_effect_number name="ability_modifier">
-				<anchored to="ability" position="righthigh" offset="10,0" width="20" height="20"/>
-			</advanced_effect_number>
-
-			<combobox_bonus_types name="ability_bonus_type">
-				<anchored to="ability_modifier" position="righthigh" offset="10,0" width="100"  height="20"/>
-			</combobox_bonus_types>
-
-            <!-- Susceptiblity version -->
-			<cycler_susceptiblitytypes name="susceptiblity_type">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
-					<left offset="5" />
-					<right offset="-230" />
-				</anchored>
-				<tooltip textres="item_ability_type_tooltip" />
-			</cycler_susceptiblitytypes>
-
-            <combobox_damage_types name="susceptiblity">
-                <anchored to="susceptiblity_type" position="righthigh" relation="relative" offset="10,0" width="80"  height="20"/>
-			</combobox_damage_types>
-
-			<advanced_effect_number name="susceptiblity_modifier">
-				<anchored to="susceptiblity" position="righthigh" offset="10,0" width="20" height="20"/>
-			</advanced_effect_number>
-
-			<!-- misc version -->
-			<cycler_misctypes name="misc_type">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
-					<left offset="5" />
-					<right offset="-230" />
-				</anchored>
-				<tooltip textres="effect_label_misc_type_tooltip" />
-			</cycler_misctypes>
-
-			<advanced_effect_number name="misc_modifier">
-				<anchored to="misc_type" position="righthigh" offset="10,0" width="20" height="20"/>
-				<tooltip textres="effect_label_misc_value_tooltip" />
-			</advanced_effect_number>
-
-			<combobox_bonus_types name="misc_bonus_type">
-				<anchored to="misc_modifier" position="righthigh" offset="10,0" width="100"  height="20"/>
-			</combobox_bonus_types>
-
-			<combobox_attack_types name="misc_attack_type">
-				<anchored to="misc_bonus_type" position="righthigh" offset="10,0" width="70"  height="20"/>
-			</combobox_attack_types>
-
             <!-- duration header-->
-			<header_column name="header_duration">
-				<static textres="power_header_effect_duration" />
+			<header_column name='header_duration'>
+				<static textres='power_header_effect_duration' />
 				<center />
 			</header_column>
 
             <!-- duration dice -->
-			<basicdice name="durdice">
-				<anchored width="50" height="20">
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="17" />
-					<left offset="5" />
+			<basicdice name='durdice'>
+				<anchored width='50' height='20'>
+					<top parent='columnanchor' anchor='bottom' relation='relative' offset='17' />
+					<left offset='5' />
 				</anchored>
-				<hideonvalue value="0" />
-				<tooltip textres="power_label_duration_dice_tooltip" />
+				<hideonvalue value='0' />
+				<tooltip textres='power_label_duration_dice_tooltip' />
 			</basicdice>
+
 			<label_fieldtop>
-				<anchored to="durdice" />
-				<static textres="item_label_effects_dice" />
-				<tooltip textres="item_effects_dice_tooltip" />
+				<anchored to='durdice' />
+				<static textres='item_label_effects_dice' />
+				<tooltip textres='item_effects_dice_tooltip' />
 			</label_fieldtop>
 
             <!-- duration modifier -->
-			<advanced_effect_number name="durmod">
-				<anchored to="durdice" position="righthigh" offset="10,0" width="20" height="20" />
-				<tooltip textres="power_label_duration_mod_tooltip" />
+			<advanced_effect_number name='durmod'>
+				<anchored to='durdice' position='righthigh' offset='10,0' width='20' height='20' />
+                <tooltip textres='power_label_duration_mod_tooltip' />
 			</advanced_effect_number>
+
 			<label_fieldtop>
-				<anchored to="durmod" />
-				<static textres="text_MOD" />
-				<tooltip textres="item_label_effects_mod_tooltip" />
+				<anchored to='durmod' />
+				<static textres='text_MOD' />
+				<tooltip textres='item_label_effects_mod_tooltip' />
 			</label_fieldtop>
 
             <!-- duration unit -->
-			<button_stringcycler name="durunit">
-				<anchored to="durmod" position="righthigh" offset="10,0" width="40" height="20" />
+			<button_stringcycler name='durunit'>
+				<anchored to='durmod' position='righthigh' offset='10,0' width='40' height='20' />
 				<parameters>
 					<defaultlabelres>effect_label_durunitrnd</defaultlabelres>
 					<labelsres>effect_label_durunitmin|effect_label_durunithr|effect_label_durunitday</labelsres>
 					<values>minute|hour|day</values>
 				</parameters>
 			</button_stringcycler>
+
 			<label_fieldtop>
-				<anchored to="durunit" />
-				<static textres="item_label_effects_unit" />
-				<tooltip textres="item_label_effects_unit_tooltip" />
+				<anchored to='durunit' />
+				<static textres='item_label_effects_unit' />
+				<tooltip textres='item_label_effects_unit_tooltip' />
 			</label_fieldtop>
 
             <!-- show/hide effect -->
-			<button_stringcycler name="visibility">
-				<script>
+			<button_stringcycler name='visibility'>
+				<anchored to='durunit' position='righthigh' offset='10,0' width='40' height='20' />
+					<script>
 					function onInit()
 						if super and super.onInit() then
 							super.onInit()
@@ -395,20 +223,22 @@
 						end
 					end
 				</script>
-				<anchored to="durunit" position="righthigh" offset="10,0" width="40" height="20" />
 				<parameters>
-					<defaultlabelres>dash</defaultlabelres>
-					<labelsres>item_label_effects_hide|item_label_effects_show</labelsres>
-					<values>hide|show</values>
+                    <defaultlabelres>item_label_effects_show</defaultlabelres>
+					<labelsres>item_label_effects_show|item_label_effects_hide</labelsres>
+					<values>Show|Hide</values>
 				</parameters>
-				<tooltip textres="item_label_effect_visible_tooltip" />
+                <tooltip textres='item_label_effect_visible_tooltip' />
 			</button_stringcycler>
-			<label_fieldtop>
-				<anchored to="visibility" />
-				<static textres="item_label_effect_visible" />
-				<tooltip textres="item_label_effect_visible_tooltip" />
-			</label_fieldtop>
 
+			<label_fieldtop>
+				<anchored to='visibility' />
+				<static textres='item_label_effect_visible' />
+				<script>
+					function onInit()
+						if super and super.onInit() then
+							super.onInit()
+						end
 						if Session.IsHost then
 							self.setVisible(true);
 						else
@@ -416,17 +246,16 @@
 						end
 					end
 				</script>
-				<anchored to="visibility" />
-				<static textres="item_label_effect_visible" />
-				<tooltip textres="item_label_effect_visible_tooltip" />
 			</label_fieldtop>
 
-			<!-- weapon/attack effect only? -->
-			<button_checkbox name="actiononly">
+            <!-- weapon/attack effect only? -->
+			<button_checkbox name='actiononly'>
+				<anchored to='visibility' position='righthigh' offset='10,0' width='10' height='20' />
+				<tooltip textres='item_label_effect_attackonly_tooltip' />
 				<script>
 					function onInit()
 						if super and super.onInit() then
-							super.onInit()
+							super.onInit();
 						end
 						local node = window.getDatabaseNode();
 						local nodeItem = DB.getChild(node, '...');
@@ -441,14 +270,13 @@
 						end
 					end
 				</script>
-				<anchored to="visibility" position="righthigh" offset="10,0" width="10" height="20" />
-				<tooltip textres="item_label_effect_attackonly_tooltip" />
 			</button_checkbox>
-			<label>
+
+			<label name='actiononlylabel'>
 				<font>sheetlabelmini</font>
-				<anchored to="actiononly" position="righthigh" offset="2,0"/>
-					<static textres="item_label_effect_attackonly" />
-					<tooltip textres="item_label_effect_attackonly_tooltip" />
+				<anchored to='actiononly' position='righthigh' offset='2,0'/>
+					<static textres='item_label_effect_attackonly' />
+					<tooltip textres='item_label_effect_attackonly_tooltip' />
 			</label>
 		</sheetdata>
 	</windowclass>

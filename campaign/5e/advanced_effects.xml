@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root>
+    <!-- Add action only functionality to Weapons -->
+    <windowclass name='char_weapon' merge='join'>
+        <script file='campaign/scripts/char_weapon_adnd.lua' />
+    </windowclass>
+
+    <!-- Add To Feats -->
+    <windowclass name='reference_feat' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='sub_version'/>
+        </sheetdata>
+    </windowclass>
+
+    <!-- Add to class Features -->
+    <windowclass name='reference_classfeature' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='content'/>
+        </sheetdata>
+    </windowclass>
+
+    <!-- Add to Racial Traits -->
+    <windowclass name='reference_racialtrait' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='content'/>
+        </sheetdata>
+    </windowclass>
+
+    <!-- Add to Items -->
+    <windowclass name='item' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='sub_version'/>
+        </sheetdata>
+    </windowclass>
+
+    <!-- Add to NPCs -->
+    <windowclass name='npc' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='sub_version'/>
+        </sheetdata>
+    </windowclass>
+
+    <!-- Add to charsheet abilities tab -->
+    <windowclass name='charsheet_abilities' merge='join' insertafter='languages'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='content'/>
+        </sheetdata>
+    </windowclass>
+
+        <windowclass name='vehicle' merge='join'>
+        <sheetdata>
+            <sub_advanced_effects name='sub_advanced_effects'  insertbefore='sub_version'/>
+        </sheetdata>
+    </windowclass>
+
+</root>
