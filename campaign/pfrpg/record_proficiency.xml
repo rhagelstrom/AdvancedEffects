@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root>
+    <windowclass name='referenceproficiency' merge='join'>
+        <script file="common/scripts/record_window_tabbed.lua" />
+        <tab>
+			<name>main</name>
+			<resource>tab_main</resource>
+			<class>record_content_text</class>
+			<embed />
+		</tab>
+        <tab merge="add">
+			<name>effects</name>
+			<resource>tab_ae</resource>
+			<class>advanced_effects</class>
+		</tab>
+    </windowclass>
+</root>

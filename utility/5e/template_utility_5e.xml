@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+
+<!--
+  Please see the LICENSE.md file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root>
+<!-- 5E hide the record version and replace with menubar button. See 5E menubar manager -->
+	<template name='sub_record_version' merge='join'>
+		<sub_content_framed_groupbox_bottom name='sub_version'>
+			<script>
+				function onInit()
+					self.setVisible(false);
+				end
+			</script>
+		</sub_content_framed_groupbox_bottom>
+	</template>
+</root>

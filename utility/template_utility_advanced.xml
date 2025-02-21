@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version='1.0' encoding='iso-8859-1'?>
 
 <!--
   Please see the LICENSE.md file included with this distribution for
@@ -6,144 +6,24 @@
 -->
 
 <root>
-	<template name="list_editor_advanced_effects">
-		<windowlist name="list">
+	<template name='list_editor_advanced_effects'>
+		<windowlist name='list'>
 			<anchored>
-				<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+				<top parent='columnanchor' anchor='bottom' relation='relative' offset='0' />
 				<left />
 				<right />
 			</anchored>
-			<allowdelete />
 			<child></child>
-			<child><backcolor>1A40301E</backcolor></child>
 			<datasource>.effectlist</datasource>
 			<class>advanced_effects_entry</class>
-			<script file="utility/scripts/list_editor_advanced_effects.lua" />
+			<sortby>
+				<control>effect_description</control>
+			</sortby>
+			<script file='utility/scripts/list_editor_advanced_effects.lua' />
 		</windowlist>
 	</template>
 
-	<template name="cycler_abilitytypes">
-		<button_stringcycler>
-			<parameters>
-                <defaultlabelres mergerule="replace">modifier</defaultlabelres>
-				<labelsres>check</labelsres>
-                <values>check</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="cycler_ability_short">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">strength</defaultlabelres>
-				<labelsres>dexterity|constitution|intelligence|wisdom|charisma</labelsres>
-				<values>dex|con|int|wis|cha</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="cycler_ability_long">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">strength</defaultlabelres>
-				<labelsres>dexterity|constitution|intelligence|wisdom|charisma</labelsres>
-				<values>dexterity|constitution|intelligence|wisdom|charisma</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="combobox_bonus_types">
-			<combobox>
-				<listdirection>down</listdirection>
-				<script>
-					function onInit()
-						super.onInit();
-						addItems(DataCommon.bonustypes);
-						add("none");
-					end
-				</script>
-			<listmaxsize>3</listmaxsize>
-			</combobox>
-	</template>
-
-	<template name="combobox_attack_types">
-			<combobox>
-				<listdirection>down</listdirection>
-				<script>
-					function onInit()
-						super.onInit();
-						addItems(DataCommon.rangetypes);
-						add("none");
-					end
-				</script>
-			<listmaxsize>3</listmaxsize>
-			</combobox>
-	</template>
-
-	<template name="cycler_effecttypes">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">dash</defaultlabelres>
-				<labelsres>save|ability|susceptiblity|misc_ae|label</labelsres>
-                <values>save|ability|susceptiblity|misc_ae|label</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="cycler_savetypes">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">modifier</defaultlabelres>
-				<labelsres>modifier</labelsres>
-				<values>modifier</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="cycler_saves">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">fortitude</defaultlabelres>
-				<labelsres>reflex|will</labelsres>
-				<values>reflex|will</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="cycler_susceptiblitytypes">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">immune</defaultlabelres>
-				<labelsres>resist|vuln</labelsres>
-				<values>resist|vuln</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-	<template name="combobox_damage_types">
-			<combobox>
-				<listdirection>down</listdirection>
-				<script>
-					function onInit()
-						super.onInit();
-						addItems(DataCommon.dmgtypes);
-					end
-				</script>
-				<listmaxsize>3</listmaxsize>
-			</combobox>
-	</template>
-
-	<template name="cycler_misctypes">
-		<button_stringcycler>
-			<parameters>
-				<defaultlabelres mergerule="replace">ac</defaultlabelres>
-				<labelsres>atk|dmg|heal|init_ae</labelsres>
-                <values>atk|dmg|heal|init</values>
-			</parameters>
-		</button_stringcycler>
-	</template>
-
-    <template name="advanced_effect_number">
+	<template name='advanced_effect_number'>
         <basicnumber>
             <default>0</default>
             <hideonvalue>0</hideonvalue>
