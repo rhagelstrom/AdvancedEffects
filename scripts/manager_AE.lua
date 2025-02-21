@@ -291,6 +291,57 @@ local function getEffectsByType_new(rActor, sEffectType, aFilter, rFilterActor, 
 	return results
 end
 
+function checkConditionalHelper_new(rActor, sEffect, rTarget, aIgnore)
+	Debug.chat('checkConditionalHelper_new', rActor, sEffect, rTarget, aIgnore)
+	if not rActor then
+		return false;
+	end
+	
+	local aEffects
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType)
+	else
+		aEffects = DB.getChildList(ActorManager.getCTNode(rActor), 'effects')
+	end
+	for _,v in ipairs(aEffects) do
+		if isValidCheckEffect(rActor, v) and not StringManager.contains(aIgnore, DB.getPath(v)) then
+			-- Parse each effect label
+			local sLabel = DB.getValue(v, "label", "");
+			local aEffectComps = EffectManager.parseEffect(sLabel);
+
+			-- Iterate through each effect component looking for a type match
+			for _,sEffectComp in ipairs(aEffectComps) do
+				local rEffectComp = EffectManager35E.parseEffectComp(sEffectComp);
+				
+				--Check conditionals
+				if rEffectComp.type == "IF" then
+					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
+						break;
+					end
+				elseif rEffectComp.type == "IFT" then
+					if not rTarget then
+						break;
+					end
+					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
+						break;
+					end
+				
+				-- Check for match
+				elseif rEffectComp.original:lower() == sEffect then
+					if EffectManager.isTargetedEffect(v) then
+						if EffectManager.isEffectTarget(v, rTarget) then
+							return true;
+						end
+					else
+						return true;
+					end
+				end
+			end
+		end
+	end
+	return false;
+end
+
 -- this will be used to manage PC/NPC effectslist objects
 -- nodeCharEffect: node in effectlist on PC/NPC
 -- nodeEntry: node in combat tracker for PC/NPC
@@ -665,6 +716,7 @@ function onInit()
 		ActionDamage.handleApplyDamage = handleApplyDamage
 		OOBManager.registerOOBMsgHandler(ActionDamage.OOB_MSGTYPE_APPLYDMG, handleApplyDamage)
 	end
+	EffectManager35E.checkConditionalHelper = checkConditionalHelper_new
 
 	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
 	OptionsManager.registerOption2('ADND_AE_EDIT', false, 'option_header_houserule', 'option_label_ADND_AE_EDIT', 'option_entry_cycler', {
