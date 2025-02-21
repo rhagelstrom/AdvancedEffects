@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root version='3.3'>
+    <script name='AbilityHandlersD20AE' file='scripts/d20/ability_handlers_d20_ae.lua' />
+	<script name='ItemHandlersD20AE' file='scripts/d20/item_handlers_d20_ae.lua'/>
+	<script name='ActionsManagerD20AE' file='scripts/d20/manager_actions_d20_ae.lua' />
+	<script name='CharManagerD20AE' file='scripts/d20/manager_char_d20_ae.lua' />
+	<script name='CombatRecordManagerD20AE' file='scripts/d20/manager_combat_record_d20_ae.lua' />
+    <script name='AdvancedEffects' file='scripts/d20/manager_d20_ae.lua' />
+</root>

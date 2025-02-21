@@ -8,7 +8,7 @@
 
 ## Description
 
-How does it work? When you apply the extension to a 5E campaign you'll notice a new field on items, npcs and character sheets (under Abilities tab) called "Effect Features". \
+How does it work? When you apply the extension to a 5E/3.5E/PFRPG campaign you'll notice a new field on items, npcs and character sheets (under Abilities tab) called "Effect Features". \
 \
 For items, when you add an effect such as "IFT: ALIGN (evil); AC: 2;" it will be placed on the owner of the item if they equipped the item and are in the combat tracker. \
 \

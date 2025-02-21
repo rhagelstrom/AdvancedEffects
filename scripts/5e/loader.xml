@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
+
+<root version='3.3'>
+	<script name='ActionAttack5EAE' file='scripts/5e/manager_action_attack_5e_ae.lua' />
+	<script name='ActionDamage5EAE' file='scripts/5e/manager_action_damage_5e_ae.lua' />
+	<script name='EffectManager5EAE' file='scripts/5e/manager_effect_5e_ae.lua' />
+	<script name='EffectManagerADND' file='scripts/5e/manager_effect_5e_adnd_ae.lua' />
+	<script name='MenubarManager5EAE' file='scripts/5e/manager_menubar_5e_ae.lua' />
+</root>
