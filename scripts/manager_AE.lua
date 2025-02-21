@@ -7,7 +7,7 @@
 -- Effects on Items, apply to character in CT
 --
 
--- luacheck: globals CombatManagerKel hasEffectCondition_new notifyApplyDamage TurboManager
+-- luacheck: globals CombatManagerKel hasEffectCondition_new TurboManager checkConditionalHelper_new
 local function sendRawMessage(sUser, nGMOnly, msg)
 	local sIdentity = nil
 	if sUser and sUser ~= '' then

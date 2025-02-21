@@ -3,7 +3,7 @@
 -- attribution and copyright information.
 --
 
--- luacheck: globals onDamageChanged
+-- luacheck: globals onDamageChanged button_damage
 function onDamageChanged()
 	local nodeWeapon = getDatabaseNode()
 	local nodeChar = DB.getChild(nodeWeapon, '...')
