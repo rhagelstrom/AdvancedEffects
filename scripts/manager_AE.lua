@@ -712,11 +712,11 @@ function onInit()
 		EffectManager35E.getEffectsByType = getEffectsByType_new
 		EffectManager35E.hasEffect = hasEffect_new
 		EffectManager35E.hasEffectCondition = hasEffectCondition_new
+		EffectManager35E.checkConditionalHelper = checkConditionalHelper_new
 		ActionDamage.notifyApplyDamage = notifyApplyDamage
 		ActionDamage.handleApplyDamage = handleApplyDamage
 		OOBManager.registerOOBMsgHandler(ActionDamage.OOB_MSGTYPE_APPLYDMG, handleApplyDamage)
 	end
-	EffectManager35E.checkConditionalHelper = checkConditionalHelper_new
 
 	-- option in house rule section, enable/disable allow PCs to edit advanced effects.
 	OptionsManager.registerOption2('ADND_AE_EDIT', false, 'option_header_houserule', 'option_label_ADND_AE_EDIT', 'option_entry_cycler', {
