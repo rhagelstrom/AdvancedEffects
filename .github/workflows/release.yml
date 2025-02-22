@@ -6,7 +6,7 @@ on:
 
 name: Release Build
 
-permissions: write-all
+permissions: read-all
 
 env:
   EXTENSION: ${{ vars.FORGE_EXTENSION }}
@@ -17,6 +17,9 @@ env:
 
 jobs:
   build:
+    permissions:
+      attestations: write 
+
     name: Create Release
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +47,8 @@ jobs:
   upload:
     name: Upload to Forge
     runs-on: ubuntu-latest
+    permissions:
+      attestations: write 
 
     needs: build
     if: ${{ vars.FORGE_ITEM_ID != "" }} && ${{ env.UPLOAD != "false" }}
