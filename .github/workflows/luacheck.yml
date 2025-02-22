@@ -12,6 +12,8 @@ on:
 
 name: Run Luacheck
 
+permissions: read-all
+
 jobs:
   getnames:
     runs-on: ubuntu-latest
