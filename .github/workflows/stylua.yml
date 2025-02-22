@@ -12,6 +12,8 @@ on:
 
 name: Run Stylua
 
+permissions: read-all
+
 jobs:
   stylua:
     runs-on: ubuntu-latest
