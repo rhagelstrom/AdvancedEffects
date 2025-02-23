@@ -105,15 +105,20 @@ function update()
         if sVisible == 'hide' then
             effect_description.setVisible(false);
             effectdetail.setVisible(false);
+			idelete.setVisible(false);
         elseif sVisible == 'show' then
             effect_description.setVisible(true);
             effectdetail.update();
+			idelete.update()
+
         elseif sVisible == '' and bReadOnly == 1 then
             effect_description.setVisible(false);
             effectdetail.setVisible(false);
+			idelete.setVisible(false);
         else
             effect_description.setVisible(true);
             effectdetail.update();
+			idelete.update();
         end
     end
 

@@ -8,7 +8,7 @@ function onInit()
     DB.addHandler(sPath .. '.locked', 'onUpdate', update);
 
     header_effects.setVisible(true);
-    effects_iedit.setVisible(true);
+    -- effects_iedit.setVisible(true);
     effects_list_iadd.setVisible(true);
     effects_list.setVisible(true);
     update()
@@ -22,12 +22,12 @@ function update()
     local bReadOnly = WindowManager.getReadOnlyState(nodeRecord);
 
     if bReadOnly then
-        effects_iedit.setVisible(false);
+        -- effects_iedit.setVisible(false);
         effects_list_iadd.setVisible(false);
         effects_list.update(bReadOnly);
 
     else
-        effects_iedit.setVisible(true);
+        -- effects_iedit.setVisible(true);
         effects_list_iadd.setVisible(true);
         effects_list.update(bReadOnly);
     end

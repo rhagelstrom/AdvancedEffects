@@ -21,6 +21,7 @@
 			<noscroll />
 			<script>
 				function onInit()
+					self.onEditModeChanged();
 					registerMenuItem(Interface.getString("list_menu_createitem"), "insert", 5);
 				end
 
@@ -34,17 +35,17 @@
 					update();
 				end
 
+				function onEditModeChanged()
+					Debug.chat("changed");
+				end
 				function update()
-					local bEdit = (window.effects_iedit.getValue() == 1);
 					for _,w in ipairs(getWindows()) do
 						local node = w.getDatabaseNode();
 						local sVis = DB.getValue(node, 'visibility', '');
 						if not Session.IsHost and sVis == 'hide' then
-							w.idelete.setVisibility(false);
-							w.spacer.setVisible(true);
+							w.idelete.setVisible(false);
 						else
-							w.idelete.setVisibility(bEdit);
-							w.spacer.setVisible(not bEdit);
+							w.idelete.setLockMode(true);
 						end
 					end
 				end

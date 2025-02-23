@@ -24,17 +24,8 @@
 				<static textres="header_effects" />
 				<center />
 			</header_column>
-			<button_iedit name="effects_iedit">
-				<anchored to="header_effects" position="insidetopright" offset="8,0" />
-				<script>
-					function onValueChanged()
-						local bEditMode = (getValue() == 1);
-						window.effects_list.update();
-					end
-				</script>
-			</button_iedit>
 			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<anchored to="header_effects" position="insidetopright"  />
 				<target>effects_list</target>
 			</button_iadd>
 
@@ -75,17 +66,28 @@
 			</genericcontrol>
 			<!-- delete button if in edit mode -->
 			<button_idelete name="idelete">
+				<script>
+				function update()
+						if super and super.update() then
+							super.update();
+						end
+						local node = window.getDatabaseNode();
+						local nodeItem = DB.getChild(node, '...');
+						local bReadOnly = DB.getValue(nodeItem, 'locked', 0);
+						if bReadOnly == 0 then
+							self.setVisible(true);
+						else
+							self.setVisible(false);
+						end
+					end
+				</script>
+				<!-- <editmode>list_iedit</editmode> -->
 				<anchored to="rightanchor">
+
 					<top offset="-2" />
 					<right anchor="left" relation="relative" offset="-18" />
 				</anchored>
 			</button_idelete>
-			<genericcontrol name="spacer">
-				<anchored to="rightanchor" height="20" width="20">
-					<top offset="-2" />
-					<right anchor="left" relation="relative" offset="-18" />
-				</anchored>
-			</genericcontrol>
 			<!-- editor button -->
 			<button_details name="effectdetail">
 				<script>
