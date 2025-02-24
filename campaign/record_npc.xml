@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- 
+  Please see the LICENSE.md file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+   	<windowclass name="npc_combat_creature" merge="join">
+		<sheetdata>
+			<subwindow name="advanced_effects_contents">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="5" />
+					<left offset="5" />
+                    <right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+                <invisible />
+			</subwindow>
+		</sheetdata>
+	</windowclass>
+</root>

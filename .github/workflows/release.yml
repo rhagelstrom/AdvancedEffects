@@ -1,0 +1,117 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Release Build
+
+permissions: read-all
+
+env:
+  EXTENSION: ${{ vars.FORGE_EXTENSION }}
+  IS_PRERELEASE: ${{ contains(github.ref_name,"-rc") }} && ${{ contains(github.ref_name,"-test") }}
+  UPLOAD: "true" # default true
+  README: "true" # default true
+  GRAPH: "true" # default false
+
+jobs:
+  build:
+    permissions:
+      attestations: write 
+
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo Assets
+      uses: actions/checkout@v4
+
+    - name: Zip Assets Into ${{ env.EXTENSION }} File
+      uses: thedoctor0/zip-release@0.7.6
+      with:
+        filename: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+        exclusions: "*.git* /*node_modules/* .editorconfig body.md *.psd *.xcf forge-thumbnail.png thumbnail.png *.toml"
+
+    - name: Add ${{ env.EXTENSION }} File to Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+        prerelease: ${{ env.IS_PRERELEASE != "false && false" }}
+        generateReleaseNotes: true
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+        path: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+        
+  upload:
+    name: Upload to Forge
+    runs-on: ubuntu-latest
+    permissions:
+      attestations: write 
+
+    needs: build
+    if: ${{ vars.FORGE_ITEM_ID != "" }} && ${{ env.UPLOAD != "false" }}
+
+    steps:
+      - name: Checkout FG-Forge-Updater repository
+        uses: actions/checkout@v4
+        with:
+          repository: "bmos/FG-Forge-Updater"
+          ref: "v1.1"
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install uv and create venv
+        run: |
+          pip install -U pip uv
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -e .
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+
+      - name: Upload ${{ env.EXTENSION }} file to live channel
+        id: upload-live
+        if: ${{ env.IS_PRERELEASE == "false && false" }}
+        env:
+          FG_RELEASE_CHANNEL: Live
+          FG_ITEM_ID: ${{ vars.FORGE_ITEM_ID }}
+          FG_USER_NAME: ${{ vars.FORGE_USER_NAME }}
+          FG_USER_PASS: ${{ secrets.FORGE_USER_PASS }}
+          FG_UL_FILE: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+          FG_README_UPDATE: ${{ env.README != "false" }}
+          FG_UPLOAD_BUILD: ${{ env.UPLOAD != "false" }}
+          FG_GRAPH_SALES: ${{ env.GRAPH == "true" }}
+        run: |
+          python -m src.main
+
+      - name: Upload ${{ env.EXTENSION }} file to test channel
+        id: upload-test
+        if: ${{ env.IS_PRERELEASE != "false && false" }}
+        env:
+          FG_RELEASE_CHANNEL: Test
+          FG_ITEM_ID: ${{ vars.FORGE_ITEM_ID }}
+          FG_USER_NAME: ${{ vars.FORGE_USER_NAME }}
+          FG_USER_PASS: ${{ secrets.FORGE_USER_PASS }}
+          FG_UL_FILE: ${{ github.event.repository.name }}${{ env.EXTENSION }}
+          FG_README_UPDATE: "false"
+          FG_UPLOAD_BUILD: ${{ env.UPLOAD != "false" }}
+          FG_GRAPH_SALES: ${{ env.GRAPH == "true" }}
+        run: |
+          python -m src.main
+
+      - name: Add cumulative users graph to release
+        id: add-graph-artifact
+        uses: ncipollo/release-action@v1
+        if: ${{ env.GRAPH == "true" }}
+        with:
+          artifacts: cumulative_users.png
+          allowUpdates: true
