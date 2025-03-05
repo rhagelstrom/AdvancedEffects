@@ -6,8 +6,17 @@
 
 <root>
     <windowclass name='reference_feat' merge='join'>
-        <sheetdata>
-            <sub_advanced_effects name='sub_advanced_effects' />
-        </sheetdata>
+        <script file="common/scripts/record_window_tabbed.lua" />
+        <tab>
+			<name>main</name>
+			<resource>tab_main</resource>
+			<class>reference_feat_main</class>
+			<embed />
+		</tab>
+        <tab merge="add">
+			<name>effects</name>
+			<resource>tab_ae</resource>
+			<class>advanced_effects</class>
+		</tab>
     </windowclass>
 </root>

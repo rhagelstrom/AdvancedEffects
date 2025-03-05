@@ -281,4 +281,61 @@
 		</sheetdata>
 	</windowclass>
 	<!-- new effect edit window work -->
+
+
+	<windowclass name="advanced_effects">
+		<sheetdata>
+			<anchor_content_top />
+			<anchor_content_bottom />
+			<sub_content_framed_groupbox name="content">
+				<class>advanced_effects_contents</class>
+			</sub_content_framed_groupbox>
+			<scrollbar_content />
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="advanced_effects_contents">
+		<margins control="0,0,0,2" />
+		<script>
+			function onInit()
+			    self.onLockModeChanged(WindowManager.getWindowReadOnlyState(self));
+			end
+			function onLockModeChanged(bReadOnly)
+			    local tFields = { 'advanced_effects_list_iadd' };
+			    WindowManager.callSafeControlsSetLockMode(self, tFields, bReadOnly);
+			end
+		</script>
+		<sheetdata>
+			<anchor_content_top />
+
+			<label_charframetop name="advanced_effects_title">
+				<anchored to="contentanchor" height="20">
+					<top relation="relative" offset="8" postoffset="8" />
+					<left offset="15" />
+					<right offset="-10" />
+				</anchored>
+				<static textres="header_effects" />
+				<icons>header_ae</icons>
+			</label_charframetop>
+
+			<list_content_noscroll_alternating_top name="advanced_effects_list">
+				<anchored>
+					<left offset="10" />
+					<right offset="-10" />
+				</anchored>
+				<datasource>.effectlist</datasource>
+				<class>advanced_effects_entry</class>
+				<sortby>
+					<control>name</control>
+				</sortby>
+				<script file='utility/scripts/list_editor_advanced_effects.lua' />
+			</list_content_noscroll_alternating_top>
+
+			<button_iadd name="advanced_effects_list_iadd">
+				<anchored to="advanced_effects_title" position="insidetopright" offset="5,0" />
+				<target>advanced_effects_list</target>
+			</button_iadd>
+		</sheetdata>
+	</windowclass>
+
 </root>

@@ -23,6 +23,8 @@
     <announcement text='Advanced Effects ~dev_version~\rby Celestian, bmos, rmilmine, rhagelstrom, SoxMax, MeAndUnique 2017-2025\rMaintained by rhagelstrom' font='emotefont' icon='AdvancedEffects' />
     <base>
         <icon name='AdvancedEffects' file='graphics/icons/advancedeffects.webp' />
+        <icon name="header_ae" file="graphics/icons/char_left_frame.png" />
+
         <includefile source='strings/strings.xml' />
 
         <includefile source='scripts/d20/loader.xml'/>

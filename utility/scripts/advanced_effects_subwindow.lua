@@ -47,15 +47,6 @@ function onLockModeChanged()
     local bReadOnly = WindowManager.getReadOnlyState(nodeRecord);
     WindowManager.callSafeControlsSetLockMode(self, {'effects_list_iadd'}, bReadOnly);
     self.effects_list.onLockModeChanged(bReadOnly);
-    if bReadOnly then
-        if self.effects_list.getWindowCount(true) == 0 then
-            parentcontrol.setVisible(false);
-        else
-            parentcontrol.setVisible(true);
-        end
-    else
-        parentcontrol.setVisible(true);
-    end
 end
 
 function onDrop(_, _, draginfo)

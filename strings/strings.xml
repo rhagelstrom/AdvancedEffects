@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='iso-8859-1'?>
 <root version='3.0'>
-    <string name='header_effects'>Effect Features</string>
+    <string name='header_effects'>Advanced Effects</string>
     <string name='item_label_effectfeature'>Effect</string>
     <string name='item_label_effect_visible'>Visibility</string>
     <string name='item_label_effect_visible_tooltip'>Always SHOW or HIDE the effect. Default mode shows if item is identified or hides if not.</string>
@@ -55,7 +55,7 @@
     <string name='susceptiblity'>Susceptiblity</string>
     <string name='misc_ae'>Miscellaneous</string>
     <string name='label'>Label Only</string>
-
+    <string name ='tab_ae'>Effects</string>
     <string name='modifier'>Modifier</string>
     <string name='percent_modifier'>% Modifier</string>
     <string name='base'>Base</string>
