@@ -16,6 +16,9 @@
 			<child></child>
 			<datasource>.effectlist</datasource>
 			<class>advanced_effects_entry</class>
+			<sortby>
+				<control>effect_description</control>
+			</sortby>
 			<script file='utility/scripts/list_editor_advanced_effects.lua' />
 		</windowlist>
 	</template>

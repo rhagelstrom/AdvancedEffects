@@ -6,8 +6,10 @@
 
 <root>
 	<windowclass name='npc' merge='join'>
-        <sheetdata>
-            <sub_advanced_effects name='sub_advanced_effects'/>
-        </sheetdata>
+      <tab merge="add">
+        <name>effects</name>
+        <resource>tab_ae</resource>
+        <class>advanced_effects</class>
+      </tab>
     </windowclass>
 </root>

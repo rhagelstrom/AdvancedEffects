@@ -5,9 +5,20 @@
 -->
 
 <root>
-    <windowclass name='charsheet_abilities' merge='join' insertafter='languages'>
-        <sheetdata>
-            <sub_advanced_effects name='sub_advanced_effects' />
-        </sheetdata>
-    </windowclass>
+    <windowclass name="charsheet" merge="join">
+        <script>
+    	    function onInit()
+                local tTabs = WindowTabManager.getTabsFromWindow(self);
+
+                WindowTabManager.registerTab('charsheet', {sName = 'effects', sTabRes = 'tab_ae',
+                    sClass = 'advanced_effects', sInsertBefore = 'notes'})
+
+                WindowTabManager.updateTabDisplay(self, tTabs);
+
+			    if super and super.onInit then
+			        super.onInit();
+			    end
+			end
+        </script>
+	</windowclass>
 </root>
