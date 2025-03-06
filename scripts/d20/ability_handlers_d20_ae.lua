@@ -28,6 +28,15 @@ function onInit()
         DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
         DB.addHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility);
     end
+    DB.addHandler('charsheet.*.effectlist', 'onChildAdded', addAbilityEffect);
+    DB.addHandler('charsheet.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.addHandler('charsheet.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
 end
 
 function onClose()
@@ -47,6 +56,15 @@ function onClose()
         DB.removeHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
         DB.removeHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility);
     end
+    DB.removeHandler('charsheet.*.effectlist', 'onChildAdded', addAbilityEffect);
+    DB.removeHandler('charsheet.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
+    DB.removeHandler('charsheet.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
 end
 
 function replaceAbilityEffects(nodeAbility)
@@ -130,6 +148,9 @@ end
 ---	Triggers after an effect on an ability is deleted, causing a recheck of the effects in the combat tracker
 function removeEffectOnAbilityEffectDelete(node)
     local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(node, '....')));
+    if not nodeCT then
+        nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(node, '..')));
+    end
     if nodeCT then
         checkEffectsAfterDelete(nodeCT);
     end

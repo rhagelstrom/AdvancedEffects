@@ -11,15 +11,7 @@ local EffectManagerAE = nil;
 
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
-    -- option in house rule section, enable/disable allow PCs to edit advanced effects.
-    OptionsManager.registerOption2('ADND_AE_EDIT', false, 'option_header_houserule', 'option_label_ADND_AE_EDIT',
-                                   'option_entry_cycler', {
-        labels = 'option_val_on',
-        values = 'enabled',
-        baselabel = 'option_val_off',
-        baseval = 'disabled',
-        default = 'disabled'
-    });
+
     -- Set up the effect manager proxy functions for the detected ruleset
     if EffectManager35E then
         EffectManagerAE = EffectManager35E;
@@ -245,15 +237,15 @@ end
 function updateItemEffects(nodeItem)
     local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, '...')));
     if not nodeChar then
-        return;
+        nodeChar = ActorManager.getCTNode(ActorManager.resolveActor((nodeItem)));
+        if not nodeChar then
+            return;
+        end
     end
 
     local bEquipped = not DB.getPath(nodeItem):match('inventorylist') or DB.getValue(nodeItem, 'carried', 1) == 2;
     local bID = not DB.getPath(nodeItem):match('inventorylist') or DB.getValue(nodeItem, 'isidentified', 1) == 1;
-    -- local bOptionID = OptionsManager.isOption("MIID", "on");
-    -- if not bOptionID then
-    -- bID = true;
-    -- end
+
 
     for _, nodeItemEffect in ipairs(DB.getChildList(nodeItem, 'effectlist')) do
         AdvancedEffects.updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, bEquipped, bID);
