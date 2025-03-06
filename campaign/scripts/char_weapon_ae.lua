@@ -82,11 +82,6 @@ function onFullAttackAction(draginfo)
         rAttack.order = i;
         table.insert(rRolls, ActionAttack.getRoll(rActor, rAttack));
     end
-    if not OptionsManager.isOption('RMMT', 'off') and (#rRolls > 1) then
-        for _, v in ipairs(rRolls) do
-            v.sDesc = v.sDesc .. ' [FULL]';
-        end
-    end
 
     if addAttackItems(rActor, nodeWeapon, draginfo) then
         ActionsManager.performMultiAction(draginfo, rActor, 'attack', rRolls);
@@ -118,7 +113,6 @@ function onAttackAction(draginfo)
     local rAction = CharWeaponManager.buildAttackAction(nodeChar, nodeWeapon);
     local rActor = ActorManager.resolveActor(nodeChar);
 
-    Debug.chat("OnAttackAction")
     if rAction.range == 'R' then
         CharWeaponManager.decrementAmmo(nodeChar, nodeWeapon);
     end
