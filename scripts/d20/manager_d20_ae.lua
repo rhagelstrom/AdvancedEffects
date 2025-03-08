@@ -131,9 +131,7 @@ function updateCharEffect(nodeCharEffect, nodeEntry)
     end
     local nGMOnly = 0;
     local sVisibility = StringManager.capitalize(DB.getValue(nodeCharEffect, 'visibility', ''));
-    if sVisibility == Interface.getString('item_label_effects_show') then
-        nGMOnly = 0;
-    elseif sVisibility == Interface.getString('item_label_effects_hide') then
+    if sVisibility == Interface.getString('item_label_effects_hide') then
         nGMOnly = 1;
     end
     if not ActorManager.isPC(nodeEntry) then

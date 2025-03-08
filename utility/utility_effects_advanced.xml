@@ -218,8 +218,8 @@
 				</script>
 				<parameters>
                     <defaultlabelres>item_label_effects_show</defaultlabelres>
-					<labelsres>item_label_effects_show|item_label_effects_hide</labelsres>
-					<values>Show|Hide</values>
+					<labelsres>item_label_effects_hide</labelsres>
+					<values>Hide</values>
 				</parameters>
                 <tooltip textres='item_label_effect_visible_tooltip' />
 			</button_stringcycler>

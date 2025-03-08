@@ -48,10 +48,11 @@ function update()
     end
     local sEffect = DB.getValue(node, 'effect', '');
     local sVis = StringManager.capitalize(DB.getValue(node, 'visibility', ''));
-    local sVisible = sVis;
     if sVis == '' then
         sVis = Interface.getString('item_label_effects_show');
     end
+    local sVisible = sVis;
+
     sVis = ' [' .. sVis .. ']';
 
     if sDuration ~= '' then

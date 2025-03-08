@@ -11,8 +11,8 @@ function onInit()
     DB.addHandler(nodePath .. '.locked', 'onUpdate', onLockModeChanged);
     if not Session.IsHost then
         DB.addHandler(nodePath .. '.isidentified', 'onUpdate', updateVis);
+        updateVis();
     end
-    updateVis();
     onLockModeChanged();
 end
 

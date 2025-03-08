@@ -10,12 +10,6 @@ local function hideNpcEffects(nodeAdvEffect)
 	if DB.getPath(nodeAdvEffect):match('npc%.id%-%d+') then
 		return;
 	end -- not for reference npcs
-
-	local sVisibility = StringManager.capitalize(DB.getValue(nodeAdvEffect, 'visibility', ''));
-	local sEffectString = DB.getValue(nodeAdvEffect, 'effect', '');
-	if sVisibility == '' and sEffectString == '' then
-		DB.setValue(nodeAdvEffect, 'visibility', 'string', Interface.getString('item_label_effects_show'));
-	end
 end
 
 function onInit()
