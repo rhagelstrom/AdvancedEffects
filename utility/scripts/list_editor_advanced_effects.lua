@@ -2,7 +2,7 @@
 -- Please see the LICENSE.md file included with this distribution for
 -- attribution and copyright information.
 --
--- luacheck: globals onLockModeChanged updateVis  addEntry
+-- luacheck: globals onLockModeChanged updateVis  addEntry onFilter
 function onLockModeChanged(bReadOnly)
     for _, w in ipairs(getWindows()) do
         w.onLockModeChanged(bReadOnly);
