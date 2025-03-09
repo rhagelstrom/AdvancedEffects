@@ -38,6 +38,9 @@ function onInit()
         if not LibraryData5E.aRecordOverrides[sRecord].aCustom.tWindowMenu['right'] then
             LibraryData5E.aRecordOverrides[sRecord].aCustom.tWindowMenu['right'] = {};
         end
+        if sRecord == 'npc' and  not LibraryData5E.aRecordOverrides[sRecord].aCustom.tWindowMenu['left'] then
+            LibraryData5E.aRecordOverrides[sRecord].aCustom.tWindowMenu['left']  = {'chat_speak'};
+        end
         table.insert(LibraryData5E.aRecordOverrides[sRecord].aCustom.tWindowMenu['right'], 1, 'version');
     end
     LibraryData.overrideRecordTypes(LibraryData5E.aRecordOverrides);
