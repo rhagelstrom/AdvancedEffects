@@ -5,12 +5,12 @@
 -->
 
 <root>
-    <windowclass name='reference_classfeatures' merge='join'>
+    <windowclass name='reference_classfeature' merge='join'>
         <script file="common/scripts/record_window_tabbed.lua" />
         <tab>
 			<name>main</name>
 			<resource>tab_main</resource>
-			<class>record_content_text</class>
+			<class>reference_classfeature_stats_specialization</class>
 			<embed />
 		</tab>
         <tab merge="add">
