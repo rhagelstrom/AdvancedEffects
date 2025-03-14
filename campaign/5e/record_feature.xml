@@ -5,7 +5,7 @@
 -->
 
 <root>
-    <windowclass name='reference_classfeature' merge='join'>
+    <windowclass name='reference_classfeatures' merge='join'>
         <script file="common/scripts/record_window_tabbed.lua" />
         <tab>
 			<name>main</name>
