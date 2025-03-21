@@ -198,8 +198,6 @@ function update()
         updateMiscEffects();
     end
 
-    effect.setVisible(bCustom);
-
     label_only.setVisible(bLabel);
 end
 
