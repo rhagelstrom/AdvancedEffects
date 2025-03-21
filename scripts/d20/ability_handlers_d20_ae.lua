@@ -28,15 +28,18 @@ function onInit()
         DB.addHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
         DB.addHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility);
     end
-    DB.addHandler('charsheet.*.effectlist', 'onChildAdded', addAbilityEffect);
-    DB.addHandler('charsheet.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.addHandler('charsheet.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
+    tNodes = {'charsheet', 'combattracker.list'};
+    for _, sName in ipairs(tNodes) do
+        DB.addHandler(sName .. '.*.effectlist', 'onChildAdded', addAbilityEffect);
+        DB.addHandler(sName .. '.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.addHandler(sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
+    end
 end
 
 function onClose()
@@ -56,21 +59,27 @@ function onClose()
         DB.removeHandler('charsheet.*.' .. sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
         DB.removeHandler('charsheet.*.' .. sName .. '', 'onChildDeleted', updateFromDeletedAbility);
     end
-    DB.removeHandler('charsheet.*.effectlist', 'onChildAdded', addAbilityEffect);
-    DB.removeHandler('charsheet.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
-    DB.removeHandler('charsheet.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
+    tNodes = {'charsheet', 'combattracker.list'};
+    for _, sName in ipairs(tNodes) do
+        DB.removeHandler(sName .. '.*.effectlist', 'onChildAdded', addAbilityEffect);
+        DB.removeHandler(sName .. '.*.effectlist.*.effect', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist.*.durdice', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist.*.durmod', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist.*.name', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist.*.durunit', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist.*.visibility', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist.*.actiononly', 'onUpdate', updateAbilityEffectsForEdit);
+        DB.removeHandler(sName .. '.*.effectlist', 'onChildDeleted', removeEffectOnAbilityEffectDelete);
+    end
 end
 
 function replaceAbilityEffects(nodeAbility)
     local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeAbility, '...')));
     if not nodeCT then
-        return;
+        nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeAbility));
+        if not nodeCT then
+            return;
+        end
     end
     local bFound;
     for _, nodeEffect in ipairs(DB.getChildList(nodeCT, 'effects')) do
@@ -81,7 +90,7 @@ function replaceAbilityEffects(nodeAbility)
             if DB.getChild(nodeAbilitySource, '...') == nodeAbility then
                 DB.deleteNode(nodeEffect); -- remove existing effect
                 bFound = true;
-                AdvancedEffects.updateItemEffects(nodeAbility);
+                AdvancedEffects.resolveActor(nodeAbility);
             end
         end
     end
@@ -91,7 +100,7 @@ end
 function addAbilityEffect(node)
     local nodeAbility = DB.getParent(node);
     if nodeAbility then
-        AdvancedEffects.updateItemEffects(nodeAbility);
+        AdvancedEffects.resolveActor(nodeAbility);
     end
 end
 
@@ -99,7 +108,7 @@ end
 function updateAbilityEffectsForEdit(node)
     local nodeAbility = DB.getChild(node, '....');
     if nodeAbility and not replaceAbilityEffects(nodeAbility) then
-        AdvancedEffects.updateItemEffects(nodeAbility);
+        AdvancedEffects.resolveActor(nodeAbility);
     end
 end
 

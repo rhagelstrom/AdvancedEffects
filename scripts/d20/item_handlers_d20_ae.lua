@@ -7,7 +7,7 @@
 --
 ---	This function removes existing effects and re-parses them.
 --	First it finds any effects that have this item as the source and removes those effects.
---	Then it calls updateItemEffects to re-parse the current/correct effects.
+--	Then it calls resolveActor to re-parse the current/correct effects.
 --
 -- luacheck: globals onInit onClose replaceItemEffects inventoryUpdateItemEffects updateItemEffectsForID
 -- luacheck: globals removeEffectOnItemEffectDelete updateFromDeletedInventory checkEffectsAfterDelete updateItemEffectsForEdit
@@ -64,7 +64,7 @@ function replaceItemEffects(nodeItem)
         if nodeItemSource and string.match(sEffSource, 'inventorylist') then
             if DB.getChild(nodeItemSource, '...') == nodeItem then
                 DB.deleteNode(nodeEffect); -- remove existing effect
-                AdvancedEffects.updateItemEffects(nodeItem);
+                AdvancedEffects.resolveActor(nodeItem);
             end
         end
     end
@@ -73,7 +73,7 @@ end
 function inventoryUpdateItemEffects(node)
     local nodeItem = DB.getParent(node);
     if nodeItem then
-        AdvancedEffects.updateItemEffects(nodeItem);
+        AdvancedEffects.resolveActor(nodeItem);
     end
 end
 

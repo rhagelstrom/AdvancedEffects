@@ -6,7 +6,7 @@
 -- Effects on Items, apply to character in CT
 --
 -- luacheck: globals AdvancedEffects onInit sendRawMessage sendEffectRemovedMessage sendEffectAddedMessage isValidCheckEffect
--- luacheck: globals updateCharEffect updateCharEffects updateItemEffect updateItemEffects
+-- luacheck: globals updateCharEffect updateCharEffects updateItemEffect resolveActor updateCharEffects
 local EffectManagerAE = nil;
 
 -- add the effect if the item is equipped and doesn't exist already
@@ -74,19 +74,19 @@ end
 --	luacheck: globals isValidCheckEffect
 function isValidCheckEffect(rActor, nodeEffect)
     if DB.getValue(nodeEffect, 'isactive', 0) == 0 then
-        return
+        return;
     end
-    local bActionItemUsed, bActionOnly = false, false
-    local sItemPath = ''
-    local sSource = DB.getValue(nodeEffect, 'source_name', '')
+    local bActionItemUsed, bActionOnly = false, false;
+    local sItemPath = '';
+    local sSource = DB.getValue(nodeEffect, 'source_name', '');
     -- if source is a valid node and we can find "actiononly"
     -- setting then we set it.
-    local node = DB.findNode(sSource)
+    local node = DB.findNode(sSource);
     if node then
-        local nodeItem = DB.getChild(node, '...')
+        local nodeItem = DB.getChild(node, '...');
         if nodeItem then
-            sItemPath = DB.getPath(nodeItem)
-            bActionOnly = (DB.getValue(node, 'actiononly', 0) ~= 0)
+            sItemPath = DB.getPath(nodeItem);
+            bActionOnly = (DB.getValue(node, 'actiononly', 0) ~= 0);
         end
     end
 
@@ -96,7 +96,7 @@ function isValidCheckEffect(rActor, nodeEffect)
             -- here is where we get the node path of the item, not the
             -- effectslist entry
             if bActionOnly and (sItemPath == rActor.itemPath) then
-                bActionItemUsed = true
+                bActionItemUsed = true;
             end
         end
 
@@ -105,15 +105,15 @@ function isValidCheckEffect(rActor, nodeEffect)
             -- here is where we get the node path of the item, not the
             -- effectslist entry
             if bActionOnly and (sItemPath == rActor.ammoPath) then
-                bActionItemUsed = true
+                bActionItemUsed = true;
             end
         end
     end
 
     if bActionOnly and not bActionItemUsed then
-        return false
+        return false;
     end
-    return true
+    return true;
 end
 
 -- this will be used to manage PC/NPC effectslist objects
@@ -232,18 +232,24 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, bEquipped, bIdentifie
     EffectManager.addEffect('', '', nodeChar, rEffect, false);
 end
 
-function updateItemEffects(nodeItem)
+function resolveActor(nodeItem)
     local nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(DB.getChild(nodeItem, '...')));
-    if not nodeChar then
+    if nodeChar then
+        -- not NPC not charsheet
+        AdvancedEffects.updateItemEffects(nodeChar, nodeItem);
+    else
+        -- Effect on char sheet or CT npc sheet
         nodeChar = ActorManager.getCTNode(ActorManager.resolveActor((nodeItem)));
-        if not nodeChar then
-            return;
+        if nodeChar then
+            AdvancedEffects.updateItemEffects(nodeChar, nodeItem);
         end
     end
+end
+
+function updateItemEffects(nodeChar, nodeItem)
 
     local bEquipped = not DB.getPath(nodeItem):match('inventorylist') or DB.getValue(nodeItem, 'carried', 1) == 2;
     local bID = not DB.getPath(nodeItem):match('inventorylist') or DB.getValue(nodeItem, 'isidentified', 1) == 1;
-
 
     for _, nodeItemEffect in ipairs(DB.getChildList(nodeItem, 'effectlist')) do
         AdvancedEffects.updateItemEffect(nodeItemEffect, DB.getValue(nodeItem, 'name', ''), nodeChar, bEquipped, bID);

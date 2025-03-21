@@ -30,7 +30,7 @@ function customAddPC(tCustom, ...)
     -- check each inventory item for effects that need to be applied
     for _, nodeItem in ipairs(DB.getChildList(tCustom['nodeRecord'], 'inventorylist')) do
         if DB.getValue(nodeItem, 'carried') == 2 then
-            AdvancedEffects.updateItemEffects(nodeItem);
+            AdvancedEffects.resolveActor(nodeItem);
         end
     end
 
@@ -38,7 +38,7 @@ function customAddPC(tCustom, ...)
     local tFields = {'specialabilitylist', 'featlist', 'proficiencylist', 'traitlist'};
     for _, fieldName in pairs(tFields) do
         for _, nodeAbility in ipairs(DB.getChildList(tCustom['nodeRecord'], fieldName)) do
-            AdvancedEffects.updateItemEffects(nodeAbility);
+            AdvancedEffects.resolveActor(nodeAbility);
         end
     end
 
