@@ -145,8 +145,6 @@ function update()
     local sType = DB.getValue(node, 'type', '');
 
     -- <values>save|ability|resist|immune|vulnerable</values>
-    local bCustom = (sType == '');
-
     local bSave = (sType == 'save');
 
     local bAbility = (sType == 'ability');

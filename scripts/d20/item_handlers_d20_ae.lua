@@ -9,7 +9,7 @@
 --	First it finds any effects that have this item as the source and removes those effects.
 --	Then it calls resolveActor to re-parse the current/correct effects.
 --
--- luacheck: globals onInit onClose replaceItemEffects inventoryUpdateItemEffects updateItemEffectsForID
+-- luacheck: globals AdvancedEffects onInit onClose replaceItemEffects inventoryUpdateItemEffects updateItemEffectsForID
 -- luacheck: globals removeEffectOnItemEffectDelete updateFromDeletedInventory checkEffectsAfterDelete updateItemEffectsForEdit
 function onInit()
     if not Session.IsHost then

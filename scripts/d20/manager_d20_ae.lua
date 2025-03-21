@@ -6,7 +6,7 @@
 -- Effects on Items, apply to character in CT
 --
 -- luacheck: globals AdvancedEffects onInit sendRawMessage sendEffectRemovedMessage sendEffectAddedMessage isValidCheckEffect
--- luacheck: globals updateCharEffect updateCharEffects updateItemEffect resolveActor updateCharEffects
+-- luacheck: globals updateCharEffect updateCharEffects updateItemEffect resolveActor updateCharEffects updateItemEffects
 local EffectManagerAE = nil;
 
 -- add the effect if the item is equipped and doesn't exist already

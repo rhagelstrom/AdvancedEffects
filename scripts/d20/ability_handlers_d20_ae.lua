@@ -9,7 +9,7 @@
 --	First it finds any effects that have this ability as the source and removes those effects.
 --	Then it calls updateAbilityEffects to re-parse the current/correct effects.
 --
--- luacheck: globals replaceAbilityEffects addAbilityEffect updateAbilityEffectsForEdit checkEffectsAfterDelete
+-- luacheck: globals AdvancedEffects replaceAbilityEffects addAbilityEffect updateAbilityEffectsForEdit checkEffectsAfterDelete
 -- luacheck: globals updateFromDeletedAbility removeEffectOnAbilityEffectDelete onInit onClose
 function onInit()
     if not Session.IsHost then
