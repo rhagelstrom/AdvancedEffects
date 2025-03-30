@@ -60,6 +60,9 @@ end
 -- build message to send that effect added
 function sendEffectAddedMessage(nodeCT, rNewEffect, _, nGMOnly)
     local sUser = DB.getOwner(nodeCT);
+    if DB.getValue(nodeCT, 'name', '') == '' then
+        return;
+    end
     -- Build output message
     local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT), sUser);
     msg.text = 'Advanced Effect [\'' .. rNewEffect.sName .. '\'] ';
@@ -150,7 +153,6 @@ function updateCharEffect(nodeCharEffect, nodeEntry)
     rEffect.sApply = DB.getValue(nodeCharEffect, 'apply', '');
     rEffect.sChangeState = DB.getValue(nodeCharEffect, 'changestate', '');
     rEffect.sName = EffectManagerAE.evalEffect(nodeEntry, rEffect.sLabel); -- handle (N)PC Effects
-
     AdvancedEffects.sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nGMOnly, User.getUsername());
     EffectManager.addEffect('', '', nodeEntry, rEffect, false);
 end

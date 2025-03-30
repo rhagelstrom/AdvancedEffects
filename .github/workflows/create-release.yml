@@ -125,7 +125,7 @@ jobs:
           FG_UPLOAD_BUILD: "TRUE"
           FG_GRAPH_SALES: "FALSE"
         run: |
-          python src/main.py
+          python -m src.main
 
       # - name: Add cumulative users graph to release
       #   uses: ncipollo/release-action@v1
