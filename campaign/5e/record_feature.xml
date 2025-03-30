@@ -10,7 +10,7 @@
         <tab>
 			<name>main</name>
 			<resource>tab_main</resource>
-			<class>reference_classfeature_stats_specialization</class>
+			<class>reference_classfeature_stats</class>
 			<embed />
 		</tab>
         <tab merge="add">
