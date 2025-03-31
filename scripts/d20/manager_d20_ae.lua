@@ -137,9 +137,9 @@ function updateCharEffect(nodeCharEffect, nodeEntry)
     if sVisibility == Interface.getString('item_label_effects_hide') then
         nGMOnly = 1;
     end
-    if not ActorManager.isPC(nodeEntry) then
-        nGMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
-    end
+    -- if not ActorManager.isPC(nodeEntry) then
+    --     nGMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
+    -- end
 
     local rEffect = {};
     rEffect.nDuration = nRollDuration;
